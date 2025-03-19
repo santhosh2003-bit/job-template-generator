@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -10,6 +9,17 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent } from '@/components/ui/card';
+import {
   Check,
   CheckCircle,
   Download,
@@ -18,9 +28,35 @@ import {
   FileCheck,
   ThumbsUp,
   X,
+  Pencil,
 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import { toast } from "@/hooks/use-toast";
+import { useForm } from 'react-hook-form';
+
+type ResumeData = {
+  personalInfo: {
+    name: string;
+    title: string;
+    email: string;
+    phone: string;
+    location: string;
+    summary: string;
+  };
+  skills: string[];
+  experience: {
+    title: string;
+    company: string;
+    location: string;
+    period: string;
+    highlights: string[];
+  }[];
+  education: {
+    degree: string;
+    school: string;
+    period: string;
+  }[];
+};
 
 const mockedResumeData = {
   personalInfo: {
@@ -76,10 +112,17 @@ const mockedResumeData = {
 type TemplateCategory = 'all' | 'minimal' | 'professional' | 'academic' | 'creative';
 
 const Templates = () => {
+  const [resumeData, setResumeData] = useState<ResumeData>(mockedResumeData);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [category, setCategory] = useState<TemplateCategory>('all');
   const [previewModal, setPreviewModal] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [currentEditSection, setCurrentEditSection] = useState<'personal' | 'skills' | 'experience' | 'education'>('personal');
   const navigate = useNavigate();
+
+  const form = useForm<ResumeData>({
+    defaultValues: resumeData
+  });
 
   const templates = [
     { 
@@ -159,7 +202,6 @@ const Templates = () => {
         title: "Resume download started",
         description: "Your resume will be downloaded shortly...",
       });
-      // In a real implementation, this would call your backend API
       setTimeout(() => {
         const link = document.createElement('a');
         const template = templates.find(t => t.id === selectedTemplate);
@@ -190,6 +232,71 @@ const Templates = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const openEditModal = (section: 'personal' | 'skills' | 'experience' | 'education') => {
+    form.reset(resumeData);
+    setCurrentEditSection(section);
+    setEditModalOpen(true);
+  };
+
+  const handleSaveEdits = (data: ResumeData) => {
+    setResumeData(data);
+    setEditModalOpen(false);
+    toast({
+      title: "Resume information updated",
+      description: "Your changes have been saved successfully.",
+    });
+  };
+
+  const addSkill = () => {
+    const currentSkills = form.getValues('skills') || [];
+    form.setValue('skills', [...currentSkills, '']);
+  };
+
+  const removeSkill = (index: number) => {
+    const currentSkills = form.getValues('skills') || [];
+    form.setValue('skills', currentSkills.filter((_, i) => i !== index));
+  };
+
+  const addExperience = () => {
+    const currentExperience = form.getValues('experience') || [];
+    form.setValue('experience', [
+      ...currentExperience, 
+      { title: '', company: '', location: '', period: '', highlights: [''] }
+    ]);
+  };
+
+  const addHighlight = (expIndex: number) => {
+    const currentExperience = form.getValues('experience') || [];
+    const updatedExperience = [...currentExperience];
+    updatedExperience[expIndex].highlights.push('');
+    form.setValue('experience', updatedExperience);
+  };
+
+  const removeHighlight = (expIndex: number, highlightIndex: number) => {
+    const currentExperience = form.getValues('experience') || [];
+    const updatedExperience = [...currentExperience];
+    updatedExperience[expIndex].highlights = updatedExperience[expIndex].highlights.filter((_, i) => i !== highlightIndex);
+    form.setValue('experience', updatedExperience);
+  };
+
+  const removeExperience = (index: number) => {
+    const currentExperience = form.getValues('experience') || [];
+    form.setValue('experience', currentExperience.filter((_, i) => i !== index));
+  };
+
+  const addEducation = () => {
+    const currentEducation = form.getValues('education') || [];
+    form.setValue('education', [
+      ...currentEducation,
+      { degree: '', school: '', period: '' }
+    ]);
+  };
+
+  const removeEducation = (index: number) => {
+    const currentEducation = form.getValues('education') || [];
+    form.setValue('education', currentEducation.filter((_, i) => i !== index));
   };
 
   return (
@@ -237,21 +344,18 @@ const Templates = () => {
                     onClick={() => handleTemplateClick(template.id)}
                   >
                     <div className="relative">
-                      {/* Actual template preview */}
                       <img 
                         src={template.image} 
                         alt={template.name} 
                         className="w-full h-80 object-cover object-top"
                       />
                       
-                      {/* Selection indicator */}
                       {selectedTemplate === template.id && (
                         <div className="absolute top-3 right-3 h-7 w-7 rounded-full bg-primary flex items-center justify-center text-white">
                           <Check className="h-4 w-4" />
                         </div>
                       )}
                       
-                      {/* Popular badge */}
                       {template.popular && (
                         <div className="absolute top-3 left-3 px-2 py-1 rounded-md bg-primary/80 text-white text-xs font-medium">
                           Popular
@@ -274,11 +378,10 @@ const Templates = () => {
           </Tabs>
         </div>
 
-        {/* Resume Data Preview */}
         <div className="glass-card rounded-xl p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Your Resume Information</h2>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => openEditModal('personal')}>
               <Edit className="h-4 w-4 mr-2" />
               Edit Details
             </Button>
@@ -291,20 +394,30 @@ const Templates = () => {
                 Personal Information
               </h3>
               <div className="space-y-3 text-sm">
-                <p><span className="font-medium">Name:</span> {mockedResumeData.personalInfo.name}</p>
-                <p><span className="font-medium">Title:</span> {mockedResumeData.personalInfo.title}</p>
-                <p><span className="font-medium">Contact:</span> {mockedResumeData.personalInfo.email} | {mockedResumeData.personalInfo.phone}</p>
-                <p><span className="font-medium">Location:</span> {mockedResumeData.personalInfo.location}</p>
+                <p><span className="font-medium">Name:</span> {resumeData.personalInfo.name}</p>
+                <p><span className="font-medium">Title:</span> {resumeData.personalInfo.title}</p>
+                <p><span className="font-medium">Contact:</span> {resumeData.personalInfo.email} | {resumeData.personalInfo.phone}</p>
+                <p><span className="font-medium">Location:</span> {resumeData.personalInfo.location}</p>
               </div>
             </div>
             
             <div>
-              <h3 className="font-medium mb-2 flex items-center">
-                <CheckCircle className="h-4 w-4 text-primary mr-2" />
-                Skills
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium mb-2 flex items-center">
+                  <CheckCircle className="h-4 w-4 text-primary mr-2" />
+                  Skills
+                </h3>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-6 px-2" 
+                  onClick={() => openEditModal('skills')}
+                >
+                  <Pencil className="h-3 w-3" />
+                </Button>
+              </div>
               <div className="flex flex-wrap gap-2">
-                {mockedResumeData.skills.map((skill, index) => (
+                {resumeData.skills.map((skill, index) => (
                   <span key={index} className="px-2 py-1 bg-secondary rounded-full text-xs">
                     {skill}
                   </span>
@@ -314,12 +427,22 @@ const Templates = () => {
           </div>
           
           <div className="mt-4">
-            <h3 className="font-medium mb-2 flex items-center">
-              <CheckCircle className="h-4 w-4 text-primary mr-2" />
-              Experience
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium mb-2 flex items-center">
+                <CheckCircle className="h-4 w-4 text-primary mr-2" />
+                Experience
+              </h3>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-6 px-2" 
+                onClick={() => openEditModal('experience')}
+              >
+                <Pencil className="h-3 w-3" />
+              </Button>
+            </div>
             <div className="space-y-4">
-              {mockedResumeData.experience.map((exp, index) => (
+              {resumeData.experience.map((exp, index) => (
                 <div key={index} className="text-sm">
                   <div className="flex justify-between mb-1">
                     <p className="font-medium">{exp.title}</p>
@@ -330,9 +453,36 @@ const Templates = () => {
               ))}
             </div>
           </div>
+
+          <div className="mt-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium mb-2 flex items-center">
+                <CheckCircle className="h-4 w-4 text-primary mr-2" />
+                Education
+              </h3>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-6 px-2" 
+                onClick={() => openEditModal('education')}
+              >
+                <Pencil className="h-3 w-3" />
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {resumeData.education.map((edu, index) => (
+                <div key={index} className="text-sm">
+                  <div className="flex justify-between mb-1">
+                    <p className="font-medium">{edu.degree}</p>
+                    <p className="text-muted-foreground">{edu.period}</p>
+                  </div>
+                  <p className="text-muted-foreground">{edu.school}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* Actions */}
         <div className="flex justify-between items-center">
           <div className="flex gap-4">
             <Button variant="outline" onClick={handlePreview}>
@@ -353,7 +503,6 @@ const Templates = () => {
           </Button>
         </div>
 
-        {/* Template Preview Modal */}
         {previewModal && selectedTemplate && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
@@ -385,6 +534,363 @@ const Templates = () => {
             </div>
           </div>
         )}
+
+        <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-auto">
+            <DialogHeader>
+              <DialogTitle>
+                Edit Resume Information
+              </DialogTitle>
+            </DialogHeader>
+            
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleSaveEdits)} className="space-y-6">
+                <Tabs defaultValue={currentEditSection} className="w-full">
+                  <TabsList className="mb-4">
+                    <TabsTrigger value="personal">Personal</TabsTrigger>
+                    <TabsTrigger value="skills">Skills</TabsTrigger>
+                    <TabsTrigger value="experience">Experience</TabsTrigger>
+                    <TabsTrigger value="education">Education</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="personal" className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="personalInfo.name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="John Doe" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="personalInfo.title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Job Title</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Software Engineer" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="personalInfo.email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <Input placeholder="email@example.com" {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="personalInfo.phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone</FormLabel>
+                            <FormControl>
+                              <Input placeholder="(123) 456-7890" {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <FormField
+                      control={form.control}
+                      name="personalInfo.location"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Location</FormLabel>
+                          <FormControl>
+                            <Input placeholder="City, State" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="personalInfo.summary"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Summary</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Brief professional summary..." 
+                              className="min-h-[100px]" 
+                              {...field} 
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </TabsContent>
+                  
+                  <TabsContent value="skills" className="space-y-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-sm font-medium">Skills</h3>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={addSkill}
+                      >
+                        Add Skill
+                      </Button>
+                    </div>
+                    
+                    <Card>
+                      <CardContent className="p-4 space-y-2">
+                        {form.watch('skills')?.map((_, index) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <FormField
+                              control={form.control}
+                              name={`skills.${index}`}
+                              render={({ field }) => (
+                                <FormItem className="flex-1 mb-0">
+                                  <FormControl>
+                                    <Input placeholder="e.g. JavaScript" {...field} />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8" 
+                              onClick={() => removeSkill(index)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                  
+                  <TabsContent value="experience" className="space-y-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-sm font-medium">Work Experience</h3>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={addExperience}
+                      >
+                        Add Experience
+                      </Button>
+                    </div>
+                    
+                    {form.watch('experience')?.map((_, expIndex) => (
+                      <Card key={expIndex} className="mb-4">
+                        <CardContent className="p-4 space-y-4">
+                          <div className="flex justify-between">
+                            <h4 className="text-sm font-medium">Experience {expIndex + 1}</h4>
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8" 
+                              onClick={() => removeExperience(expIndex)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          
+                          <FormField
+                            control={form.control}
+                            name={`experience.${expIndex}.title`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Title</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Software Engineer" {...field} />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name={`experience.${expIndex}.company`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Company</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="Company Name" {...field} />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                            
+                            <FormField
+                              control={form.control}
+                              name={`experience.${expIndex}.location`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Location</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="City, State" {...field} />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          
+                          <FormField
+                            control={form.control}
+                            name={`experience.${expIndex}.period`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Period</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Jan 2021 - Present" {...field} />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <div>
+                            <div className="flex justify-between items-center mb-2">
+                              <FormLabel>Highlights</FormLabel>
+                              <Button 
+                                type="button" 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => addHighlight(expIndex)}
+                              >
+                                Add Highlight
+                              </Button>
+                            </div>
+                            
+                            {form.watch(`experience.${expIndex}.highlights`)?.map((_, highlightIndex) => (
+                              <div key={highlightIndex} className="flex items-center gap-2 mb-2">
+                                <FormField
+                                  control={form.control}
+                                  name={`experience.${expIndex}.highlights.${highlightIndex}`}
+                                  render={({ field }) => (
+                                    <FormItem className="flex-1 mb-0">
+                                      <FormControl>
+                                        <Input placeholder="Accomplishment or responsibility..." {...field} />
+                                      </FormControl>
+                                    </FormItem>
+                                  )}
+                                />
+                                <Button 
+                                  type="button" 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-8 w-8" 
+                                  onClick={() => removeHighlight(expIndex, highlightIndex)}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </TabsContent>
+                  
+                  <TabsContent value="education" className="space-y-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-sm font-medium">Education</h3>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={addEducation}
+                      >
+                        Add Education
+                      </Button>
+                    </div>
+                    
+                    {form.watch('education')?.map((_, eduIndex) => (
+                      <Card key={eduIndex} className="mb-4">
+                        <CardContent className="p-4 space-y-4">
+                          <div className="flex justify-between">
+                            <h4 className="text-sm font-medium">Education {eduIndex + 1}</h4>
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8" 
+                              onClick={() => removeEducation(eduIndex)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          
+                          <FormField
+                            control={form.control}
+                            name={`education.${eduIndex}.degree`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Degree</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Bachelor of Science in Computer Science" {...field} />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name={`education.${eduIndex}.school`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>School</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="University Name" {...field} />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name={`education.${eduIndex}.period`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Period</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="2016 - 2020" {...field} />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </TabsContent>
+                </Tabs>
+                
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setEditModalOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit">Save Changes</Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );
