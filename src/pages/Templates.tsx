@@ -19,6 +19,7 @@ import {
   ThumbsUp,
 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
+import { toast } from "@/hooks/use-toast";
 
 const mockedResumeData = {
   personalInfo: {
@@ -71,29 +72,64 @@ const mockedResumeData = {
   ]
 };
 
-const templateColors = {
-  minimal: "bg-white",
-  modern: "bg-gray-50",
-  professional: "bg-blue-50",
-  creative: "bg-purple-50"
-};
-
-type TemplateCategory = 'all' | 'minimal' | 'modern' | 'professional' | 'creative';
+type TemplateCategory = 'all' | 'minimal' | 'professional' | 'academic' | 'creative';
 
 const Templates = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [category, setCategory] = useState<TemplateCategory>('all');
+  const [previewModal, setPreviewModal] = useState(false);
   const navigate = useNavigate();
 
   const templates = [
-    { id: "template1", name: "Stockholm", category: "minimal", popular: true },
-    { id: "template2", name: "Berlin", category: "modern", popular: true },
-    { id: "template3", name: "Paris", category: "professional" },
-    { id: "template4", name: "Tokyo", category: "creative", popular: true },
-    { id: "template5", name: "New York", category: "minimal" },
-    { id: "template6", name: "Sydney", category: "modern" },
-    { id: "template7", name: "London", category: "professional", popular: true },
-    { id: "template8", name: "Vienna", category: "creative" },
+    { 
+      id: "template1", 
+      name: "Professional Clean", 
+      category: "professional", 
+      popular: true,
+      image: "/lovable-uploads/f48bebe0-0d22-424e-945c-0766c5010c9d.png"
+    },
+    { 
+      id: "template2", 
+      name: "Academic", 
+      category: "academic", 
+      popular: false,
+      image: "/lovable-uploads/0fe25031-2317-4f6b-a80c-9e183b89db34.png"
+    },
+    { 
+      id: "template3", 
+      name: "Technical Detail", 
+      category: "professional", 
+      popular: true,
+      image: "/lovable-uploads/506d859b-1ee9-4a76-9bc5-2aab31eb2713.png"
+    },
+    { 
+      id: "template4", 
+      name: "Modern Achievements", 
+      category: "professional", 
+      popular: true,
+      image: "/lovable-uploads/da38501c-178a-4ab5-83d2-24f271ab872d.png"
+    },
+    { 
+      id: "template5", 
+      name: "Tech Minimalist", 
+      category: "minimal", 
+      popular: false,
+      image: "/lovable-uploads/045b3ae8-1bc8-4c03-9056-6e34fc137969.png"
+    },
+    { 
+      id: "template6", 
+      name: "Experience Focus", 
+      category: "professional", 
+      popular: false,
+      image: "/lovable-uploads/8084e7d7-bcd4-443b-83fd-039f4f8ef460.png"
+    },
+    { 
+      id: "template7", 
+      name: "Data Analyst", 
+      category: "professional", 
+      popular: true,
+      image: "/lovable-uploads/f56216a3-d7af-4bcc-b113-acb98a9e8f4f.png"
+    },
   ];
 
   const filteredTemplates = category === 'all' 
@@ -104,9 +140,54 @@ const Templates = () => {
     setSelectedTemplate(templateId);
   };
 
+  const handlePreview = () => {
+    if (selectedTemplate) {
+      setPreviewModal(true);
+    } else {
+      toast({
+        title: "No template selected",
+        description: "Please select a template to preview",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDownload = () => {
+    if (selectedTemplate) {
+      toast({
+        title: "Resume download started",
+        description: "Your resume will be downloaded shortly...",
+      });
+      // In a real implementation, this would call your backend API
+      setTimeout(() => {
+        const link = document.createElement('a');
+        const template = templates.find(t => t.id === selectedTemplate);
+        if (template) {
+          link.href = template.image;
+          link.download = `resume-${template.name.toLowerCase().replace(/\s+/g, '-')}.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }, 1500);
+    } else {
+      toast({
+        title: "No template selected",
+        description: "Please select a template to download",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleContinue = () => {
     if (selectedTemplate) {
       navigate('/jobs');
+    } else {
+      toast({
+        title: "No template selected",
+        description: "Please select a template to continue",
+        variant: "destructive",
+      });
     }
   };
 
@@ -133,14 +214,14 @@ const Templates = () => {
               <TabsList className="glass">
                 <TabsTrigger value="all">All Templates</TabsTrigger>
                 <TabsTrigger value="minimal">Minimal</TabsTrigger>
-                <TabsTrigger value="modern">Modern</TabsTrigger>
                 <TabsTrigger value="professional">Professional</TabsTrigger>
+                <TabsTrigger value="academic">Academic</TabsTrigger>
                 <TabsTrigger value="creative">Creative</TabsTrigger>
               </TabsList>
             </div>
 
             <TabsContent value={category} className="mt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredTemplates.map((template) => (
                   <motion.div 
                     key={template.id}
@@ -154,28 +235,24 @@ const Templates = () => {
                     }`}
                     onClick={() => handleTemplateClick(template.id)}
                   >
-                    <div className={`h-48 ${templateColors[template.category as keyof typeof templateColors]} relative`}>
-                      {/* Template preview mockup */}
-                      <div className="absolute inset-4 border border-gray-200 rounded shadow-sm p-2 bg-white">
-                        <div className="h-6 bg-primary/10 w-24 mx-auto mb-2"></div>
-                        <div className="h-3 bg-gray-200 w-full mb-2"></div>
-                        <div className="h-3 bg-gray-200 w-5/6 mb-2"></div>
-                        <div className="h-3 bg-gray-200 w-full mb-4"></div>
-                        <div className="h-2 bg-gray-100 w-full mb-1"></div>
-                        <div className="h-2 bg-gray-100 w-full mb-1"></div>
-                        <div className="h-2 bg-gray-100 w-3/4 mb-2"></div>
-                      </div>
+                    <div className="relative">
+                      {/* Actual template preview */}
+                      <img 
+                        src={template.image} 
+                        alt={template.name} 
+                        className="w-full h-80 object-cover object-top"
+                      />
                       
                       {/* Selection indicator */}
                       {selectedTemplate === template.id && (
-                        <div className="absolute top-2 right-2 h-6 w-6 rounded-full bg-primary flex items-center justify-center text-white">
-                          <Check size={14} />
+                        <div className="absolute top-3 right-3 h-7 w-7 rounded-full bg-primary flex items-center justify-center text-white">
+                          <Check className="h-4 w-4" />
                         </div>
                       )}
                       
                       {/* Popular badge */}
                       {template.popular && (
-                        <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-primary/80 text-white text-xs font-medium">
+                        <div className="absolute top-3 left-3 px-2 py-1 rounded-md bg-primary/80 text-white text-xs font-medium">
                           Popular
                         </div>
                       )}
@@ -257,11 +334,11 @@ const Templates = () => {
         {/* Actions */}
         <div className="flex justify-between items-center">
           <div className="flex gap-4">
-            <Button variant="outline" disabled={!selectedTemplate}>
+            <Button variant="outline" onClick={handlePreview}>
               <Eye className="h-4 w-4 mr-2" />
               Preview
             </Button>
-            <Button variant="outline" disabled={!selectedTemplate}>
+            <Button variant="outline" onClick={handleDownload}>
               <Download className="h-4 w-4 mr-2" />
               Download
             </Button>
@@ -274,6 +351,39 @@ const Templates = () => {
             <FileCheck className="h-4 w-4 ml-2" />
           </Button>
         </div>
+
+        {/* Template Preview Modal */}
+        {previewModal && selectedTemplate && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
+              <div className="p-4 border-b flex justify-between items-center">
+                <h3 className="font-medium text-lg">
+                  {templates.find(t => t.id === selectedTemplate)?.name} Preview
+                </h3>
+                <Button variant="ghost" size="icon" onClick={() => setPreviewModal(false)}>
+                  <span className="sr-only">Close</span>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="p-4">
+                <img 
+                  src={templates.find(t => t.id === selectedTemplate)?.image} 
+                  alt="Resume Preview" 
+                  className="max-w-full max-h-[70vh] mx-auto"
+                />
+              </div>
+              <div className="p-4 border-t flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setPreviewModal(false)}>
+                  Close
+                </Button>
+                <Button onClick={handleDownload}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );
