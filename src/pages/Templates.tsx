@@ -17,6 +17,7 @@ import {
   Eye,
   FileCheck,
   ThumbsUp,
+  X,
 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import { toast } from "@/hooks/use-toast";
