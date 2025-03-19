@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -14,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -33,6 +35,8 @@ import {
 import Layout from '@/components/layout/Layout';
 import { toast } from "@/hooks/use-toast";
 import { useForm } from 'react-hook-form';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 type ResumeData = {
   personalInfo: {
@@ -118,6 +122,9 @@ const Templates = () => {
   const [previewModal, setPreviewModal] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentEditSection, setCurrentEditSection] = useState<'personal' | 'skills' | 'experience' | 'education'>('personal');
+  const [generatingPdf, setGeneratingPdf] = useState(false);
+  const [personalized, setPersonalized] = useState<boolean>(false);
+  const [personalizedPreviewUrl, setPersonalizedPreviewUrl] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const form = useForm<ResumeData>({
@@ -180,13 +187,251 @@ const Templates = () => {
     ? templates 
     : templates.filter(t => t.category === category);
 
-  const handleTemplateClick = (templateId: string) => {
-    setSelectedTemplate(templateId);
+  const generatePersonalizedTemplate = async () => {
+    if (!selectedTemplate) return null;
+    
+    // Create a canvas element to render the personalized resume
+    const templateDiv = document.createElement('div');
+    templateDiv.id = 'personalizedTemplate';
+    templateDiv.style.width = '800px';
+    templateDiv.style.height = '1130px'; // A4 ratio
+    templateDiv.style.position = 'absolute';
+    templateDiv.style.left = '-9999px';
+    document.body.appendChild(templateDiv);
+    
+    const selectedTemplateData = templates.find(t => t.id === selectedTemplate);
+    
+    // Template specific styling based on the selected template
+    let templateHtml = '';
+    
+    if (selectedTemplate === 'template1') {
+      // Professional Clean template
+      templateHtml = `
+        <div style="font-family: Arial, sans-serif; padding: 40px; height: 100%;">
+          <div style="border-bottom: 2px solid #2563eb; margin-bottom: 20px;">
+            <h1 style="color: #1e40af; margin: 0; font-size: 28px;">${resumeData.personalInfo.name}</h1>
+            <h2 style="color: #3b82f6; margin: 5px 0; font-size: 20px;">${resumeData.personalInfo.title}</h2>
+            <div style="display: flex; justify-content: space-between; margin-top: 10px; color: #4b5563; font-size: 14px;">
+              <div>${resumeData.personalInfo.email}</div>
+              <div>${resumeData.personalInfo.phone}</div>
+              <div>${resumeData.personalInfo.location}</div>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Summary</h3>
+            <p>${resumeData.personalInfo.summary}</p>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Skills</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              ${resumeData.skills.map(skill => `
+                <span style="background-color: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 13px;">${skill}</span>
+              `).join('')}
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Experience</h3>
+            ${resumeData.experience.map(exp => `
+              <div style="margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                  <h4 style="margin: 0; font-size: 17px;">${exp.title}</h4>
+                  <div style="color: #4b5563; font-size: 14px;">${exp.period}</div>
+                </div>
+                <div style="color: #4b5563; font-size: 15px; margin-bottom: 6px;">${exp.company}, ${exp.location}</div>
+                <ul style="margin-top: 5px; padding-left: 20px;">
+                  ${exp.highlights.map(highlight => `
+                    <li style="margin-bottom: 3px;">${highlight}</li>
+                  `).join('')}
+                </ul>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div>
+            <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Education</h3>
+            ${resumeData.education.map(edu => `
+              <div style="margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                  <h4 style="margin: 0; font-size: 17px;">${edu.degree}</h4>
+                  <div style="color: #4b5563; font-size: 14px;">${edu.period}</div>
+                </div>
+                <div style="color: #4b5563; font-size: 15px;">${edu.school}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    } else if (selectedTemplate === 'template2') {
+      // Academic template
+      templateHtml = `
+        <div style="font-family: Times New Roman, serif; padding: 40px; height: 100%;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="font-size: 24px; margin: 0; text-transform: uppercase; letter-spacing: 2px;">${resumeData.personalInfo.name}</h1>
+            <h2 style="font-size: 18px; margin: 5px 0; font-weight: normal;">${resumeData.personalInfo.title}</h2>
+            <div style="font-size: 14px; margin-top: 10px;">
+              <div>${resumeData.personalInfo.email} | ${resumeData.personalInfo.phone} | ${resumeData.personalInfo.location}</div>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 16px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px;">Objective</h3>
+            <p>${resumeData.personalInfo.summary}</p>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 16px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px;">Education</h3>
+            ${resumeData.education.map(edu => `
+              <div style="margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                  <h4 style="margin: 0; font-size: 15px; font-weight: bold;">${edu.degree}</h4>
+                  <div style="font-size: 14px;">${edu.period}</div>
+                </div>
+                <div style="font-style: italic; font-size: 14px;">${edu.school}</div>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 16px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px;">Experience</h3>
+            ${resumeData.experience.map(exp => `
+              <div style="margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                  <h4 style="margin: 0; font-size: 15px; font-weight: bold;">${exp.title}</h4>
+                  <div style="font-size: 14px;">${exp.period}</div>
+                </div>
+                <div style="font-style: italic; font-size: 14px; margin-bottom: 6px;">${exp.company}, ${exp.location}</div>
+                <ul style="margin-top: 5px; padding-left: 20px;">
+                  ${exp.highlights.map(highlight => `
+                    <li style="margin-bottom: 3px;">${highlight}</li>
+                  `).join('')}
+                </ul>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div>
+            <h3 style="font-size: 16px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px;">Skills</h3>
+            <p>${resumeData.skills.join(', ')}</p>
+          </div>
+        </div>
+      `;
+    } else {
+      // Default template for other template types
+      templateHtml = `
+        <div style="font-family: Arial, sans-serif; padding: 30px; height: 100%;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="font-size: 26px; margin: 0;">${resumeData.personalInfo.name}</h1>
+            <h2 style="font-size: 18px; margin: 5px 0; color: #666;">${resumeData.personalInfo.title}</h2>
+            <div style="font-size: 14px; margin-top: 10px; color: #555;">
+              <div>${resumeData.personalInfo.email} | ${resumeData.personalInfo.phone} | ${resumeData.personalInfo.location}</div>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">Summary</h3>
+            <p>${resumeData.personalInfo.summary}</p>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">Skills</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              ${resumeData.skills.map(skill => `
+                <span style="background-color: #f3f4f6; padding: 3px 8px; border-radius: 4px; font-size: 13px;">${skill}</span>
+              `).join('')}
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">Experience</h3>
+            ${resumeData.experience.map(exp => `
+              <div style="margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                  <h4 style="margin: 0; font-size: 16px; color: #333;">${exp.title}</h4>
+                  <div style="color: #666; font-size: 14px;">${exp.period}</div>
+                </div>
+                <div style="color: #555; font-size: 14px; margin-bottom: 6px;">${exp.company}, ${exp.location}</div>
+                <ul style="margin-top: 5px; padding-left: 20px;">
+                  ${exp.highlights.map(highlight => `
+                    <li style="margin-bottom: 3px;">${highlight}</li>
+                  `).join('')}
+                </ul>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div>
+            <h3 style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">Education</h3>
+            ${resumeData.education.map(edu => `
+              <div style="margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                  <h4 style="margin: 0; font-size: 16px; color: #333;">${edu.degree}</h4>
+                  <div style="color: #666; font-size: 14px;">${edu.period}</div>
+                </div>
+                <div style="color: #555; font-size: 14px;">${edu.school}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+    
+    // Set the HTML content
+    templateDiv.innerHTML = templateHtml;
+    
+    try {
+      // Generate image from the personalized template
+      const canvas = await html2canvas(templateDiv, {
+        scale: 2, // Higher resolution
+        logging: false,
+        useCORS: true,
+        backgroundColor: 'white'
+      });
+      
+      // Convert canvas to data URL
+      const imageUrl = canvas.toDataURL('image/png');
+      
+      // Clean up
+      document.body.removeChild(templateDiv);
+      
+      return imageUrl;
+    } catch (error) {
+      console.error('Error generating personalized template:', error);
+      document.body.removeChild(templateDiv);
+      return null;
+    }
   };
 
-  const handlePreview = () => {
+  const handleTemplateClick = (templateId: string) => {
+    setSelectedTemplate(templateId);
+    // Reset personalized preview when selecting a new template
+    setPersonalized(false);
+    setPersonalizedPreviewUrl(null);
+  };
+
+  const handlePreview = async () => {
     if (selectedTemplate) {
-      setPreviewModal(true);
+      // Generate personalized preview
+      setGeneratingPdf(true);
+      const previewUrl = await generatePersonalizedTemplate();
+      setGeneratingPdf(false);
+      
+      if (previewUrl) {
+        setPersonalizedPreviewUrl(previewUrl);
+        setPersonalized(true);
+        setPreviewModal(true);
+      } else {
+        // Fallback to template image if personalization fails
+        setPersonalized(false);
+        setPreviewModal(true);
+        toast({
+          title: "Could not generate personalized preview",
+          description: "Using template preview instead",
+          variant: "destructive",
+        });
+      }
     } else {
       toast({
         title: "No template selected",
@@ -196,23 +441,53 @@ const Templates = () => {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (selectedTemplate) {
+      setGeneratingPdf(true);
       toast({
-        title: "Resume download started",
-        description: "Your resume will be downloaded shortly...",
+        title: "Generating your personalized resume",
+        description: "This may take a moment...",
       });
-      setTimeout(() => {
-        const link = document.createElement('a');
-        const template = templates.find(t => t.id === selectedTemplate);
-        if (template) {
-          link.href = template.image;
-          link.download = `resume-${template.name.toLowerCase().replace(/\s+/g, '-')}.pdf`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+      
+      // Get the selected template
+      const template = templates.find(t => t.id === selectedTemplate);
+      
+      try {
+        // Generate personalized template
+        const imageUrl = await generatePersonalizedTemplate();
+        
+        if (imageUrl) {
+          // Create PDF
+          const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'px',
+            format: [800, 1130]
+          });
+          
+          // Add the image to the PDF
+          pdf.addImage(imageUrl, 'PNG', 0, 0, 800, 1130);
+          
+          // Download PDF
+          pdf.save(`resume-${resumeData.personalInfo.name.toLowerCase().replace(/\s+/g, '-')}-${template?.name.toLowerCase().replace(/\s+/g, '-')}.pdf`);
+          
+          toast({
+            title: "Resume downloaded!",
+            description: "Your personalized resume has been downloaded as a PDF",
+            variant: "default",
+          });
+        } else {
+          throw new Error("Failed to generate personalized template");
         }
-      }, 1500);
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        toast({
+          title: "Download failed",
+          description: "There was a problem generating your resume. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setGeneratingPdf(false);
+      }
     } else {
       toast({
         title: "No template selected",
@@ -485,18 +760,36 @@ const Templates = () => {
 
         <div className="flex justify-between items-center">
           <div className="flex gap-4">
-            <Button variant="outline" onClick={handlePreview}>
-              <Eye className="h-4 w-4 mr-2" />
-              Preview
+            <Button variant="outline" onClick={handlePreview} disabled={generatingPdf}>
+              {generatingPdf ? (
+                <>
+                  <span className="animate-spin mr-2">⏳</span>
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Eye className="h-4 w-4 mr-2" />
+                  Preview
+                </>
+              )}
             </Button>
-            <Button variant="outline" onClick={handleDownload}>
-              <Download className="h-4 w-4 mr-2" />
-              Download
+            <Button variant="outline" onClick={handleDownload} disabled={generatingPdf}>
+              {generatingPdf ? (
+                <>
+                  <span className="animate-spin mr-2">⏳</span>
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+                </>
+              )}
             </Button>
           </div>
           <Button 
             onClick={handleContinue}
-            disabled={!selectedTemplate}
+            disabled={!selectedTemplate || generatingPdf}
           >
             Continue to Job Matches
             <FileCheck className="h-4 w-4 ml-2" />
@@ -508,7 +801,7 @@ const Templates = () => {
             <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
               <div className="p-4 border-b flex justify-between items-center">
                 <h3 className="font-medium text-lg">
-                  {templates.find(t => t.id === selectedTemplate)?.name} Preview
+                  {templates.find(t => t.id === selectedTemplate)?.name} {personalized ? "Personalized" : ""} Preview
                 </h3>
                 <Button variant="ghost" size="icon" onClick={() => setPreviewModal(false)}>
                   <span className="sr-only">Close</span>
@@ -516,19 +809,36 @@ const Templates = () => {
                 </Button>
               </div>
               <div className="p-4">
-                <img 
-                  src={templates.find(t => t.id === selectedTemplate)?.image} 
-                  alt="Resume Preview" 
-                  className="max-w-full max-h-[70vh] mx-auto"
-                />
+                {personalized && personalizedPreviewUrl ? (
+                  <img 
+                    src={personalizedPreviewUrl} 
+                    alt="Personalized Resume Preview" 
+                    className="max-w-full max-h-[70vh] mx-auto"
+                  />
+                ) : (
+                  <img 
+                    src={templates.find(t => t.id === selectedTemplate)?.image} 
+                    alt="Resume Preview" 
+                    className="max-w-full max-h-[70vh] mx-auto"
+                  />
+                )}
               </div>
               <div className="p-4 border-t flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setPreviewModal(false)}>
                   Close
                 </Button>
-                <Button onClick={handleDownload}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Download
+                <Button onClick={handleDownload} disabled={generatingPdf}>
+                  {generatingPdf ? (
+                    <>
+                      <span className="animate-spin mr-2">⏳</span>
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
