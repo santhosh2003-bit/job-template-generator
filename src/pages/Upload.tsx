@@ -6,9 +6,9 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import Layout from '@/components/layout/Layout';
-import { Check, FileText, Upload, File, X, Loader2 } from 'lucide-react';
+import { Check, FileText, Upload as UploadIcon, File, X, Loader2 } from 'lucide-react';
 
-const Upload = () => {
+const ResumeUpload = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -122,12 +122,12 @@ const Upload = () => {
   };
 
   const steps = [
-    { label: "Upload", icon: <Upload size={18} /> },
-    { label: "Uploading", icon: <Loader2 size={18} className="animate-spin" /> },
-    { label: "Analyzing", icon: <Loader2 size={18} className="animate-spin" /> },
-    { label: "Extracting", icon: <Loader2 size={18} className="animate-spin" /> },
-    { label: "Formatting", icon: <Loader2 size={18} className="animate-spin" /> },
-    { label: "Complete", icon: <Check size={18} /> },
+    { label: "Upload", icon: <UploadIcon className="h-[18px] w-[18px]" /> },
+    { label: "Uploading", icon: <Loader2 className="h-[18px] w-[18px] animate-spin" /> },
+    { label: "Analyzing", icon: <Loader2 className="h-[18px] w-[18px] animate-spin" /> },
+    { label: "Extracting", icon: <Loader2 className="h-[18px] w-[18px] animate-spin" /> },
+    { label: "Formatting", icon: <Loader2 className="h-[18px] w-[18px] animate-spin" /> },
+    { label: "Complete", icon: <Check className="h-[18px] w-[18px]" /> },
   ];
 
   return (
@@ -175,7 +175,7 @@ const Upload = () => {
                     'bg-white border-muted text-muted-foreground'
                   }`}
                 >
-                  {i < step ? <Check size={16} /> : s.icon}
+                  {i < step ? <Check className="h-4 w-4" /> : s.icon}
                 </div>
                 <div className={`text-xs mt-2 text-center transition-colors ${
                   i <= step ? 'text-primary font-medium' : 'text-muted-foreground'
@@ -228,7 +228,7 @@ const Upload = () => {
                     variant="outline"
                     className="relative"
                   >
-                    <Upload className="mr-2 h-4 w-4" />
+                    <UploadIcon className="mr-2 h-4 w-4" />
                     Browse Files
                   </Button>
                 </div>
@@ -330,7 +330,7 @@ const Upload = () => {
                       status === 'current' ? 'bg-primary text-white' :
                       'bg-muted'
                     }`}>
-                      {status === 'complete' ? <Check size={16} /> : s.icon}
+                      {status === 'complete' ? <Check className="h-4 w-4" /> : s.icon}
                     </div>
                     <div>
                       <p className="font-medium">{s.label}</p>
@@ -351,4 +351,4 @@ const Upload = () => {
   );
 };
 
-export default Upload;
+export default ResumeUpload;
