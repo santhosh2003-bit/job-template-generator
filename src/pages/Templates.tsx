@@ -199,183 +199,517 @@ const Templates = () => {
     templateDiv.style.left = '-9999px';
     document.body.appendChild(templateDiv);
     
-    const selectedTemplateData = templates.find(t => t.id === selectedTemplate);
-    
     // Template specific styling based on the selected template
     let templateHtml = '';
     
-    if (selectedTemplate === 'template1') {
-      // Professional Clean template
-      templateHtml = `
-        <div style="font-family: Arial, sans-serif; padding: 40px; height: 100%;">
-          <div style="border-bottom: 2px solid #2563eb; margin-bottom: 20px;">
-            <h1 style="color: #1e40af; margin: 0; font-size: 28px;">${resumeData.personalInfo.name}</h1>
-            <h2 style="color: #3b82f6; margin: 5px 0; font-size: 20px;">${resumeData.personalInfo.title}</h2>
-            <div style="display: flex; justify-content: space-between; margin-top: 10px; color: #4b5563; font-size: 14px;">
-              <div>${resumeData.personalInfo.email}</div>
-              <div>${resumeData.personalInfo.phone}</div>
-              <div>${resumeData.personalInfo.location}</div>
+    // Choose template format based on the selected template ID
+    switch(selectedTemplate) {
+      case 'template1':
+        // Professional Clean template (Blue accents)
+        templateHtml = `
+          <div style="font-family: Arial, sans-serif; padding: 40px; height: 100%; color: #333;">
+            <div style="border-bottom: 2px solid #2563eb; margin-bottom: 20px;">
+              <h1 style="color: #1e40af; margin: 0; font-size: 28px;">${resumeData.personalInfo.name}</h1>
+              <h2 style="color: #3b82f6; margin: 5px 0; font-size: 20px;">${resumeData.personalInfo.title}</h2>
+              <div style="display: flex; justify-content: space-between; margin-top: 10px; color: #4b5563; font-size: 14px;">
+                <div>${resumeData.personalInfo.email}</div>
+                <div>${resumeData.personalInfo.phone}</div>
+                <div>${resumeData.personalInfo.location}</div>
+              </div>
             </div>
-          </div>
-          
-          <div style="margin-bottom: 20px;">
-            <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Summary</h3>
-            <p>${resumeData.personalInfo.summary}</p>
-          </div>
-          
-          <div style="margin-bottom: 20px;">
-            <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Skills</h3>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-              ${resumeData.skills.map(skill => `
-                <span style="background-color: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 13px;">${skill}</span>
+            
+            <div style="margin-bottom: 20px;">
+              <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Summary</h3>
+              <p>${resumeData.personalInfo.summary}</p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Skills</h3>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                ${resumeData.skills.map(skill => `
+                  <span style="background-color: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 13px;">${skill}</span>
+                `).join('')}
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Experience</h3>
+              ${resumeData.experience.map(exp => `
+                <div style="margin-bottom: 15px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <h4 style="margin: 0; font-size: 17px;">${exp.title}</h4>
+                    <div style="color: #4b5563; font-size: 14px;">${exp.period}</div>
+                  </div>
+                  <div style="color: #4b5563; font-size: 15px; margin-bottom: 6px;">${exp.company}, ${exp.location}</div>
+                  <ul style="margin-top: 5px; padding-left: 20px;">
+                    ${exp.highlights.map(highlight => `
+                      <li style="margin-bottom: 3px;">${highlight}</li>
+                    `).join('')}
+                  </ul>
+                </div>
+              `).join('')}
+            </div>
+            
+            <div>
+              <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Education</h3>
+              ${resumeData.education.map(edu => `
+                <div style="margin-bottom: 10px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <h4 style="margin: 0; font-size: 17px;">${edu.degree}</h4>
+                    <div style="color: #4b5563; font-size: 14px;">${edu.period}</div>
+                  </div>
+                  <div style="color: #4b5563; font-size: 15px;">${edu.school}</div>
+                </div>
               `).join('')}
             </div>
           </div>
-          
-          <div style="margin-bottom: 20px;">
-            <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Experience</h3>
-            ${resumeData.experience.map(exp => `
-              <div style="margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                  <h4 style="margin: 0; font-size: 17px;">${exp.title}</h4>
-                  <div style="color: #4b5563; font-size: 14px;">${exp.period}</div>
-                </div>
-                <div style="color: #4b5563; font-size: 15px; margin-bottom: 6px;">${exp.company}, ${exp.location}</div>
-                <ul style="margin-top: 5px; padding-left: 20px;">
-                  ${exp.highlights.map(highlight => `
-                    <li style="margin-bottom: 3px;">${highlight}</li>
-                  `).join('')}
-                </ul>
+        `;
+        break;
+        
+      case 'template2':
+        // Academic template (Formal, serif fonts)
+        templateHtml = `
+          <div style="font-family: 'Times New Roman', serif; padding: 40px; height: 100%; color: #000;">
+            <div style="text-align: center; margin-bottom: 30px; border-bottom: 1px solid #000; padding-bottom: 20px;">
+              <h1 style="font-size: 28px; margin: 0; text-transform: uppercase; letter-spacing: 2px;">${resumeData.personalInfo.name}</h1>
+              <h2 style="font-size: 18px; margin: 5px 0; font-weight: normal;">${resumeData.personalInfo.title}</h2>
+              <div style="font-size: 14px; margin-top: 10px;">
+                <div>${resumeData.personalInfo.email} | ${resumeData.personalInfo.phone} | ${resumeData.personalInfo.location}</div>
               </div>
-            `).join('')}
-          </div>
-          
-          <div>
-            <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Education</h3>
-            ${resumeData.education.map(edu => `
-              <div style="margin-bottom: 10px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                  <h4 style="margin: 0; font-size: 17px;">${edu.degree}</h4>
-                  <div style="color: #4b5563; font-size: 14px;">${edu.period}</div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <h3 style="font-size: 18px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px;">Research Objective</h3>
+              <p style="text-align: justify;">${resumeData.personalInfo.summary}</p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <h3 style="font-size: 18px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px;">Education</h3>
+              ${resumeData.education.map(edu => `
+                <div style="margin-bottom: 15px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <h4 style="margin: 0; font-size: 16px; font-weight: bold;">${edu.degree}</h4>
+                    <div style="font-size: 14px;">${edu.period}</div>
+                  </div>
+                  <div style="font-style: italic; font-size: 14px;">${edu.school}</div>
                 </div>
-                <div style="color: #4b5563; font-size: 15px;">${edu.school}</div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    } else if (selectedTemplate === 'template2') {
-      // Academic template
-      templateHtml = `
-        <div style="font-family: Times New Roman, serif; padding: 40px; height: 100%;">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="font-size: 24px; margin: 0; text-transform: uppercase; letter-spacing: 2px;">${resumeData.personalInfo.name}</h1>
-            <h2 style="font-size: 18px; margin: 5px 0; font-weight: normal;">${resumeData.personalInfo.title}</h2>
-            <div style="font-size: 14px; margin-top: 10px;">
-              <div>${resumeData.personalInfo.email} | ${resumeData.personalInfo.phone} | ${resumeData.personalInfo.location}</div>
+              `).join('')}
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <h3 style="font-size: 18px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px;">Professional Experience</h3>
+              ${resumeData.experience.map(exp => `
+                <div style="margin-bottom: 15px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <h4 style="margin: 0; font-size: 16px; font-weight: bold;">${exp.title}</h4>
+                    <div style="font-size: 14px;">${exp.period}</div>
+                  </div>
+                  <div style="font-style: italic; font-size: 14px; margin-bottom: 6px;">${exp.company}, ${exp.location}</div>
+                  <ul style="margin-top: 5px; padding-left: 20px;">
+                    ${exp.highlights.map(highlight => `
+                      <li style="margin-bottom: 3px; text-align: justify;">${highlight}</li>
+                    `).join('')}
+                  </ul>
+                </div>
+              `).join('')}
+            </div>
+            
+            <div>
+              <h3 style="font-size: 18px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px;">Areas of Expertise</h3>
+              <p style="text-align: justify;">${resumeData.skills.join(', ')}</p>
             </div>
           </div>
-          
-          <div style="margin-bottom: 20px;">
-            <h3 style="font-size: 16px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px;">Objective</h3>
-            <p>${resumeData.personalInfo.summary}</p>
-          </div>
-          
-          <div style="margin-bottom: 20px;">
-            <h3 style="font-size: 16px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px;">Education</h3>
-            ${resumeData.education.map(edu => `
-              <div style="margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                  <h4 style="margin: 0; font-size: 15px; font-weight: bold;">${edu.degree}</h4>
-                  <div style="font-size: 14px;">${edu.period}</div>
-                </div>
-                <div style="font-style: italic; font-size: 14px;">${edu.school}</div>
+        `;
+        break;
+        
+      case 'template3':
+        // Technical Detail template (Dark with code-like formatting)
+        templateHtml = `
+          <div style="font-family: 'Courier New', monospace; padding: 40px; height: 100%; background-color: #f8f9fa; color: #333;">
+            <div style="margin-bottom: 30px;">
+              <h1 style="font-size: 26px; margin: 0; border-bottom: 2px solid #6366f1;">${resumeData.personalInfo.name}</h1>
+              <h2 style="font-size: 18px; margin: 5px 0; color: #6366f1;">${resumeData.personalInfo.title}</h2>
+              <div style="font-size: 14px; margin-top: 10px; display: flex; gap: 20px;">
+                <div><span style="color: #6366f1;">@:</span> ${resumeData.personalInfo.email}</div>
+                <div><span style="color: #6366f1;">📱:</span> ${resumeData.personalInfo.phone}</div>
+                <div><span style="color: #6366f1;">📍:</span> ${resumeData.personalInfo.location}</div>
               </div>
-            `).join('')}
-          </div>
-          
-          <div style="margin-bottom: 20px;">
-            <h3 style="font-size: 16px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px;">Experience</h3>
-            ${resumeData.experience.map(exp => `
-              <div style="margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                  <h4 style="margin: 0; font-size: 15px; font-weight: bold;">${exp.title}</h4>
-                  <div style="font-size: 14px;">${exp.period}</div>
-                </div>
-                <div style="font-style: italic; font-size: 14px; margin-bottom: 6px;">${exp.company}, ${exp.location}</div>
-                <ul style="margin-top: 5px; padding-left: 20px;">
-                  ${exp.highlights.map(highlight => `
-                    <li style="margin-bottom: 3px;">${highlight}</li>
-                  `).join('')}
-                </ul>
-              </div>
-            `).join('')}
-          </div>
-          
-          <div>
-            <h3 style="font-size: 16px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px;">Skills</h3>
-            <p>${resumeData.skills.join(', ')}</p>
-          </div>
-        </div>
-      `;
-    } else {
-      // Default template for other template types
-      templateHtml = `
-        <div style="font-family: Arial, sans-serif; padding: 30px; height: 100%;">
-          <div style="text-align: center; margin-bottom: 20px;">
-            <h1 style="font-size: 26px; margin: 0;">${resumeData.personalInfo.name}</h1>
-            <h2 style="font-size: 18px; margin: 5px 0; color: #666;">${resumeData.personalInfo.title}</h2>
-            <div style="font-size: 14px; margin-top: 10px; color: #555;">
-              <div>${resumeData.personalInfo.email} | ${resumeData.personalInfo.phone} | ${resumeData.personalInfo.location}</div>
             </div>
-          </div>
-          
-          <div style="margin-bottom: 20px;">
-            <h3 style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">Summary</h3>
-            <p>${resumeData.personalInfo.summary}</p>
-          </div>
-          
-          <div style="margin-bottom: 20px;">
-            <h3 style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">Skills</h3>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-              ${resumeData.skills.map(skill => `
-                <span style="background-color: #f3f4f6; padding: 3px 8px; border-radius: 4px; font-size: 13px;">${skill}</span>
+            
+            <div style="margin-bottom: 20px;">
+              <h3 style="font-size: 18px; color: #6366f1; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">// PROFILE</h3>
+              <p style="font-family: 'Courier New', monospace;">${resumeData.personalInfo.summary}</p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <h3 style="font-size: 18px; color: #6366f1; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">// TECHNICAL SKILLS</h3>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px; font-family: 'Courier New', monospace;">
+                ${resumeData.skills.map(skill => `
+                  <span style="background-color: #e0e7ff; color: #4f46e5; padding: 4px 8px; border-radius: 4px; font-size: 13px; font-family: 'Courier New', monospace;">${skill}</span>
+                `).join('')}
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <h3 style="font-size: 18px; color: #6366f1; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">// WORK_EXPERIENCE</h3>
+              ${resumeData.experience.map(exp => `
+                <div style="margin-bottom: 15px; font-family: 'Courier New', monospace;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <h4 style="margin: 0; font-size: 16px;">${exp.title}</h4>
+                    <div style="color: #6366f1; font-size: 14px;">${exp.period}</div>
+                  </div>
+                  <div style="color: #4b5563; font-size: 14px; margin-bottom: 6px;">${exp.company}, ${exp.location}</div>
+                  <ul style="margin-top: 5px; padding-left: 20px; list-style-type: '> ';">
+                    ${exp.highlights.map(highlight => `
+                      <li style="margin-bottom: 3px;">${highlight}</li>
+                    `).join('')}
+                  </ul>
+                </div>
+              `).join('')}
+            </div>
+            
+            <div>
+              <h3 style="font-size: 18px; color: #6366f1; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">// EDUCATION</h3>
+              ${resumeData.education.map(edu => `
+                <div style="margin-bottom: 10px; font-family: 'Courier New', monospace;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <h4 style="margin: 0; font-size: 16px;">${edu.degree}</h4>
+                    <div style="color: #6366f1; font-size: 14px;">${edu.period}</div>
+                  </div>
+                  <div style="color: #4b5563; font-size: 14px;">${edu.school}</div>
+                </div>
               `).join('')}
             </div>
           </div>
-          
-          <div style="margin-bottom: 20px;">
-            <h3 style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">Experience</h3>
-            ${resumeData.experience.map(exp => `
-              <div style="margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                  <h4 style="margin: 0; font-size: 16px; color: #333;">${exp.title}</h4>
-                  <div style="color: #666; font-size: 14px;">${exp.period}</div>
+        `;
+        break;
+        
+      case 'template4':
+        // Modern Achievements (Green accents with achievement focus)
+        templateHtml = `
+          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; height: 100%; color: #333;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 3px solid #10b981; padding-bottom: 20px;">
+              <div>
+                <h1 style="font-size: 28px; margin: 0; color: #064e3b;">${resumeData.personalInfo.name}</h1>
+                <h2 style="font-size: 18px; margin: 5px 0; color: #10b981;">${resumeData.personalInfo.title}</h2>
+              </div>
+              <div style="text-align: right; font-size: 14px;">
+                <div>${resumeData.personalInfo.email}</div>
+                <div>${resumeData.personalInfo.phone}</div>
+                <div>${resumeData.personalInfo.location}</div>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+              <h3 style="font-size: 18px; color: #064e3b; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">PROFESSIONAL SUMMARY</h3>
+              <p>${resumeData.personalInfo.summary}</p>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+              <h3 style="font-size: 18px; color: #064e3b; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">KEY ACHIEVEMENTS</h3>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                ${resumeData.skills.map(skill => `
+                  <span style="background-color: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 20px; font-size: 13px;">${skill}</span>
+                `).join('')}
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+              <h3 style="font-size: 18px; color: #064e3b; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">PROFESSIONAL EXPERIENCE</h3>
+              ${resumeData.experience.map(exp => `
+                <div style="margin-bottom: 18px; padding-left: 15px; border-left: 3px solid #10b981;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <h4 style="margin: 0; font-size: 17px; color: #064e3b;">${exp.title}</h4>
+                    <div style="font-weight: bold; color: #10b981; font-size: 14px;">${exp.period}</div>
+                  </div>
+                  <div style="color: #4b5563; font-size: 15px; margin-bottom: 8px; font-style: italic;">${exp.company}, ${exp.location}</div>
+                  <ul style="margin-top: 5px; padding-left: 20px; list-style-type: '✓ ';">
+                    ${exp.highlights.map(highlight => `
+                      <li style="margin-bottom: 5px;">${highlight}</li>
+                    `).join('')}
+                  </ul>
                 </div>
-                <div style="color: #555; font-size: 14px; margin-bottom: 6px;">${exp.company}, ${exp.location}</div>
-                <ul style="margin-top: 5px; padding-left: 20px;">
-                  ${exp.highlights.map(highlight => `
-                    <li style="margin-bottom: 3px;">${highlight}</li>
+              `).join('')}
+            </div>
+            
+            <div>
+              <h3 style="font-size: 18px; color: #064e3b; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">EDUCATION</h3>
+              ${resumeData.education.map(edu => `
+                <div style="margin-bottom: 12px; display: flex; justify-content: space-between;">
+                  <div>
+                    <h4 style="margin: 0; font-size: 16px; color: #064e3b;">${edu.degree}</h4>
+                    <div style="color: #4b5563; font-size: 14px;">${edu.school}</div>
+                  </div>
+                  <div style="font-weight: bold; color: #10b981; font-size: 14px; text-align: right;">${edu.period}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        break;
+        
+      case 'template5':
+        // Tech Minimalist (Clean, minimal design)
+        templateHtml = `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 40px; height: 100%; color: #333; background-color: #fff;">
+            <div style="text-align: center; margin-bottom: 40px;">
+              <h1 style="font-size: 32px; margin: 0; letter-spacing: -1px; font-weight: 700;">${resumeData.personalInfo.name}</h1>
+              <h2 style="font-size: 16px; margin: 10px 0; font-weight: 400; color: #666; letter-spacing: 1px; text-transform: uppercase;">${resumeData.personalInfo.title}</h2>
+              <div style="font-size: 14px; margin-top: 15px; display: flex; justify-content: center; gap: 20px; color: #666;">
+                <div>${resumeData.personalInfo.email}</div>
+                <div>${resumeData.personalInfo.phone}</div>
+                <div>${resumeData.personalInfo.location}</div>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 30px;">
+              <p style="text-align: center; max-width: 600px; margin: 0 auto; line-height: 1.6;">${resumeData.personalInfo.summary}</p>
+            </div>
+            
+            <div style="margin-bottom: 30px; display: flex; justify-content: center; flex-wrap: wrap; gap: 6px;">
+              ${resumeData.skills.map(skill => `
+                <span style="background-color: #f5f5f5; padding: 6px 12px; border-radius: 3px; font-size: 12px; letter-spacing: 0.5px;">${skill}</span>
+              `).join('')}
+            </div>
+            
+            <div style="margin-bottom: 30px;">
+              <h3 style="font-size: 16px; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 20px;">Experience</h3>
+              ${resumeData.experience.map(exp => `
+                <div style="margin-bottom: 25px; text-align: center;">
+                  <h4 style="margin: 0; font-size: 18px; font-weight: 600;">${exp.title}</h4>
+                  <div style="font-size: 14px; color: #666; margin: 5px 0;">${exp.company}, ${exp.location} | ${exp.period}</div>
+                  <ul style="list-style: none; padding: 0; margin: 10px auto; max-width: 600px; text-align: left;">
+                    ${exp.highlights.map(highlight => `
+                      <li style="margin-bottom: 8px; padding-left: 15px; position: relative; line-height: 1.5;">
+                        <span style="position: absolute; left: 0; top: 8px; height: 4px; width: 4px; background-color: #000; border-radius: 50%;"></span>
+                        ${highlight}
+                      </li>
+                    `).join('')}
+                  </ul>
+                </div>
+              `).join('')}
+            </div>
+            
+            <div>
+              <h3 style="font-size: 16px; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 20px;">Education</h3>
+              ${resumeData.education.map(edu => `
+                <div style="margin-bottom: 15px; text-align: center;">
+                  <h4 style="margin: 0; font-size: 18px; font-weight: 600;">${edu.degree}</h4>
+                  <div style="font-size: 14px; color: #666; margin: 5px 0;">${edu.school} | ${edu.period}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        break;
+        
+      case 'template6':
+        // Experience Focus (Timeline style with experience emphasis)
+        templateHtml = `
+          <div style="font-family: 'Roboto', Arial, sans-serif; padding: 40px; height: 100%; color: #333; background-color: #fff;">
+            <div style="margin-bottom: 30px;">
+              <h1 style="font-size: 28px; margin: 0; color: #333;">${resumeData.personalInfo.name}</h1>
+              <h2 style="font-size: 18px; margin: 5px 0; color: #555;">${resumeData.personalInfo.title}</h2>
+              <div style="display: flex; gap: 15px; margin-top: 10px; font-size: 14px; color: #555;">
+                <div>${resumeData.personalInfo.email}</div>
+                <div>${resumeData.personalInfo.phone}</div>
+                <div>${resumeData.personalInfo.location}</div>
+              </div>
+              <div style="margin-top: 15px;">
+                <p>${resumeData.personalInfo.summary}</p>
+              </div>
+            </div>
+            
+            <div style="display: flex; margin-bottom: 30px;">
+              <div style="flex: 1; padding-right: 30px;">
+                <h3 style="font-size: 18px; margin-bottom: 15px; position: relative; padding-bottom: 10px;">
+                  Skills
+                  <span style="position: absolute; bottom: 0; left: 0; width: 50px; height: 3px; background-color: #ff6b6b;"></span>
+                </h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                  ${resumeData.skills.map(skill => `
+                    <span style="background-color: #f8f9fa; border: 1px solid #e9ecef; padding: 5px 10px; border-radius: 3px; font-size: 13px;">${skill}</span>
                   `).join('')}
-                </ul>
-              </div>
-            `).join('')}
-          </div>
-          
-          <div>
-            <h3 style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">Education</h3>
-            ${resumeData.education.map(edu => `
-              <div style="margin-bottom: 10px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                  <h4 style="margin: 0; font-size: 16px; color: #333;">${edu.degree}</h4>
-                  <div style="color: #666; font-size: 14px;">${edu.period}</div>
                 </div>
-                <div style="color: #555; font-size: 14px;">${edu.school}</div>
+                
+                <h3 style="font-size: 18px; margin: 25px 0 15px; position: relative; padding-bottom: 10px;">
+                  Education
+                  <span style="position: absolute; bottom: 0; left: 0; width: 50px; height: 3px; background-color: #ff6b6b;"></span>
+                </h3>
+                ${resumeData.education.map(edu => `
+                  <div style="margin-bottom: 15px;">
+                    <h4 style="margin: 0; font-size: 16px;">${edu.degree}</h4>
+                    <div style="font-size: 14px; color: #666;">${edu.school}</div>
+                    <div style="font-size: 14px; color: #888;">${edu.period}</div>
+                  </div>
+                `).join('')}
               </div>
-            `).join('')}
+              
+              <div style="flex: 2; border-left: 1px solid #e9ecef; padding-left: 30px;">
+                <h3 style="font-size: 18px; margin-bottom: 20px; position: relative; padding-bottom: 10px;">
+                  Professional Experience
+                  <span style="position: absolute; bottom: 0; left: 0; width: 50px; height: 3px; background-color: #ff6b6b;"></span>
+                </h3>
+                
+                <div style="position: relative;">
+                  ${resumeData.experience.map((exp, i) => `
+                    <div style="margin-bottom: 25px; position: relative; padding-left: 20px;">
+                      <span style="position: absolute; left: -5px; top: 0; width: 10px; height: 10px; border-radius: 50%; background-color: #ff6b6b;"></span>
+                      <span style="position: absolute; left: 0; top: 10px; bottom: ${i === resumeData.experience.length - 1 ? '0' : '-15px'}; width: 1px; background-color: #e9ecef;"></span>
+                      
+                      <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <h4 style="margin: 0; font-size: 17px; color: #333;">${exp.title}</h4>
+                        <div style="font-size: 14px; color: #ff6b6b; font-weight: 500;">${exp.period}</div>
+                      </div>
+                      <div style="font-size: 15px; color: #555; margin-bottom: 8px;">${exp.company}, ${exp.location}</div>
+                      <ul style="margin-top: 5px; padding-left: 20px;">
+                        ${exp.highlights.map(highlight => `
+                          <li style="margin-bottom: 5px;">${highlight}</li>
+                        `).join('')}
+                      </ul>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      `;
+        `;
+        break;
+        
+      case 'template7':
+        // Data Analyst (Analytics-focused design with visualization elements)
+        templateHtml = `
+          <div style="font-family: 'Open Sans', Arial, sans-serif; padding: 40px; height: 100%; color: #333; background-color: #fff;">
+            <div style="display: flex; margin-bottom: 30px;">
+              <div style="flex: 2; padding-right: 30px;">
+                <h1 style="font-size: 26px; margin: 0; color: #2c3e50;">${resumeData.personalInfo.name}</h1>
+                <h2 style="font-size: 18px; margin: 5px 0; color: #3498db;">${resumeData.personalInfo.title}</h2>
+                <div style="margin-top: 15px; line-height: 1.6;">
+                  <p>${resumeData.personalInfo.summary}</p>
+                </div>
+              </div>
+              <div style="flex: 1; border-left: 2px solid #ecf0f1; padding-left: 30px;">
+                <div style="margin-bottom: 15px;">
+                  <div style="font-size: 14px; color: #7f8c8d;"><span style="color: #3498db;">Email:</span> ${resumeData.personalInfo.email}</div>
+                  <div style="font-size: 14px; color: #7f8c8d;"><span style="color: #3498db;">Phone:</span> ${resumeData.personalInfo.phone}</div>
+                  <div style="font-size: 14px; color: #7f8c8d;"><span style="color: #3498db;">Location:</span> ${resumeData.personalInfo.location}</div>
+                </div>
+                
+                <h3 style="font-size: 16px; color: #2c3e50; margin: 20px 0 10px; padding-bottom: 5px; border-bottom: 1px solid #ecf0f1;">Data Skills</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                  ${resumeData.skills.map(skill => `
+                    <span style="background-color: #eaf2f8; color: #3498db; padding: 4px 8px; border-radius: 3px; font-size: 12px;">${skill}</span>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 30px;">
+              <h3 style="font-size: 18px; color: #2c3e50; position: relative; padding-bottom: 10px; border-bottom: 1px solid #ecf0f1;">
+                Professional Experience
+                <span style="position: absolute; bottom: -1px; left: 0; width: 60px; height: 3px; background-color: #3498db;"></span>
+              </h3>
+              
+              ${resumeData.experience.map(exp => `
+                <div style="margin: 20px 0; padding-left: 15px; border-left: 3px solid #3498db;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <h4 style="margin: 0; font-size: 17px; color: #2c3e50;">${exp.title}</h4>
+                    <div style="font-size: 14px; color: #3498db;">${exp.period}</div>
+                  </div>
+                  <div style="font-size: 15px; color: #7f8c8d; margin-bottom: 8px;">${exp.company}, ${exp.location}</div>
+                  
+                  <div style="margin-top: 10px;">
+                    <h5 style="margin: 0 0 8px; font-size: 15px; color: #2c3e50;">Key Contributions:</h5>
+                    <ul style="margin: 0; padding-left: 20px;">
+                      ${exp.highlights.map(highlight => `
+                        <li style="margin-bottom: 5px;">${highlight}</li>
+                      `).join('')}
+                    </ul>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            
+            <div>
+              <h3 style="font-size: 18px; color: #2c3e50; position: relative; padding-bottom: 10px; border-bottom: 1px solid #ecf0f1;">
+                Education
+                <span style="position: absolute; bottom: -1px; left: 0; width: 60px; height: 3px; background-color: #3498db;"></span>
+              </h3>
+              
+              <div style="display: flex; flex-wrap: wrap; margin-top: 15px;">
+                ${resumeData.education.map(edu => `
+                  <div style="flex: 1; min-width: 300px; margin: 10px 20px 10px 0;">
+                    <h4 style="margin: 0; font-size: 16px; color: #2c3e50;">${edu.degree}</h4>
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                      <div style="font-size: 14px; color: #7f8c8d;">${edu.school}</div>
+                      <div style="font-size: 14px; color: #3498db;">${edu.period}</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+        break;
+        
+      default:
+        // Default template as fallback
+        templateHtml = `
+          <div style="font-family: Arial, sans-serif; padding: 30px; height: 100%;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <h1 style="font-size: 26px; margin: 0;">${resumeData.personalInfo.name}</h1>
+              <h2 style="font-size: 18px; margin: 5px 0; color: #666;">${resumeData.personalInfo.title}</h2>
+              <div style="font-size: 14px; margin-top: 10px; color: #555;">
+                <div>${resumeData.personalInfo.email} | ${resumeData.personalInfo.phone} | ${resumeData.personalInfo.location}</div>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <h3 style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">Summary</h3>
+              <p>${resumeData.personalInfo.summary}</p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <h3 style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">Skills</h3>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                ${resumeData.skills.map(skill => `
+                  <span style="background-color: #f3f4f6; padding: 3px 8px; border-radius: 4px; font-size: 13px;">${skill}</span>
+                `).join('')}
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <h3 style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">Experience</h3>
+              ${resumeData.experience.map(exp => `
+                <div style="margin-bottom: 15px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <h4 style="margin: 0; font-size: 16px; color: #333;">${exp.title}</h4>
+                    <div style="color: #666; font-size: 14px;">${exp.period}</div>
+                  </div>
+                  <div style="color: #555; font-size: 14px; margin-bottom: 6px;">${exp.company}, ${exp.location}</div>
+                  <ul style="margin-top: 5px; padding-left: 20px;">
+                    ${exp.highlights.map(highlight => `
+                      <li style="margin-bottom: 3px;">${highlight}</li>
+                    `).join('')}
+                  </ul>
+                </div>
+              `).join('')}
+            </div>
+            
+            <div>
+              <h3 style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">Education</h3>
+              ${resumeData.education.map(edu => `
+                <div style="margin-bottom: 10px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <h4 style="margin: 0; font-size: 16px; color: #333;">${edu.degree}</h4>
+                    <div style="color: #666; font-size: 14px;">${edu.period}</div>
+                  </div>
+                  <div style="color: #555; font-size: 14px;">${edu.school}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
     }
     
     // Set the HTML content
