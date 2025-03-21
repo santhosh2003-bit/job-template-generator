@@ -4,12 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -20,7 +14,7 @@ import {
 import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import {
   Check,
   CheckCircle,
@@ -28,9 +22,8 @@ import {
   Edit,
   Eye,
   FileCheck,
-  ThumbsUp,
-  X,
   Pencil,
+  X,
 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import { toast } from "@/hooks/use-toast";
@@ -113,17 +106,12 @@ const mockedResumeData = {
   ]
 };
 
-type TemplateCategory = 'all' | 'minimal' | 'professional' | 'academic' | 'creative';
-
 const Templates = () => {
   const [resumeData, setResumeData] = useState<ResumeData>(mockedResumeData);
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
-  const [category, setCategory] = useState<TemplateCategory>('all');
   const [previewModal, setPreviewModal] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentEditSection, setCurrentEditSection] = useState<'personal' | 'skills' | 'experience' | 'education'>('personal');
   const [generatingPdf, setGeneratingPdf] = useState(false);
-  const [personalized, setPersonalized] = useState<boolean>(false);
   const [personalizedPreviewUrl, setPersonalizedPreviewUrl] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -131,65 +119,7 @@ const Templates = () => {
     defaultValues: resumeData
   });
 
-  const templates = [
-    { 
-      id: "template1", 
-      name: "Professional Clean", 
-      category: "professional", 
-      popular: true,
-      image: "/lovable-uploads/f48bebe0-0d22-424e-945c-0766c5010c9d.png"
-    },
-    { 
-      id: "template2", 
-      name: "Academic", 
-      category: "academic", 
-      popular: false,
-      image: "/lovable-uploads/0fe25031-2317-4f6b-a80c-9e183b89db34.png"
-    },
-    { 
-      id: "template3", 
-      name: "Technical Detail", 
-      category: "professional", 
-      popular: true,
-      image: "/lovable-uploads/506d859b-1ee9-4a76-9bc5-2aab31eb2713.png"
-    },
-    { 
-      id: "template4", 
-      name: "Modern Achievements", 
-      category: "professional", 
-      popular: true,
-      image: "/lovable-uploads/da38501c-178a-4ab5-83d2-24f271ab872d.png"
-    },
-    { 
-      id: "template5", 
-      name: "Tech Minimalist", 
-      category: "minimal", 
-      popular: false,
-      image: "/lovable-uploads/045b3ae8-1bc8-4c03-9056-6e34fc137969.png"
-    },
-    { 
-      id: "template6", 
-      name: "Experience Focus", 
-      category: "professional", 
-      popular: false,
-      image: "/lovable-uploads/8084e7d7-bcd4-443b-83fd-039f4f8ef460.png"
-    },
-    { 
-      id: "template7", 
-      name: "Data Analyst", 
-      category: "professional", 
-      popular: true,
-      image: "/lovable-uploads/f56216a3-d7af-4bcc-b113-acb98a9e8f4f.png"
-    },
-  ];
-
-  const filteredTemplates = category === 'all' 
-    ? templates 
-    : templates.filter(t => t.category === category);
-
   const generatePersonalizedTemplate = async () => {
-    if (!selectedTemplate) return null;
-    
     // Create a canvas element to render the personalized resume
     const templateDiv = document.createElement('div');
     templateDiv.id = 'personalizedTemplate';
@@ -199,518 +129,65 @@ const Templates = () => {
     templateDiv.style.left = '-9999px';
     document.body.appendChild(templateDiv);
     
-    // Template specific styling based on the selected template
-    let templateHtml = '';
-    
-    // Choose template format based on the selected template ID
-    switch(selectedTemplate) {
-      case 'template1':
-        // Professional Clean template (Blue accents)
-        templateHtml = `
-          <div style="font-family: Arial, sans-serif; padding: 40px; height: 100%; color: #333;">
-            <div style="border-bottom: 2px solid #2563eb; margin-bottom: 20px;">
-              <h1 style="color: #1e40af; margin: 0; font-size: 28px;">${resumeData.personalInfo.name}</h1>
-              <h2 style="color: #3b82f6; margin: 5px 0; font-size: 20px;">${resumeData.personalInfo.title}</h2>
-              <div style="display: flex; justify-content: space-between; margin-top: 10px; color: #4b5563; font-size: 14px;">
-                <div>${resumeData.personalInfo.email}</div>
-                <div>${resumeData.personalInfo.phone}</div>
-                <div>${resumeData.personalInfo.location}</div>
+    // Generate a custom resume design
+    const templateHtml = `
+      <div style="font-family: Arial, sans-serif; padding: 40px; height: 100%; color: #333;">
+        <div style="border-bottom: 2px solid #2563eb; margin-bottom: 20px;">
+          <h1 style="color: #1e40af; margin: 0; font-size: 28px;">${resumeData.personalInfo.name}</h1>
+          <h2 style="color: #3b82f6; margin: 5px 0; font-size: 20px;">${resumeData.personalInfo.title}</h2>
+          <div style="display: flex; justify-content: space-between; margin-top: 10px; color: #4b5563; font-size: 14px;">
+            <div>${resumeData.personalInfo.email}</div>
+            <div>${resumeData.personalInfo.phone}</div>
+            <div>${resumeData.personalInfo.location}</div>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Summary</h3>
+          <p>${resumeData.personalInfo.summary}</p>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Skills</h3>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            ${resumeData.skills.map(skill => `
+              <span style="background-color: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 13px;">${skill}</span>
+            `).join('')}
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Experience</h3>
+          ${resumeData.experience.map(exp => `
+            <div style="margin-bottom: 15px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <h4 style="margin: 0; font-size: 17px;">${exp.title}</h4>
+                <div style="color: #4b5563; font-size: 14px;">${exp.period}</div>
               </div>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-              <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Summary</h3>
-              <p>${resumeData.personalInfo.summary}</p>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-              <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Skills</h3>
-              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                ${resumeData.skills.map(skill => `
-                  <span style="background-color: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 13px;">${skill}</span>
+              <div style="color: #4b5563; font-size: 15px; margin-bottom: 6px;">${exp.company}, ${exp.location}</div>
+              <ul style="margin-top: 5px; padding-left: 20px;">
+                ${exp.highlights.map(highlight => `
+                  <li style="margin-bottom: 3px;">${highlight}</li>
                 `).join('')}
-              </div>
+              </ul>
             </div>
-            
-            <div style="margin-bottom: 20px;">
-              <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Experience</h3>
-              ${resumeData.experience.map(exp => `
-                <div style="margin-bottom: 15px;">
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                    <h4 style="margin: 0; font-size: 17px;">${exp.title}</h4>
-                    <div style="color: #4b5563; font-size: 14px;">${exp.period}</div>
-                  </div>
-                  <div style="color: #4b5563; font-size: 15px; margin-bottom: 6px;">${exp.company}, ${exp.location}</div>
-                  <ul style="margin-top: 5px; padding-left: 20px;">
-                    ${exp.highlights.map(highlight => `
-                      <li style="margin-bottom: 3px;">${highlight}</li>
-                    `).join('')}
-                  </ul>
-                </div>
-              `).join('')}
-            </div>
-            
-            <div>
-              <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Education</h3>
-              ${resumeData.education.map(edu => `
-                <div style="margin-bottom: 10px;">
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                    <h4 style="margin: 0; font-size: 17px;">${edu.degree}</h4>
-                    <div style="color: #4b5563; font-size: 14px;">${edu.period}</div>
-                  </div>
-                  <div style="color: #4b5563; font-size: 15px;">${edu.school}</div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-        break;
+          `).join('')}
+        </div>
         
-      case 'template2':
-        // Academic template (Formal, serif fonts)
-        templateHtml = `
-          <div style="font-family: 'Times New Roman', serif; padding: 40px; height: 100%; color: #000;">
-            <div style="text-align: center; margin-bottom: 30px; border-bottom: 1px solid #000; padding-bottom: 20px;">
-              <h1 style="font-size: 28px; margin: 0; text-transform: uppercase; letter-spacing: 2px;">${resumeData.personalInfo.name}</h1>
-              <h2 style="font-size: 18px; margin: 5px 0; font-weight: normal;">${resumeData.personalInfo.title}</h2>
-              <div style="font-size: 14px; margin-top: 10px;">
-                <div>${resumeData.personalInfo.email} | ${resumeData.personalInfo.phone} | ${resumeData.personalInfo.location}</div>
+        <div>
+          <h3 style="color: #1e40af; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Education</h3>
+          ${resumeData.education.map(edu => `
+            <div style="margin-bottom: 10px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <h4 style="margin: 0; font-size: 17px;">${edu.degree}</h4>
+                <div style="color: #4b5563; font-size: 14px;">${edu.period}</div>
               </div>
+              <div style="color: #4b5563; font-size: 15px;">${edu.school}</div>
             </div>
-            
-            <div style="margin-bottom: 20px;">
-              <h3 style="font-size: 18px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px;">Research Objective</h3>
-              <p style="text-align: justify;">${resumeData.personalInfo.summary}</p>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-              <h3 style="font-size: 18px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px;">Education</h3>
-              ${resumeData.education.map(edu => `
-                <div style="margin-bottom: 15px;">
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                    <h4 style="margin: 0; font-size: 16px; font-weight: bold;">${edu.degree}</h4>
-                    <div style="font-size: 14px;">${edu.period}</div>
-                  </div>
-                  <div style="font-style: italic; font-size: 14px;">${edu.school}</div>
-                </div>
-              `).join('')}
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-              <h3 style="font-size: 18px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px;">Professional Experience</h3>
-              ${resumeData.experience.map(exp => `
-                <div style="margin-bottom: 15px;">
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                    <h4 style="margin: 0; font-size: 16px; font-weight: bold;">${exp.title}</h4>
-                    <div style="font-size: 14px;">${exp.period}</div>
-                  </div>
-                  <div style="font-style: italic; font-size: 14px; margin-bottom: 6px;">${exp.company}, ${exp.location}</div>
-                  <ul style="margin-top: 5px; padding-left: 20px;">
-                    ${exp.highlights.map(highlight => `
-                      <li style="margin-bottom: 3px; text-align: justify;">${highlight}</li>
-                    `).join('')}
-                  </ul>
-                </div>
-              `).join('')}
-            </div>
-            
-            <div>
-              <h3 style="font-size: 18px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 5px;">Areas of Expertise</h3>
-              <p style="text-align: justify;">${resumeData.skills.join(', ')}</p>
-            </div>
-          </div>
-        `;
-        break;
-        
-      case 'template3':
-        // Technical Detail template (Dark with code-like formatting)
-        templateHtml = `
-          <div style="font-family: 'Courier New', monospace; padding: 40px; height: 100%; background-color: #f8f9fa; color: #333;">
-            <div style="margin-bottom: 30px;">
-              <h1 style="font-size: 26px; margin: 0; border-bottom: 2px solid #6366f1;">${resumeData.personalInfo.name}</h1>
-              <h2 style="font-size: 18px; margin: 5px 0; color: #6366f1;">${resumeData.personalInfo.title}</h2>
-              <div style="font-size: 14px; margin-top: 10px; display: flex; gap: 20px;">
-                <div><span style="color: #6366f1;">@:</span> ${resumeData.personalInfo.email}</div>
-                <div><span style="color: #6366f1;">📱:</span> ${resumeData.personalInfo.phone}</div>
-                <div><span style="color: #6366f1;">📍:</span> ${resumeData.personalInfo.location}</div>
-              </div>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-              <h3 style="font-size: 18px; color: #6366f1; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">// PROFILE</h3>
-              <p style="font-family: 'Courier New', monospace;">${resumeData.personalInfo.summary}</p>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-              <h3 style="font-size: 18px; color: #6366f1; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">// TECHNICAL SKILLS</h3>
-              <div style="display: flex; flex-wrap: wrap; gap: 8px; font-family: 'Courier New', monospace;">
-                ${resumeData.skills.map(skill => `
-                  <span style="background-color: #e0e7ff; color: #4f46e5; padding: 4px 8px; border-radius: 4px; font-size: 13px; font-family: 'Courier New', monospace;">${skill}</span>
-                `).join('')}
-              </div>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-              <h3 style="font-size: 18px; color: #6366f1; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">// WORK_EXPERIENCE</h3>
-              ${resumeData.experience.map(exp => `
-                <div style="margin-bottom: 15px; font-family: 'Courier New', monospace;">
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                    <h4 style="margin: 0; font-size: 16px;">${exp.title}</h4>
-                    <div style="color: #6366f1; font-size: 14px;">${exp.period}</div>
-                  </div>
-                  <div style="color: #4b5563; font-size: 14px; margin-bottom: 6px;">${exp.company}, ${exp.location}</div>
-                  <ul style="margin-top: 5px; padding-left: 20px; list-style-type: '> ';">
-                    ${exp.highlights.map(highlight => `
-                      <li style="margin-bottom: 3px;">${highlight}</li>
-                    `).join('')}
-                  </ul>
-                </div>
-              `).join('')}
-            </div>
-            
-            <div>
-              <h3 style="font-size: 18px; color: #6366f1; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">// EDUCATION</h3>
-              ${resumeData.education.map(edu => `
-                <div style="margin-bottom: 10px; font-family: 'Courier New', monospace;">
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                    <h4 style="margin: 0; font-size: 16px;">${edu.degree}</h4>
-                    <div style="color: #6366f1; font-size: 14px;">${edu.period}</div>
-                  </div>
-                  <div style="color: #4b5563; font-size: 14px;">${edu.school}</div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-        break;
-        
-      case 'template4':
-        // Modern Achievements (Green accents with achievement focus)
-        templateHtml = `
-          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; height: 100%; color: #333;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 3px solid #10b981; padding-bottom: 20px;">
-              <div>
-                <h1 style="font-size: 28px; margin: 0; color: #064e3b;">${resumeData.personalInfo.name}</h1>
-                <h2 style="font-size: 18px; margin: 5px 0; color: #10b981;">${resumeData.personalInfo.title}</h2>
-              </div>
-              <div style="text-align: right; font-size: 14px;">
-                <div>${resumeData.personalInfo.email}</div>
-                <div>${resumeData.personalInfo.phone}</div>
-                <div>${resumeData.personalInfo.location}</div>
-              </div>
-            </div>
-            
-            <div style="margin-bottom: 25px;">
-              <h3 style="font-size: 18px; color: #064e3b; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">PROFESSIONAL SUMMARY</h3>
-              <p>${resumeData.personalInfo.summary}</p>
-            </div>
-            
-            <div style="margin-bottom: 25px;">
-              <h3 style="font-size: 18px; color: #064e3b; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">KEY ACHIEVEMENTS</h3>
-              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                ${resumeData.skills.map(skill => `
-                  <span style="background-color: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 20px; font-size: 13px;">${skill}</span>
-                `).join('')}
-              </div>
-            </div>
-            
-            <div style="margin-bottom: 25px;">
-              <h3 style="font-size: 18px; color: #064e3b; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">PROFESSIONAL EXPERIENCE</h3>
-              ${resumeData.experience.map(exp => `
-                <div style="margin-bottom: 18px; padding-left: 15px; border-left: 3px solid #10b981;">
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                    <h4 style="margin: 0; font-size: 17px; color: #064e3b;">${exp.title}</h4>
-                    <div style="font-weight: bold; color: #10b981; font-size: 14px;">${exp.period}</div>
-                  </div>
-                  <div style="color: #4b5563; font-size: 15px; margin-bottom: 8px; font-style: italic;">${exp.company}, ${exp.location}</div>
-                  <ul style="margin-top: 5px; padding-left: 20px; list-style-type: '✓ ';">
-                    ${exp.highlights.map(highlight => `
-                      <li style="margin-bottom: 5px;">${highlight}</li>
-                    `).join('')}
-                  </ul>
-                </div>
-              `).join('')}
-            </div>
-            
-            <div>
-              <h3 style="font-size: 18px; color: #064e3b; border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">EDUCATION</h3>
-              ${resumeData.education.map(edu => `
-                <div style="margin-bottom: 12px; display: flex; justify-content: space-between;">
-                  <div>
-                    <h4 style="margin: 0; font-size: 16px; color: #064e3b;">${edu.degree}</h4>
-                    <div style="color: #4b5563; font-size: 14px;">${edu.school}</div>
-                  </div>
-                  <div style="font-weight: bold; color: #10b981; font-size: 14px; text-align: right;">${edu.period}</div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-        break;
-        
-      case 'template5':
-        // Tech Minimalist (Clean, minimal design)
-        templateHtml = `
-          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 40px; height: 100%; color: #333; background-color: #fff;">
-            <div style="text-align: center; margin-bottom: 40px;">
-              <h1 style="font-size: 32px; margin: 0; letter-spacing: -1px; font-weight: 700;">${resumeData.personalInfo.name}</h1>
-              <h2 style="font-size: 16px; margin: 10px 0; font-weight: 400; color: #666; letter-spacing: 1px; text-transform: uppercase;">${resumeData.personalInfo.title}</h2>
-              <div style="font-size: 14px; margin-top: 15px; display: flex; justify-content: center; gap: 20px; color: #666;">
-                <div>${resumeData.personalInfo.email}</div>
-                <div>${resumeData.personalInfo.phone}</div>
-                <div>${resumeData.personalInfo.location}</div>
-              </div>
-            </div>
-            
-            <div style="margin-bottom: 30px;">
-              <p style="text-align: center; max-width: 600px; margin: 0 auto; line-height: 1.6;">${resumeData.personalInfo.summary}</p>
-            </div>
-            
-            <div style="margin-bottom: 30px; display: flex; justify-content: center; flex-wrap: wrap; gap: 6px;">
-              ${resumeData.skills.map(skill => `
-                <span style="background-color: #f5f5f5; padding: 6px 12px; border-radius: 3px; font-size: 12px; letter-spacing: 0.5px;">${skill}</span>
-              `).join('')}
-            </div>
-            
-            <div style="margin-bottom: 30px;">
-              <h3 style="font-size: 16px; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 20px;">Experience</h3>
-              ${resumeData.experience.map(exp => `
-                <div style="margin-bottom: 25px; text-align: center;">
-                  <h4 style="margin: 0; font-size: 18px; font-weight: 600;">${exp.title}</h4>
-                  <div style="font-size: 14px; color: #666; margin: 5px 0;">${exp.company}, ${exp.location} | ${exp.period}</div>
-                  <ul style="list-style: none; padding: 0; margin: 10px auto; max-width: 600px; text-align: left;">
-                    ${exp.highlights.map(highlight => `
-                      <li style="margin-bottom: 8px; padding-left: 15px; position: relative; line-height: 1.5;">
-                        <span style="position: absolute; left: 0; top: 8px; height: 4px; width: 4px; background-color: #000; border-radius: 50%;"></span>
-                        ${highlight}
-                      </li>
-                    `).join('')}
-                  </ul>
-                </div>
-              `).join('')}
-            </div>
-            
-            <div>
-              <h3 style="font-size: 16px; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 20px;">Education</h3>
-              ${resumeData.education.map(edu => `
-                <div style="margin-bottom: 15px; text-align: center;">
-                  <h4 style="margin: 0; font-size: 18px; font-weight: 600;">${edu.degree}</h4>
-                  <div style="font-size: 14px; color: #666; margin: 5px 0;">${edu.school} | ${edu.period}</div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-        break;
-        
-      case 'template6':
-        // Experience Focus (Timeline style with experience emphasis)
-        templateHtml = `
-          <div style="font-family: 'Roboto', Arial, sans-serif; padding: 40px; height: 100%; color: #333; background-color: #fff;">
-            <div style="margin-bottom: 30px;">
-              <h1 style="font-size: 28px; margin: 0; color: #333;">${resumeData.personalInfo.name}</h1>
-              <h2 style="font-size: 18px; margin: 5px 0; color: #555;">${resumeData.personalInfo.title}</h2>
-              <div style="display: flex; gap: 15px; margin-top: 10px; font-size: 14px; color: #555;">
-                <div>${resumeData.personalInfo.email}</div>
-                <div>${resumeData.personalInfo.phone}</div>
-                <div>${resumeData.personalInfo.location}</div>
-              </div>
-              <div style="margin-top: 15px;">
-                <p>${resumeData.personalInfo.summary}</p>
-              </div>
-            </div>
-            
-            <div style="display: flex; margin-bottom: 30px;">
-              <div style="flex: 1; padding-right: 30px;">
-                <h3 style="font-size: 18px; margin-bottom: 15px; position: relative; padding-bottom: 10px;">
-                  Skills
-                  <span style="position: absolute; bottom: 0; left: 0; width: 50px; height: 3px; background-color: #ff6b6b;"></span>
-                </h3>
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                  ${resumeData.skills.map(skill => `
-                    <span style="background-color: #f8f9fa; border: 1px solid #e9ecef; padding: 5px 10px; border-radius: 3px; font-size: 13px;">${skill}</span>
-                  `).join('')}
-                </div>
-                
-                <h3 style="font-size: 18px; margin: 25px 0 15px; position: relative; padding-bottom: 10px;">
-                  Education
-                  <span style="position: absolute; bottom: 0; left: 0; width: 50px; height: 3px; background-color: #ff6b6b;"></span>
-                </h3>
-                ${resumeData.education.map(edu => `
-                  <div style="margin-bottom: 15px;">
-                    <h4 style="margin: 0; font-size: 16px;">${edu.degree}</h4>
-                    <div style="font-size: 14px; color: #666;">${edu.school}</div>
-                    <div style="font-size: 14px; color: #888;">${edu.period}</div>
-                  </div>
-                `).join('')}
-              </div>
-              
-              <div style="flex: 2; border-left: 1px solid #e9ecef; padding-left: 30px;">
-                <h3 style="font-size: 18px; margin-bottom: 20px; position: relative; padding-bottom: 10px;">
-                  Professional Experience
-                  <span style="position: absolute; bottom: 0; left: 0; width: 50px; height: 3px; background-color: #ff6b6b;"></span>
-                </h3>
-                
-                <div style="position: relative;">
-                  ${resumeData.experience.map((exp, i) => `
-                    <div style="margin-bottom: 25px; position: relative; padding-left: 20px;">
-                      <span style="position: absolute; left: -5px; top: 0; width: 10px; height: 10px; border-radius: 50%; background-color: #ff6b6b;"></span>
-                      <span style="position: absolute; left: 0; top: 10px; bottom: ${i === resumeData.experience.length - 1 ? '0' : '-15px'}; width: 1px; background-color: #e9ecef;"></span>
-                      
-                      <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                        <h4 style="margin: 0; font-size: 17px; color: #333;">${exp.title}</h4>
-                        <div style="font-size: 14px; color: #ff6b6b; font-weight: 500;">${exp.period}</div>
-                      </div>
-                      <div style="font-size: 15px; color: #555; margin-bottom: 8px;">${exp.company}, ${exp.location}</div>
-                      <ul style="margin-top: 5px; padding-left: 20px;">
-                        ${exp.highlights.map(highlight => `
-                          <li style="margin-bottom: 5px;">${highlight}</li>
-                        `).join('')}
-                      </ul>
-                    </div>
-                  `).join('')}
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-        break;
-        
-      case 'template7':
-        // Data Analyst (Analytics-focused design with visualization elements)
-        templateHtml = `
-          <div style="font-family: 'Open Sans', Arial, sans-serif; padding: 40px; height: 100%; color: #333; background-color: #fff;">
-            <div style="display: flex; margin-bottom: 30px;">
-              <div style="flex: 2; padding-right: 30px;">
-                <h1 style="font-size: 26px; margin: 0; color: #2c3e50;">${resumeData.personalInfo.name}</h1>
-                <h2 style="font-size: 18px; margin: 5px 0; color: #3498db;">${resumeData.personalInfo.title}</h2>
-                <div style="margin-top: 15px; line-height: 1.6;">
-                  <p>${resumeData.personalInfo.summary}</p>
-                </div>
-              </div>
-              <div style="flex: 1; border-left: 2px solid #ecf0f1; padding-left: 30px;">
-                <div style="margin-bottom: 15px;">
-                  <div style="font-size: 14px; color: #7f8c8d;"><span style="color: #3498db;">Email:</span> ${resumeData.personalInfo.email}</div>
-                  <div style="font-size: 14px; color: #7f8c8d;"><span style="color: #3498db;">Phone:</span> ${resumeData.personalInfo.phone}</div>
-                  <div style="font-size: 14px; color: #7f8c8d;"><span style="color: #3498db;">Location:</span> ${resumeData.personalInfo.location}</div>
-                </div>
-                
-                <h3 style="font-size: 16px; color: #2c3e50; margin: 20px 0 10px; padding-bottom: 5px; border-bottom: 1px solid #ecf0f1;">Data Skills</h3>
-                <div style="display: flex; flex-wrap: wrap; gap: 5px;">
-                  ${resumeData.skills.map(skill => `
-                    <span style="background-color: #eaf2f8; color: #3498db; padding: 4px 8px; border-radius: 3px; font-size: 12px;">${skill}</span>
-                  `).join('')}
-                </div>
-              </div>
-            </div>
-            
-            <div style="margin-bottom: 30px;">
-              <h3 style="font-size: 18px; color: #2c3e50; position: relative; padding-bottom: 10px; border-bottom: 1px solid #ecf0f1;">
-                Professional Experience
-                <span style="position: absolute; bottom: -1px; left: 0; width: 60px; height: 3px; background-color: #3498db;"></span>
-              </h3>
-              
-              ${resumeData.experience.map(exp => `
-                <div style="margin: 20px 0; padding-left: 15px; border-left: 3px solid #3498db;">
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                    <h4 style="margin: 0; font-size: 17px; color: #2c3e50;">${exp.title}</h4>
-                    <div style="font-size: 14px; color: #3498db;">${exp.period}</div>
-                  </div>
-                  <div style="font-size: 15px; color: #7f8c8d; margin-bottom: 8px;">${exp.company}, ${exp.location}</div>
-                  
-                  <div style="margin-top: 10px;">
-                    <h5 style="margin: 0 0 8px; font-size: 15px; color: #2c3e50;">Key Contributions:</h5>
-                    <ul style="margin: 0; padding-left: 20px;">
-                      ${exp.highlights.map(highlight => `
-                        <li style="margin-bottom: 5px;">${highlight}</li>
-                      `).join('')}
-                    </ul>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-            
-            <div>
-              <h3 style="font-size: 18px; color: #2c3e50; position: relative; padding-bottom: 10px; border-bottom: 1px solid #ecf0f1;">
-                Education
-                <span style="position: absolute; bottom: -1px; left: 0; width: 60px; height: 3px; background-color: #3498db;"></span>
-              </h3>
-              
-              <div style="display: flex; flex-wrap: wrap; margin-top: 15px;">
-                ${resumeData.education.map(edu => `
-                  <div style="flex: 1; min-width: 300px; margin: 10px 20px 10px 0;">
-                    <h4 style="margin: 0; font-size: 16px; color: #2c3e50;">${edu.degree}</h4>
-                    <div style="display: flex; justify-content: space-between; margin-top: 5px;">
-                      <div style="font-size: 14px; color: #7f8c8d;">${edu.school}</div>
-                      <div style="font-size: 14px; color: #3498db;">${edu.period}</div>
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          </div>
-        `;
-        break;
-        
-      default:
-        // Default template as fallback
-        templateHtml = `
-          <div style="font-family: Arial, sans-serif; padding: 30px; height: 100%;">
-            <div style="text-align: center; margin-bottom: 20px;">
-              <h1 style="font-size: 26px; margin: 0;">${resumeData.personalInfo.name}</h1>
-              <h2 style="font-size: 18px; margin: 5px 0; color: #666;">${resumeData.personalInfo.title}</h2>
-              <div style="font-size: 14px; margin-top: 10px; color: #555;">
-                <div>${resumeData.personalInfo.email} | ${resumeData.personalInfo.phone} | ${resumeData.personalInfo.location}</div>
-              </div>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-              <h3 style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">Summary</h3>
-              <p>${resumeData.personalInfo.summary}</p>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-              <h3 style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">Skills</h3>
-              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                ${resumeData.skills.map(skill => `
-                  <span style="background-color: #f3f4f6; padding: 3px 8px; border-radius: 4px; font-size: 13px;">${skill}</span>
-                `).join('')}
-              </div>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-              <h3 style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">Experience</h3>
-              ${resumeData.experience.map(exp => `
-                <div style="margin-bottom: 15px;">
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                    <h4 style="margin: 0; font-size: 16px; color: #333;">${exp.title}</h4>
-                    <div style="color: #666; font-size: 14px;">${exp.period}</div>
-                  </div>
-                  <div style="color: #555; font-size: 14px; margin-bottom: 6px;">${exp.company}, ${exp.location}</div>
-                  <ul style="margin-top: 5px; padding-left: 20px;">
-                    ${exp.highlights.map(highlight => `
-                      <li style="margin-bottom: 3px;">${highlight}</li>
-                    `).join('')}
-                  </ul>
-                </div>
-              `).join('')}
-            </div>
-            
-            <div>
-              <h3 style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">Education</h3>
-              ${resumeData.education.map(edu => `
-                <div style="margin-bottom: 10px;">
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                    <h4 style="margin: 0; font-size: 16px; color: #333;">${edu.degree}</h4>
-                    <div style="color: #666; font-size: 14px;">${edu.period}</div>
-                  </div>
-                  <div style="color: #555; font-size: 14px;">${edu.school}</div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-    }
+          `).join('')}
+        </div>
+      </div>
+    `;
     
     // Set the HTML content
     templateDiv.innerHTML = templateHtml;
@@ -738,109 +215,71 @@ const Templates = () => {
     }
   };
 
-  const handleTemplateClick = (templateId: string) => {
-    setSelectedTemplate(templateId);
-    // Reset personalized preview when selecting a new template
-    setPersonalized(false);
-    setPersonalizedPreviewUrl(null);
-  };
-
   const handlePreview = async () => {
-    if (selectedTemplate) {
-      // Generate personalized preview
-      setGeneratingPdf(true);
-      const previewUrl = await generatePersonalizedTemplate();
-      setGeneratingPdf(false);
-      
-      if (previewUrl) {
-        setPersonalizedPreviewUrl(previewUrl);
-        setPersonalized(true);
-        setPreviewModal(true);
-      } else {
-        // Fallback to template image if personalization fails
-        setPersonalized(false);
-        setPreviewModal(true);
-        toast({
-          title: "Could not generate personalized preview",
-          description: "Using template preview instead",
-          variant: "destructive",
-        });
-      }
+    // Generate personalized preview
+    setGeneratingPdf(true);
+    const previewUrl = await generatePersonalizedTemplate();
+    setGeneratingPdf(false);
+    
+    if (previewUrl) {
+      setPersonalizedPreviewUrl(previewUrl);
+      setPreviewModal(true);
     } else {
       toast({
-        title: "No template selected",
-        description: "Please select a template to preview",
+        title: "Could not generate preview",
+        description: "There was an error generating your resume preview",
         variant: "destructive",
       });
     }
   };
 
   const handleDownload = async () => {
-    if (selectedTemplate) {
-      setGeneratingPdf(true);
-      toast({
-        title: "Generating your personalized resume",
-        description: "This may take a moment...",
-      });
+    setGeneratingPdf(true);
+    toast({
+      title: "Generating your resume",
+      description: "This may take a moment...",
+    });
+    
+    try {
+      // Generate personalized template
+      const imageUrl = await generatePersonalizedTemplate();
       
-      // Get the selected template
-      const template = templates.find(t => t.id === selectedTemplate);
-      
-      try {
-        // Generate personalized template
-        const imageUrl = await generatePersonalizedTemplate();
-        
-        if (imageUrl) {
-          // Create PDF
-          const pdf = new jsPDF({
-            orientation: 'portrait',
-            unit: 'px',
-            format: [800, 1130]
-          });
-          
-          // Add the image to the PDF
-          pdf.addImage(imageUrl, 'PNG', 0, 0, 800, 1130);
-          
-          // Download PDF
-          pdf.save(`resume-${resumeData.personalInfo.name.toLowerCase().replace(/\s+/g, '-')}-${template?.name.toLowerCase().replace(/\s+/g, '-')}.pdf`);
-          
-          toast({
-            title: "Resume downloaded!",
-            description: "Your personalized resume has been downloaded as a PDF",
-            variant: "default",
-          });
-        } else {
-          throw new Error("Failed to generate personalized template");
-        }
-      } catch (error) {
-        console.error("Error generating PDF:", error);
-        toast({
-          title: "Download failed",
-          description: "There was a problem generating your resume. Please try again.",
-          variant: "destructive",
+      if (imageUrl) {
+        // Create PDF
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'px',
+          format: [800, 1130]
         });
-      } finally {
-        setGeneratingPdf(false);
+        
+        // Add the image to the PDF
+        pdf.addImage(imageUrl, 'PNG', 0, 0, 800, 1130);
+        
+        // Download PDF
+        pdf.save(`resume-${resumeData.personalInfo.name.toLowerCase().replace(/\s+/g, '-')}.pdf`);
+        
+        toast({
+          title: "Resume downloaded!",
+          description: "Your resume has been downloaded as a PDF",
+          variant: "default",
+        });
+      } else {
+        throw new Error("Failed to generate template");
       }
-    } else {
+    } catch (error) {
+      console.error("Error generating PDF:", error);
       toast({
-        title: "No template selected",
-        description: "Please select a template to download",
+        title: "Download failed",
+        description: "There was a problem generating your resume. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setGeneratingPdf(false);
     }
   };
 
   const handleContinue = () => {
-    if (selectedTemplate) {
-      navigate('/jobs');
-    } else {
-      toast({
-        title: "No template selected",
-        description: "Please select a template to continue",
-        variant: "destructive",
-      });
-    }
+    navigate('/jobs');
   };
 
   const openEditModal = (section: 'personal' | 'skills' | 'experience' | 'education') => {
@@ -919,245 +358,161 @@ const Templates = () => {
           <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary mb-4">
             Your Resume Information Has Been Extracted
           </span>
-          <h1 className="text-3xl font-bold">Choose Your Resume Template</h1>
+          <h1 className="text-3xl font-bold">Your Customized Resume</h1>
           <p className="text-muted-foreground mt-2">
-            Select a template that best represents your professional brand.
+            We've analyzed your uploaded resume and created an optimized version for job applications.
           </p>
         </motion.div>
 
-        <div className="mb-8">
-          <Tabs defaultValue="all" className="w-full" onValueChange={(v) => setCategory(v as TemplateCategory)}>
-            <div className="flex justify-center mb-6">
-              <TabsList className="glass">
-                <TabsTrigger value="all">All Templates</TabsTrigger>
-                <TabsTrigger value="minimal">Minimal</TabsTrigger>
-                <TabsTrigger value="professional">Professional</TabsTrigger>
-                <TabsTrigger value="academic">Academic</TabsTrigger>
-                <TabsTrigger value="creative">Creative</TabsTrigger>
-              </TabsList>
-            </div>
-
-            <TabsContent value={category} className="mt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredTemplates.map((template) => (
-                  <motion.div 
-                    key={template.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3 }}
-                    className={`glass-card rounded-xl overflow-hidden cursor-pointer transition-all duration-300 ${
-                      selectedTemplate === template.id 
-                        ? 'ring-2 ring-primary scale-[1.02]' 
-                        : 'hover:shadow-lg hover:scale-[1.01]'
-                    }`}
-                    onClick={() => handleTemplateClick(template.id)}
-                  >
-                    <div className="relative">
-                      <img 
-                        src={template.image} 
-                        alt={template.name} 
-                        className="w-full h-80 object-cover object-top"
-                      />
-                      
-                      {selectedTemplate === template.id && (
-                        <div className="absolute top-3 right-3 h-7 w-7 rounded-full bg-primary flex items-center justify-center text-white">
-                          <Check className="h-4 w-4" />
-                        </div>
-                      )}
-                      
-                      {template.popular && (
-                        <div className="absolute top-3 left-3 px-2 py-1 rounded-md bg-primary/80 text-white text-xs font-medium">
-                          Popular
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="p-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-medium">{template.name}</h3>
-                        <span className="text-xs capitalize px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">
-                          {template.category}
-                        </span>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-
-        <div className="glass-card rounded-xl p-6 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Your Resume Information</h2>
-            <Button variant="outline" size="sm" onClick={() => openEditModal('personal')}>
-              <Edit className="h-4 w-4 mr-2" />
-              Edit Details
-            </Button>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="glass-card rounded-xl p-8 mb-8">
+          <div className="flex justify-between items-start mb-8">
             <div>
-              <h3 className="font-medium mb-2 flex items-center">
-                <CheckCircle className="h-4 w-4 text-primary mr-2" />
-                Personal Information
-              </h3>
-              <div className="space-y-3 text-sm">
-                <p><span className="font-medium">Name:</span> {resumeData.personalInfo.name}</p>
-                <p><span className="font-medium">Title:</span> {resumeData.personalInfo.title}</p>
-                <p><span className="font-medium">Contact:</span> {resumeData.personalInfo.email} | {resumeData.personalInfo.phone}</p>
+              <h2 className="text-2xl font-bold mb-2">{resumeData.personalInfo.name}</h2>
+              <h3 className="text-lg text-muted-foreground">{resumeData.personalInfo.title}</h3>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handlePreview} disabled={generatingPdf}>
+                {generatingPdf ? (
+                  <>
+                    <span className="animate-spin mr-2">⏳</span>
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Eye className="h-4 w-4 mr-2" />
+                    Preview
+                  </>
+                )}
+              </Button>
+              <Button variant="outline" onClick={handleDownload} disabled={generatingPdf}>
+                {generatingPdf ? (
+                  <>
+                    <span className="animate-spin mr-2">⏳</span>
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Download className="h-4 w-4 mr-2" />
+                    Download PDF
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-medium text-lg">Personal Information</h3>
+                <Button variant="ghost" size="sm" onClick={() => openEditModal('personal')}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+              </div>
+              <div className="space-y-2 text-sm">
+                <p><span className="font-medium">Email:</span> {resumeData.personalInfo.email}</p>
+                <p><span className="font-medium">Phone:</span> {resumeData.personalInfo.phone}</p>
                 <p><span className="font-medium">Location:</span> {resumeData.personalInfo.location}</p>
               </div>
+
+              <div className="mt-6">
+                <h4 className="font-medium mb-2">Professional Summary</h4>
+                <p className="text-sm text-muted-foreground">{resumeData.personalInfo.summary}</p>
+              </div>
             </div>
-            
+
             <div>
-              <div className="flex items-center justify-between">
-                <h3 className="font-medium mb-2 flex items-center">
-                  <CheckCircle className="h-4 w-4 text-primary mr-2" />
-                  Skills
-                </h3>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-6 px-2" 
-                  onClick={() => openEditModal('skills')}
-                >
-                  <Pencil className="h-3 w-3" />
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-medium text-lg">Skills</h3>
+                <Button variant="ghost" size="sm" onClick={() => openEditModal('skills')}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
                 </Button>
               </div>
               <div className="flex flex-wrap gap-2">
                 {resumeData.skills.map((skill, index) => (
-                  <span key={index} className="px-2 py-1 bg-secondary rounded-full text-xs">
+                  <span key={index} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs">
                     {skill}
                   </span>
                 ))}
               </div>
             </div>
           </div>
-          
-          <div className="mt-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-medium mb-2 flex items-center">
-                <CheckCircle className="h-4 w-4 text-primary mr-2" />
-                Experience
-              </h3>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-6 px-2" 
-                onClick={() => openEditModal('experience')}
-              >
-                <Pencil className="h-3 w-3" />
+
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-medium text-lg">Experience</h3>
+              <Button variant="ghost" size="sm" onClick={() => openEditModal('experience')}>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
               </Button>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-6">
               {resumeData.experience.map((exp, index) => (
-                <div key={index} className="text-sm">
+                <div key={index} className="border-l-2 border-primary/30 pl-4">
                   <div className="flex justify-between mb-1">
-                    <p className="font-medium">{exp.title}</p>
-                    <p className="text-muted-foreground">{exp.period}</p>
+                    <h4 className="font-medium">{exp.title}</h4>
+                    <span className="text-sm text-muted-foreground">{exp.period}</span>
                   </div>
-                  <p className="text-muted-foreground">{exp.company}, {exp.location}</p>
+                  <p className="text-sm text-muted-foreground mb-2">{exp.company}, {exp.location}</p>
+                  <ul className="space-y-1 list-disc list-inside text-sm">
+                    {exp.highlights.map((highlight, idx) => (
+                      <li key={idx}>{highlight}</li>
+                    ))}
+                  </ul>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="mt-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-medium mb-2 flex items-center">
-                <CheckCircle className="h-4 w-4 text-primary mr-2" />
-                Education
-              </h3>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-6 px-2" 
-                onClick={() => openEditModal('education')}
-              >
-                <Pencil className="h-3 w-3" />
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-medium text-lg">Education</h3>
+              <Button variant="ghost" size="sm" onClick={() => openEditModal('education')}>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
               </Button>
             </div>
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {resumeData.education.map((edu, index) => (
-                <div key={index} className="text-sm">
-                  <div className="flex justify-between mb-1">
-                    <p className="font-medium">{edu.degree}</p>
-                    <p className="text-muted-foreground">{edu.period}</p>
-                  </div>
-                  <p className="text-muted-foreground">{edu.school}</p>
-                </div>
+                <Card key={index} className="p-4">
+                  <h4 className="font-medium">{edu.degree}</h4>
+                  <p className="text-sm text-muted-foreground">{edu.school}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{edu.period}</p>
+                </Card>
               ))}
             </div>
           </div>
         </div>
 
         <div className="flex justify-between items-center">
-          <div className="flex gap-4">
-            <Button variant="outline" onClick={handlePreview} disabled={generatingPdf}>
-              {generatingPdf ? (
-                <>
-                  <span className="animate-spin mr-2">⏳</span>
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Eye className="h-4 w-4 mr-2" />
-                  Preview
-                </>
-              )}
-            </Button>
-            <Button variant="outline" onClick={handleDownload} disabled={generatingPdf}>
-              {generatingPdf ? (
-                <>
-                  <span className="animate-spin mr-2">⏳</span>
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Download className="h-4 w-4 mr-2" />
-                  Download
-                </>
-              )}
-            </Button>
-          </div>
-          <Button 
-            onClick={handleContinue}
-            disabled={!selectedTemplate || generatingPdf}
-          >
+          <p className="text-sm text-muted-foreground">
+            Your resume has been optimized for ATS systems
+            <CheckCircle className="h-4 w-4 inline ml-1 text-green-500" />
+          </p>
+          <Button onClick={handleContinue}>
             Continue to Job Matches
             <FileCheck className="h-4 w-4 ml-2" />
           </Button>
         </div>
 
-        {previewModal && selectedTemplate && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
-              <div className="p-4 border-b flex justify-between items-center">
-                <h3 className="font-medium text-lg">
-                  {templates.find(t => t.id === selectedTemplate)?.name} {personalized ? "Personalized" : ""} Preview
-                </h3>
-                <Button variant="ghost" size="icon" onClick={() => setPreviewModal(false)}>
-                  <span className="sr-only">Close</span>
-                  <X className="h-4 w-4" />
-                </Button>
+        {previewModal && personalizedPreviewUrl && (
+          <Dialog open={previewModal} onOpenChange={setPreviewModal}>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-auto">
+              <DialogHeader>
+                <DialogTitle>Resume Preview</DialogTitle>
+                <DialogDescription>
+                  This is how your resume will look when downloaded as a PDF
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex justify-center my-4">
+                <img 
+                  src={personalizedPreviewUrl} 
+                  alt="Resume Preview" 
+                  className="max-w-full max-h-[70vh] border shadow-sm rounded"
+                />
               </div>
-              <div className="p-4">
-                {personalized && personalizedPreviewUrl ? (
-                  <img 
-                    src={personalizedPreviewUrl} 
-                    alt="Personalized Resume Preview" 
-                    className="max-w-full max-h-[70vh] mx-auto"
-                  />
-                ) : (
-                  <img 
-                    src={templates.find(t => t.id === selectedTemplate)?.image} 
-                    alt="Resume Preview" 
-                    className="max-w-full max-h-[70vh] mx-auto"
-                  />
-                )}
-              </div>
-              <div className="p-4 border-t flex justify-end gap-2">
+              <DialogFooter>
                 <Button variant="outline" onClick={() => setPreviewModal(false)}>
                   Close
                 </Button>
@@ -1170,13 +525,13 @@ const Templates = () => {
                   ) : (
                     <>
                       <Download className="h-4 w-4 mr-2" />
-                      Download
+                      Download PDF
                     </>
                   )}
                 </Button>
-              </div>
-            </div>
-          </div>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         )}
 
         <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
@@ -1189,15 +544,8 @@ const Templates = () => {
             
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSaveEdits)} className="space-y-6">
-                <Tabs defaultValue={currentEditSection} className="w-full">
-                  <TabsList className="mb-4">
-                    <TabsTrigger value="personal">Personal</TabsTrigger>
-                    <TabsTrigger value="skills">Skills</TabsTrigger>
-                    <TabsTrigger value="experience">Experience</TabsTrigger>
-                    <TabsTrigger value="education">Education</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="personal" className="space-y-4">
+                {currentEditSection === 'personal' && (
+                  <div className="space-y-4">
                     <FormField
                       control={form.control}
                       name="personalInfo.name"
@@ -1281,9 +629,11 @@ const Templates = () => {
                         </FormItem>
                       )}
                     />
-                  </TabsContent>
-                  
-                  <TabsContent value="skills" className="space-y-4">
+                  </div>
+                )}
+                
+                {currentEditSection === 'skills' && (
+                  <div className="space-y-4">
                     <div className="flex justify-between items-center mb-2">
                       <h3 className="text-sm font-medium">Skills</h3>
                       <Button 
@@ -1297,7 +647,7 @@ const Templates = () => {
                     </div>
                     
                     <Card>
-                      <CardContent className="p-4 space-y-2">
+                      <div className="p-4 space-y-2">
                         {form.watch('skills')?.map((_, index) => (
                           <div key={index} className="flex items-center gap-2">
                             <FormField
@@ -1322,11 +672,13 @@ const Templates = () => {
                             </Button>
                           </div>
                         ))}
-                      </CardContent>
+                      </div>
                     </Card>
-                  </TabsContent>
-                  
-                  <TabsContent value="experience" className="space-y-4">
+                  </div>
+                )}
+                
+                {currentEditSection === 'experience' && (
+                  <div className="space-y-4">
                     <div className="flex justify-between items-center mb-2">
                       <h3 className="text-sm font-medium">Work Experience</h3>
                       <Button 
@@ -1341,7 +693,7 @@ const Templates = () => {
                     
                     {form.watch('experience')?.map((_, expIndex) => (
                       <Card key={expIndex} className="mb-4">
-                        <CardContent className="p-4 space-y-4">
+                        <div className="p-4 space-y-4">
                           <div className="flex justify-between">
                             <h4 className="text-sm font-medium">Experience {expIndex + 1}</h4>
                             <Button 
@@ -1447,12 +799,14 @@ const Templates = () => {
                               </div>
                             ))}
                           </div>
-                        </CardContent>
+                        </div>
                       </Card>
                     ))}
-                  </TabsContent>
-                  
-                  <TabsContent value="education" className="space-y-4">
+                  </div>
+                )}
+                
+                {currentEditSection === 'education' && (
+                  <div className="space-y-4">
                     <div className="flex justify-between items-center mb-2">
                       <h3 className="text-sm font-medium">Education</h3>
                       <Button 
@@ -1467,7 +821,7 @@ const Templates = () => {
                     
                     {form.watch('education')?.map((_, eduIndex) => (
                       <Card key={eduIndex} className="mb-4">
-                        <CardContent className="p-4 space-y-4">
+                        <div className="p-4 space-y-4">
                           <div className="flex justify-between">
                             <h4 className="text-sm font-medium">Education {eduIndex + 1}</h4>
                             <Button 
@@ -1519,11 +873,11 @@ const Templates = () => {
                               </FormItem>
                             )}
                           />
-                        </CardContent>
+                        </div>
                       </Card>
                     ))}
-                  </TabsContent>
-                </Tabs>
+                  </div>
+                )}
                 
                 <DialogFooter>
                   <Button type="button" variant="outline" onClick={() => setEditModalOpen(false)}>
