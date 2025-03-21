@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -45,7 +46,7 @@ const Navbar = () => {
         className={cn(
           'fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out',
           isScrolled || isMenuOpen
-            ? 'glass border-b border-white/10 py-3'
+            ? 'glass border-b border-white/10 py-3 dark:bg-background/80 dark:border-border/30'
             : 'bg-transparent py-5'
         )}
       >
@@ -55,13 +56,13 @@ const Navbar = () => {
             className="flex items-center space-x-2 text-primary"
           >
             <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-              <span className="text-white font-bold">R</span>
+              <span className="text-white font-bold dark:text-primary-foreground">R</span>
             </div>
             <span className="font-semibold text-xl tracking-tight">ResumeCraft</span>
           </Link>
 
           {/* Desktop navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-6">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -76,22 +77,26 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
+            <ThemeToggle />
             <Button size="sm" onClick={handleGetStarted}>Get Started</Button>
           </nav>
 
           {/* Mobile menu button */}
-          <button
-            className="md:hidden p-2 text-foreground"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            <ThemeToggle />
+            <button
+              className="p-2 text-foreground"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile navigation */}
         {isMenuOpen && (
-          <nav className="md:hidden absolute top-full left-0 right-0 glass border-b border-white/10 animate-fade-in">
+          <nav className="md:hidden absolute top-full left-0 right-0 glass border-b border-white/10 animate-fade-in dark:bg-background/80 dark:border-border/30">
             <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
               {navLinks.map((link, index) => (
                 <Link

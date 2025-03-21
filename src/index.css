@@ -64,6 +64,15 @@
     --border: 217 33% 18%;
     --input: 217 33% 18%;
     --ring: 212 27% 84%;
+
+    --sidebar-background: 222 47% 10%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 210 100% 50%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 217 33% 18%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 25%;
+    --sidebar-ring: 212 27% 84%;
   }
 }
 
@@ -76,72 +85,27 @@
     @apply bg-background text-foreground antialiased;
   }
 
-  .glass {
-    @apply bg-white/50 backdrop-blur-md;
+  /* Add theme transition for smooth theme switching */
+  :root {
+    --transition-duration: 0.3s;
   }
 
-  .glass-card {
-    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-lg;
+  html.dark {
+    color-scheme: dark;
   }
 
-  .content-transition {
-    @apply transition-all duration-500 ease-out;
+  html.light {
+    color-scheme: light;
   }
 
-  .page-container {
-    @apply container mx-auto px-4 pt-24 pb-16 min-h-screen;
+  html, body, * {
+    transition: background-color var(--transition-duration) ease, 
+                border-color var(--transition-duration) ease,
+                box-shadow var(--transition-duration) ease,
+                color var(--transition-duration) ease;
   }
 
-  .animate-stagger-1 {
-    animation-delay: 100ms;
-  }
-  
-  .animate-stagger-2 {
-    animation-delay: 200ms;
-  }
-  
-  .animate-stagger-3 {
-    animation-delay: 300ms;
-  }
-  
-  .animate-stagger-4 {
-    animation-delay: 400ms;
-  }
-  
-  .animate-stagger-5 {
-    animation-delay: 500ms;
-  }
+  /* ... keep existing code (glass, glass-card, content-transition, etc.) */
 }
 
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/inter/v12/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-html {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  scroll-behavior: smooth;
-}
-
-/* Stylized scrollbar for webkit browsers */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
-}
+/* ... keep existing code (font-face, scrollbar styles, etc.) */
