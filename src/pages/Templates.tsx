@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -133,36 +134,37 @@ const mockedResumeData = {
   ]
 };
 
+// Updated template options with placeholder images instead of uploaded templates
 const templateOptions: TemplateOption[] = [
   {
     id: "professional",
     name: "Professional",
     description: "Clean, traditional layout with a professional appeal",
-    thumbnail: "/lovable-uploads/f48bebe0-0d22-424e-945c-0766c5010c9d.png"
+    thumbnail: "https://placehold.co/400x300/e2e8f0/334155?text=Professional+Template"
   },
   {
     id: "modern",
     name: "Modern",
     description: "Contemporary design with creative styling",
-    thumbnail: "/lovable-uploads/045b3ae8-1bc8-4c03-9056-6e34fc137969.png"
+    thumbnail: "https://placehold.co/400x300/dbeafe/1e40af?text=Modern+Template"
   },
   {
     id: "minimal",
     name: "Minimal",
     description: "Simple, clean design focusing on content",
-    thumbnail: "/lovable-uploads/da38501c-178a-4ab5-83d2-24f271ab872d.png"
+    thumbnail: "https://placehold.co/400x300/f1f5f9/334155?text=Minimal+Template"
   },
   {
     id: "creative",
     name: "Creative",
     description: "Bold design with unique elements for creative fields",
-    thumbnail: "/lovable-uploads/506d859b-1ee9-4a76-9bc5-2aab31eb2713.png"
+    thumbnail: "https://placehold.co/400x300/f0fdf4/166534?text=Creative+Template"
   },
   {
     id: "executive",
     name: "Executive",
     description: "Sophisticated layout for senior positions",
-    thumbnail: "/lovable-uploads/8084e7d7-bcd4-443b-83fd-039f4f8ef460.png"
+    thumbnail: "https://placehold.co/400x300/fef2f2/991b1b?text=Executive+Template"
   }
 ];
 
@@ -707,11 +709,11 @@ const Templates = () => {
           className="text-center mb-10"
         >
           <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary mb-4">
-            Your Resume Information Has Been Extracted
+            Resume Builder
           </span>
-          <h1 className="text-3xl font-bold">Your Customized Resume</h1>
+          <h1 className="text-3xl font-bold">Choose Your Resume Template</h1>
           <p className="text-muted-foreground mt-2">
-            Choose a template and customize your resume for job applications.
+            Select a template and customize your resume for job applications.
           </p>
         </motion.div>
 
