@@ -23,6 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/layout/Layout";
 import ResumePreview from "@/components/resume/ResumePreview";
 import { Briefcase, MapPin, Clock, BarChart3, Search } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Jobs = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,6 +33,7 @@ const Jobs = () => {
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const mockJobs = [
     {
@@ -182,19 +184,19 @@ const Jobs = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="mt-20"
+        className="mt-10 md:mt-20 px-4 md:px-0"
       >
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold mb-2">Find Your Perfect Job</h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+        <div className="text-center mb-6 md:mb-10">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Find Your Perfect Job</h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto text-sm md:text-base">
             Browse through our curated job listings tailored to your skills and
             experience.
           </p>
         </div>
 
         {/* Search and Filters */}
-        <div className="glass-card p-6 rounded-xl mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="glass-card p-4 md:p-6 rounded-xl mb-6 md:mb-8">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div>
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -250,9 +252,9 @@ const Jobs = () => {
         {/* Job Listings */}
         <div className="space-y-4 mb-10">
           {filteredJobs.length === 0 ? (
-            <div className="text-center p-12 glass-card rounded-xl">
-              <h3 className="text-xl font-medium mb-2">No Jobs Found</h3>
-              <p className="text-muted-foreground">
+            <div className="text-center p-6 md:p-12 glass-card rounded-xl">
+              <h3 className="text-lg md:text-xl font-medium mb-2">No Jobs Found</h3>
+              <p className="text-muted-foreground text-sm md:text-base">
                 Try adjusting your search criteria or check back later for new
                 postings.
               </p>
@@ -260,16 +262,16 @@ const Jobs = () => {
           ) : (
             filteredJobs.map((job) => (
               <Card key={job.id} className="overflow-hidden">
-                <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start">
+                <CardHeader className="pb-3 p-4 md:p-6">
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-2">
                     <div>
-                      <CardTitle className="text-xl">{job.title}</CardTitle>
+                      <CardTitle className="text-lg md:text-xl">{job.title}</CardTitle>
                       <CardDescription className="flex items-center mt-1">
                         <Briefcase className="mr-1 h-4 w-4" />
                         {job.company}
                       </CardDescription>
                     </div>
-                    <div className="flex flex-col items-end">
+                    <div className="flex items-start md:items-end md:flex-col">
                       <div className="bg-primary/10 text-primary rounded-full px-3 py-1 text-sm flex items-center">
                         <BarChart3 className="mr-1 h-4 w-4" />
                         {job.match}% Match
@@ -277,8 +279,8 @@ const Jobs = () => {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="pb-3">
-                  <div className="flex flex-wrap gap-3 text-sm text-muted-foreground mb-4">
+                <CardContent className="pb-3 p-4 md:p-6 pt-0">
+                  <div className="flex flex-wrap gap-3 text-xs md:text-sm text-muted-foreground mb-4">
                     <div className="flex items-center">
                       <MapPin className="mr-1 h-4 w-4" />
                       {job.location}
@@ -292,13 +294,17 @@ const Jobs = () => {
                       {job.posted}
                     </div>
                   </div>
-                  <p className="text-sm line-clamp-2">{job.description}</p>
+                  <p className="text-xs md:text-sm line-clamp-2">{job.description}</p>
                 </CardContent>
-                <CardFooter className="flex justify-between pt-3 border-t">
+                <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-3 border-t p-4 md:p-6">
                   <div>
-                    <p className="text-sm font-medium">{job.salary}</p>
+                    <p className="text-xs md:text-sm font-medium">{job.salary}</p>
                   </div>
-                  <Button variant="outline" onClick={() => handlePreview(job)}>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handlePreview(job)}
+                    className="w-full sm:w-auto"
+                  >
                     Preview Resume
                   </Button>
                 </CardFooter>
