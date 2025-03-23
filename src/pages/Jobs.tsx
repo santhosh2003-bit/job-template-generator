@@ -27,7 +27,7 @@ import { Briefcase, MapPin, Clock, BarChart3, Search } from "lucide-react";
 const Jobs = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [location, setLocation] = useState("");
-  const [jobType, setJobType] = useState("");
+  const [jobType, setJobType] = useState("all");
   const [salary, setSalary] = useState([50]);
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -167,7 +167,7 @@ const Jobs = () => {
       .includes(searchTerm.toLowerCase());
     const matchesLocation =
       location === "" || job.location.includes(location);
-    const matchesType = jobType === "" || job.type === jobType;
+    const matchesType = jobType === "all" || job.type === jobType;
     const jobSalaryMin = parseInt(
       job.salary.replace(/[^0-9]/g, "").substring(0, 6)
     );
@@ -223,7 +223,7 @@ const Jobs = () => {
                   <SelectValue placeholder="Job Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="Full-time">Full-time</SelectItem>
                   <SelectItem value="Part-time">Part-time</SelectItem>
                   <SelectItem value="Contract">Contract</SelectItem>
