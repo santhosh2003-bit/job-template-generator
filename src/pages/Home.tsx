@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -11,6 +12,11 @@ import {
   FileUp,
   LayoutTemplate,
   Search,
+  Upload,
+  BarChart,
+  FileCheck,
+  Edit3,
+  Send,
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 
@@ -155,40 +161,43 @@ const Home = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">How It Works</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              From Resume to customized
+              From Resume to customised job application in 3 simple steps
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {[
               {
-                icon: <FileUp className="h-10 w-10" />,
+                icon: <Upload className="h-10 w-10 text-primary" />,
                 title: "Upload Your Resume",
                 description:
-                  "Upload your existing resume or start from scratch using our intuitive builder.",
+                  "Upload your existing resume or create a new one using our intuitive builder.",
+                number: 1,
               },
               {
-                icon: <User className="h-10 w-10" />,
-                title: "Choose a Template",
+                icon: <BarChart className="h-10 w-10 text-primary" />,
+                title: "AI Job Ranking",
                 description:
-                  "Select from our professionally designed templates that match your career goals.",
+                  "Our AI analyzes your resume and provides ranking of job descriptions matching your experience and skills.",
+                number: 2,
               },
               {
-                icon: <Search className="h-10 w-10" />,
-                title: "Apply to Jobs",
+                icon: <FileCheck className="h-10 w-10 text-primary" />,
+                title: "Get custom resumes & apply",
                 description:
-                  "Get matched with relevant job openings and apply directly through our platform.",
+                  "Get custom resumes generated for you for every matched job, modify if needed & hit apply.",
+                number: 3,
               },
             ].map((step, index) => (
               <div
                 key={index}
                 className="glass-card p-6 rounded-xl relative flex flex-col items-center text-center"
               >
-                <div className="absolute -top-4 h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
-                  {index + 1}
-                </div>
                 <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   {step.icon}
+                </div>
+                <div className="absolute -top-4 -right-4 h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
+                  {step.number}
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
                 <p className="text-muted-foreground">{step.description}</p>

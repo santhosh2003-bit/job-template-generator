@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Menu, X, Mail, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useResume } from "@/context/ResumeContext";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +21,8 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { checkResumeStatus } = useResume();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,13 +39,31 @@ const Navbar = () => {
 
   const navLinks = [
     { name: "Home", path: "/" },
-    { name: "Upload Resume", path: "/upload" },
-    { name: "Templates", path: "/templates" },
-    { name: "Jobs", path: "/jobs" },
+    { 
+      name: "Upload Resume", 
+      path: "/upload",
+      onClick: () => true 
+    },
+    { 
+      name: "Templates", 
+      path: "/templates",
+      onClick: () => checkResumeStatus()
+    },
+    { 
+      name: "Jobs", 
+      path: "/jobs",
+      onClick: () => checkResumeStatus()
+    },
   ];
 
   const handleGetStarted = () => {
     setIsAuthDialogOpen(true);
+  };
+  
+  const handleNavLinkClick = (e: React.MouseEvent, link: any) => {
+    if (link.onClick && !link.onClick()) {
+      e.preventDefault();
+    }
   };
 
   return (
@@ -67,7 +88,6 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Desktop navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             {navLinks.map((link) => (
               <Link
@@ -79,6 +99,7 @@ const Navbar = () => {
                     ? "text-primary font-medium"
                     : "text-foreground/80"
                 )}
+                onClick={(e) => handleNavLinkClick(e, link)}
               >
                 {link.name}
               </Link>
@@ -89,7 +110,6 @@ const Navbar = () => {
             </Button>
           </nav>
 
-          {/* Mobile menu button */}
           <div className="md:hidden flex items-center gap-2">
             <ThemeToggle />
             <button
@@ -102,7 +122,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile navigation */}
         {isMenuOpen && (
           <nav className="md:hidden absolute top-full left-0 right-0 glass border-b border-white/10 animate-fade-in dark:bg-background/80 dark:border-border/30">
             <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
@@ -117,6 +136,7 @@ const Navbar = () => {
                       ? "bg-accent text-primary font-medium"
                       : "hover:bg-accent/50"
                   )}
+                  onClick={(e) => handleNavLinkClick(e, link)}
                 >
                   {link.name}
                 </Link>
@@ -132,7 +152,6 @@ const Navbar = () => {
         )}
       </header>
 
-      {/* Authentication Dialog */}
       <Dialog open={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

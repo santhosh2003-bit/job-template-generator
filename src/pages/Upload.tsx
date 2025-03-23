@@ -1,10 +1,11 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import Layout from "@/components/layout/Layout";
+import { useResume } from "@/context/ResumeContext";
 import {
   Check,
   FileText,
@@ -23,6 +24,7 @@ const ResumeUpload = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { setHasResume, setResumeData } = useResume();
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -109,6 +111,32 @@ const ResumeUpload = () => {
                 setStep(5); // Complete
                 setUploading(false);
 
+                // Set resume state
+                setHasResume(true);
+                
+                // Set mock resume data
+                setResumeData({
+                  name: "John Doe",
+                  email: "john.doe@example.com",
+                  phone: "(123) 456-7890",
+                  experience: [
+                    {
+                      title: "Frontend Developer",
+                      company: "Tech Solutions Inc.",
+                      date: "Jan 2020 - Present",
+                      description: "Developed responsive web applications using React and TypeScript."
+                    }
+                  ],
+                  education: [
+                    {
+                      degree: "Bachelor of Science in Computer Science",
+                      school: "University of Technology",
+                      date: "2016 - 2020"
+                    }
+                  ],
+                  skills: ["JavaScript", "React", "TypeScript", "HTML/CSS", "Node.js"]
+                });
+
                 // Navigate to templates page after completion
                 setTimeout(() => {
                   navigate("/templates");
@@ -119,7 +147,7 @@ const ResumeUpload = () => {
         }, 500);
       }
     }, 100);
-  }, [navigate]);
+  }, [navigate, setHasResume, setResumeData]);
 
   const handleUpload = () => {
     if (!file) return;
