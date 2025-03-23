@@ -1,12 +1,18 @@
-
-import { useState, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import Layout from '@/components/layout/Layout';
-import { Check, FileText, Upload as UploadIcon, File, X, Loader2 } from 'lucide-react';
+import { useState, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import Layout from "@/components/layout/Layout";
+import {
+  Check,
+  FileText,
+  Upload as UploadIcon,
+  File,
+  X,
+  Loader2,
+} from "lucide-react";
 
 const ResumeUpload = () => {
   const [isDragging, setIsDragging] = useState(false);
@@ -31,7 +37,7 @@ const ResumeUpload = () => {
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       validateAndSetFile(e.dataTransfer.files[0]);
     }
@@ -44,8 +50,12 @@ const ResumeUpload = () => {
   };
 
   const validateAndSetFile = (file: File) => {
-    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    
+    const allowedTypes = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
+
     if (!allowedTypes.includes(file.type)) {
       toast({
         title: "Invalid file type",
@@ -54,8 +64,9 @@ const ResumeUpload = () => {
       });
       return;
     }
-    
-    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+
+    if (file.size > 5 * 1024 * 1024) {
+      // 5MB limit
       toast({
         title: "File too large",
         description: "Maximum file size is 5MB",
@@ -63,30 +74,30 @@ const ResumeUpload = () => {
       });
       return;
     }
-    
+
     setFile(file);
   };
 
   const handleRemoveFile = () => {
     setFile(null);
     if (inputRef.current) {
-      inputRef.current.value = '';
+      inputRef.current.value = "";
     }
   };
 
   const simulateUpload = useCallback(() => {
     setUploading(true);
     setStep(1);
-    
+
     // Simulate upload progress
     let progress = 0;
     const interval = setInterval(() => {
       progress += 5;
       setUploadProgress(progress);
-      
+
       if (progress >= 100) {
         clearInterval(interval);
-        
+
         // Simulate processing steps
         setTimeout(() => {
           setStep(2); // Analyzing
@@ -97,10 +108,10 @@ const ResumeUpload = () => {
               setTimeout(() => {
                 setStep(5); // Complete
                 setUploading(false);
-                
+
                 // Navigate to templates page after completion
                 setTimeout(() => {
-                  navigate('/templates');
+                  navigate("/templates");
                 }, 1000);
               }, 1000);
             }, 1500);
@@ -112,29 +123,41 @@ const ResumeUpload = () => {
 
   const handleUpload = () => {
     if (!file) return;
-    
+
     toast({
       title: "Resume upload started",
       description: "We're processing your resume...",
     });
-    
+
     simulateUpload();
   };
 
   const steps = [
     { label: "Upload", icon: <UploadIcon className="h-[18px] w-[18px]" /> },
-    { label: "Uploading", icon: <Loader2 className="h-[18px] w-[18px] animate-spin" /> },
-    { label: "Analyzing", icon: <Loader2 className="h-[18px] w-[18px] animate-spin" /> },
-    { label: "Extracting", icon: <Loader2 className="h-[18px] w-[18px] animate-spin" /> },
-    { label: "Formatting", icon: <Loader2 className="h-[18px] w-[18px] animate-spin" /> },
+    {
+      label: "Uploading",
+      icon: <Loader2 className="h-[18px] w-[18px] animate-spin" />,
+    },
+    {
+      label: "Analyzing",
+      icon: <Loader2 className="h-[18px] w-[18px] animate-spin" />,
+    },
+    {
+      label: "Extracting",
+      icon: <Loader2 className="h-[18px] w-[18px] animate-spin" />,
+    },
+    {
+      label: "Formatting",
+      icon: <Loader2 className="h-[18px] w-[18px] animate-spin" />,
+    },
     { label: "Complete", icon: <Check className="h-[18px] w-[18px]" /> },
   ];
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-3xl mx-auto mt-20">
         <div className="text-center mb-10">
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -142,13 +165,14 @@ const ResumeUpload = () => {
           >
             Upload Your Resume
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-muted-foreground mt-2"
           >
-            Upload your existing resume to get started. We support PDF, DOC, and DOCX formats.
+            Upload your existing resume to get started. We support PDF, DOC, and
+            DOCX formats.
           </motion.p>
         </div>
 
@@ -156,30 +180,36 @@ const ResumeUpload = () => {
         <div className="mb-10">
           <div className="flex items-center justify-between max-w-2xl mx-auto relative">
             <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-muted z-0" />
-            
+
             {steps.map((s, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ 
-                  opacity: 1, 
+                animate={{
+                  opacity: 1,
                   scale: 1,
-                  transition: { delay: i * 0.1 }
+                  transition: { delay: i * 0.1 },
                 }}
                 className="relative z-10"
               >
-                <div 
+                <div
                   className={`h-10 w-10 rounded-full flex items-center justify-center border-2 transition-all ${
-                    i < step ? 'bg-primary border-primary text-white' : 
-                    i === step ? 'bg-primary border-primary text-white' : 
-                    'bg-white border-muted text-muted-foreground'
+                    i < step
+                      ? "bg-primary border-primary text-white"
+                      : i === step
+                      ? "bg-primary border-primary text-white"
+                      : "bg-white border-muted text-muted-foreground"
                   }`}
                 >
                   {i < step ? <Check className="h-4 w-4" /> : s.icon}
                 </div>
-                <div className={`text-xs mt-2 text-center transition-colors ${
-                  i <= step ? 'text-primary font-medium' : 'text-muted-foreground'
-                }`}>
+                <div
+                  className={`text-xs mt-2 text-center transition-colors ${
+                    i <= step
+                      ? "text-primary font-medium"
+                      : "text-muted-foreground"
+                  }`}
+                >
                   {s.label}
                 </div>
               </motion.div>
@@ -199,16 +229,18 @@ const ResumeUpload = () => {
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 className={`border-2 border-dashed rounded-xl p-10 text-center transition-colors ${
-                  isDragging ? 'border-primary bg-primary/5' : 'border-muted'
+                  isDragging ? "border-primary bg-primary/5" : "border-muted"
                 }`}
               >
                 <div className="flex flex-col items-center justify-center space-y-4">
                   <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
                     <FileText className="h-8 w-8 text-primary" />
                   </div>
-                  
+
                   <div className="space-y-2">
-                    <h3 className="text-lg font-medium">Drag & Drop Your Resume</h3>
+                    <h3 className="text-lg font-medium">
+                      Drag & Drop Your Resume
+                    </h3>
                     <p className="text-muted-foreground text-sm">
                       Or click to browse files (PDF, DOC, DOCX up to 5MB)
                     </p>
@@ -220,10 +252,11 @@ const ResumeUpload = () => {
                     onChange={handleFileChange}
                     accept=".pdf,.doc,.docx"
                     className="hidden"
+                    placeholder="Upload your resume"
                     id="resume-upload"
                   />
-                  
-                  <Button 
+
+                  <Button
                     onClick={() => inputRef.current?.click()}
                     variant="outline"
                     className="relative"
@@ -239,15 +272,16 @@ const ResumeUpload = () => {
                   <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mr-4">
                     <File className="h-6 w-6 text-primary" />
                   </div>
-                  
+
                   <div className="flex-1">
                     <h3 className="font-medium truncate">{file.name}</h3>
                     <p className="text-muted-foreground text-sm">
-                      {(file.size / 1024 / 1024).toFixed(2)} MB • {file.type.split('/')[1].toUpperCase()}
+                      {(file.size / 1024 / 1024).toFixed(2)} MB •{" "}
+                      {file.type.split("/")[1].toUpperCase()}
                     </p>
                   </div>
-                  
-                  <Button 
+
+                  <Button
                     onClick={handleRemoveFile}
                     variant="ghost"
                     size="icon"
@@ -256,7 +290,7 @@ const ResumeUpload = () => {
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
-                
+
                 <div className="mt-6">
                   <Button onClick={handleUpload} className="w-full">
                     Process Resume
@@ -264,7 +298,7 @@ const ResumeUpload = () => {
                 </div>
               </div>
             )}
-            
+
             <div className="mt-8 glass-card p-6 rounded-xl">
               <h3 className="font-medium mb-4">What happens after upload?</h3>
               <ul className="space-y-3">
@@ -276,7 +310,9 @@ const ResumeUpload = () => {
                 ].map((item, i) => (
                   <li key={i} className="flex items-start">
                     <span className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center mr-3 mt-0.5">
-                      <span className="text-primary text-xs font-medium">{i + 1}</span>
+                      <span className="text-primary text-xs font-medium">
+                        {i + 1}
+                      </span>
                     </span>
                     <span className="text-muted-foreground">{item}</span>
                   </li>
@@ -296,12 +332,12 @@ const ResumeUpload = () => {
                 {step < 5 ? "Processing Your Resume" : "Processing Complete!"}
               </h2>
               <p className="text-muted-foreground">
-                {step < 5 
-                  ? "Please wait while we analyze and process your resume..." 
+                {step < 5
+                  ? "Please wait while we analyze and process your resume..."
                   : "Your resume has been successfully processed. Taking you to templates..."}
               </p>
             </div>
-            
+
             {step === 1 && (
               <div className="mb-6">
                 <div className="flex justify-between text-sm mb-2">
@@ -311,33 +347,45 @@ const ResumeUpload = () => {
                 <Progress value={uploadProgress} className="h-2" />
               </div>
             )}
-            
+
             <div className="space-y-6">
               {steps.slice(1).map((s, i) => {
                 const stepIndex = i + 1;
-                let status: 'pending' | 'current' | 'complete' = 'pending';
-                
-                if (step > stepIndex) status = 'complete';
-                else if (step === stepIndex) status = 'current';
-                
+                let status: "pending" | "current" | "complete" = "pending";
+
+                if (step > stepIndex) status = "complete";
+                else if (step === stepIndex) status = "current";
+
                 return (
-                  <div 
-                    key={i} 
-                    className={`flex items-center ${status === 'pending' ? 'opacity-50' : ''}`}
+                  <div
+                    key={i}
+                    className={`flex items-center ${
+                      status === "pending" ? "opacity-50" : ""
+                    }`}
                   >
-                    <div className={`h-8 w-8 rounded-full flex items-center justify-center mr-4 ${
-                      status === 'complete' ? 'bg-primary text-white' :
-                      status === 'current' ? 'bg-primary text-white' :
-                      'bg-muted'
-                    }`}>
-                      {status === 'complete' ? <Check className="h-4 w-4" /> : s.icon}
+                    <div
+                      className={`h-8 w-8 rounded-full flex items-center justify-center mr-4 ${
+                        status === "complete"
+                          ? "bg-primary text-white"
+                          : status === "current"
+                          ? "bg-primary text-white"
+                          : "bg-muted"
+                      }`}
+                    >
+                      {status === "complete" ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        s.icon
+                      )}
                     </div>
                     <div>
                       <p className="font-medium">{s.label}</p>
                       <p className="text-muted-foreground text-sm">
-                        {status === 'complete' ? 'Completed' : 
-                         status === 'current' ? 'In progress...' : 
-                         'Pending'}
+                        {status === "complete"
+                          ? "Completed"
+                          : status === "current"
+                          ? "In progress..."
+                          : "Pending"}
                       </p>
                     </div>
                   </div>

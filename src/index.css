@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -98,11 +97,13 @@
     color-scheme: light;
   }
 
-  html, body, * {
-    transition: background-color var(--transition-duration) ease, 
-                border-color var(--transition-duration) ease,
-                box-shadow var(--transition-duration) ease,
-                color var(--transition-duration) ease;
+  html,
+  body,
+  * {
+    transition: background-color var(--transition-duration) ease,
+      border-color var(--transition-duration) ease,
+      box-shadow var(--transition-duration) ease,
+      color var(--transition-duration) ease;
   }
 
   /* ... keep existing code (glass, glass-card, content-transition, etc.) */
