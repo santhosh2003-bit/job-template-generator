@@ -81,6 +81,10 @@ type ResumeData = {
     school: string;
     period: string;
   }[];
+  projects: {
+    title: string;
+    description: string;
+  }[];
 };
 
 type TemplateOption = {
@@ -172,6 +176,18 @@ const mockedResumeData = {
       period: "2012 - 2016",
     },
   ],
+  projects: [
+    {
+      title: "LIBRARY MANAGEMENT SYSTEM:",
+      description:
+        "Developed a full-featured library management system using Node.js, Express.js, React, andMongoDB.",
+    },
+    {
+      title: "COURSE ENROLLMENT APPLICATION PROJECT:",
+      description:
+        "I also built a Course Enrollment Application that streamlines the registration process for students",
+    },
+  ],
 };
 
 // Updated template options with placeholder images instead of uploaded templates
@@ -180,36 +196,19 @@ const templateOptions: TemplateOption[] = [
     id: "professional",
     name: "Professional",
     description: "Clean, traditional layout with a professional appeal",
-    thumbnail:
-      "https://placehold.co/400x300/e2e8f0/334155?text=Professional+Template",
+    thumbnail: "/templates/template1.png",
   },
   {
     id: "modern",
     name: "Modern",
     description: "Contemporary design with creative styling",
-    thumbnail:
-      "https://placehold.co/400x300/dbeafe/1e40af?text=Modern+Template",
+    thumbnail: "/templates/template1.png",
   },
   {
     id: "minimal",
     name: "Minimal",
     description: "Simple, clean design focusing on content",
-    thumbnail:
-      "https://placehold.co/400x300/f1f5f9/334155?text=Minimal+Template",
-  },
-  {
-    id: "creative",
-    name: "Creative",
-    description: "Bold design with unique elements for creative fields",
-    thumbnail:
-      "https://placehold.co/400x300/f0fdf4/166534?text=Creative+Template",
-  },
-  {
-    id: "executive",
-    name: "Executive",
-    description: "Sophisticated layout for senior positions",
-    thumbnail:
-      "https://placehold.co/400x300/fef2f2/991b1b?text=Executive+Template",
+    thumbnail: "/templates/template1.png",
   },
 ];
 
@@ -218,7 +217,7 @@ const Templates = () => {
   const [previewModal, setPreviewModal] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentEditSection, setCurrentEditSection] = useState<
-    "personal" | "skills" | "experience" | "education"
+    "personal" | "skills" | "experience" | "education" | "projects"
   >("personal");
   const [generatingPdf, setGeneratingPdf] = useState(false);
   const [personalizedPreviewUrl, setPersonalizedPreviewUrl] = useState<
@@ -386,6 +385,27 @@ const Templates = () => {
             )
             .join("")}
         </div>
+        
+      </div>
+      <div style=margin-bottom: 5px">
+        <h3
+          style="color: #000000; border-bottom: 1px solid #000000; padding-bottom: 5px; font-weight: bold; font-size: 16px;">
+          Projects
+        </h3>
+        <div style="display: flex;flex-wrap:wrap;gap:5px;">
+          ${resumeData.projects
+            .map(
+              (pro, index) => `
+            <h1
+              style="font-size: 13px;font-weight:600;">
+              ${pro.title},
+            </h1>
+            <p style="font-size:12px;">${pro.description}</p>
+          `
+            )
+            .join("")}
+        </div>
+        
       </div>
     </div>
         `;
@@ -916,7 +936,7 @@ const Templates = () => {
   };
 
   const openEditModal = (
-    section: "personal" | "skills" | "experience" | "education"
+    section: "personal" | "skills" | "experience" | "education" | "projects"
   ) => {
     form.reset(resumeData);
     setCurrentEditSection(section);
@@ -984,12 +1004,26 @@ const Templates = () => {
       { degree: "", school: "", period: "" },
     ]);
   };
+  const addProject = () => {
+    const currentProjects = form.getValues("projects") || [];
+    form.setValue("projects", [
+      ...currentProjects,
+      { title: "", description: "" },
+    ]);
+  };
 
   const removeEducation = (index: number) => {
     const currentEducation = form.getValues("education") || [];
     form.setValue(
       "education",
       currentEducation.filter((_, i) => i !== index)
+    );
+  };
+  const removeProject = (index: number) => {
+    const currentProjects = form.getValues("projects") || [];
+    form.setValue(
+      "projects",
+      currentProjects.filter((_, i) => i !== index)
     );
   };
 
@@ -1025,7 +1059,7 @@ const Templates = () => {
                   <img
                     src={template.thumbnail}
                     alt={template.name}
-                    className="w-full h-40 object-cover rounded-md mb-4"
+                    className="w-full h-[500px] object-cover rounded-md mb-4"
                   />
                   <div className="flex items-center justify-between">
                     <div>
@@ -1206,6 +1240,29 @@ const Templates = () => {
                   <p className="text-sm text-muted-foreground">{edu.school}</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     {edu.period}
+                  </p>
+                </Card>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-medium text-lg">Projects</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => openEditModal("projects")}
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {resumeData.projects.map((edu, index) => (
+                <Card key={index} className="p-4">
+                  <h1 className="font-medium">{edu.title}</h1>
+                  <p className="text-sm text-muted-foreground">
+                    {edu.description}
                   </p>
                 </Card>
               ))}
@@ -1648,7 +1705,75 @@ const Templates = () => {
                     ))}
                   </div>
                 )}
+                {/* this is project Edit Option */}
+                {currentEditSection === "projects" && (
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-sm font-medium">Projects</h3>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={addProject}
+                      >
+                        Add Project
+                      </Button>
+                    </div>
 
+                    {form.watch("projects")?.map((_, proIndex) => (
+                      <Card key={proIndex} className="mb-4">
+                        <div className="p-4 space-y-4">
+                          <div className="flex justify-between">
+                            <h4 className="text-sm font-medium">
+                              Projects {proIndex + 1}
+                            </h4>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => removeProject(proIndex)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          <FormField
+                            control={form.control}
+                            name={`projects.${proIndex}.title`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Title</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder="Library Management System"
+                                    {...field}
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`projects.${proIndex}.description`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Description</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder="This is Library Management System"
+                                    {...field}
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
                 <DialogFooter>
                   <Button
                     type="button"

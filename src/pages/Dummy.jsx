@@ -61,6 +61,18 @@ const Dummy = () => {
         period: "2012 - 2016",
       },
     ],
+    projects: [
+      {
+        title: "LIBRARY MANAGEMENT SYSTEM:",
+        description:
+          "Developed a full-featured library management system using Node.js, Express.js, React, andMongoDB.",
+      },
+      {
+        title: "COURSE ENROLLMENT APPLICATION PROJECT:",
+        description:
+          "I also built a Course Enrollment Application that streamlines the registration process for students",
+      },
+    ],
   };
 
   return (
@@ -239,6 +251,31 @@ const Dummy = () => {
         </h3>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
           {resumeData.skills.map((skill, index) => (
+            <span
+              key={index}
+              style={{
+                fontSize: "13.5px",
+              }}
+            >
+              {skill},
+            </span>
+          ))}
+        </div>
+      </div>
+      <div style={{ marginBottom: "5px" }}>
+        <h3
+          style={{
+            color: "#000000",
+            borderBottom: "1px solid #000000",
+            paddingBottom: "5px",
+            fontWeight: "bold",
+            fontSize: "16px",
+          }}
+        >
+          Projects
+        </h3>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+          {resumeData.projects.map((pro, index) => (
             <span
               key={index}
               style={{
