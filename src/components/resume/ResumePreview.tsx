@@ -1,3 +1,4 @@
+
 import React from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -42,8 +43,12 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       resumeContainer.style.position = "relative";
       resumeContainer.style.overflow = "visible";
       
+      // Set specific dimensions for PDF generation
+      const pdfWidth = 210; // A4 width in mm
+      const pdfHeight = 297; // A4 height in mm
+      
       // Wait for styles to be applied
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       // Use higher scale for better quality
       const canvas = await html2canvas(resumeContainer, {
@@ -53,8 +58,18 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         backgroundColor: "#ffffff",
         allowTaint: true,
         // Ensure we capture the full height
-        height: resumeContainer.scrollHeight,
-        windowHeight: resumeContainer.scrollHeight
+        height: resumeContainer.scrollHeight + 50, // Add extra space to ensure everything is captured
+        windowHeight: resumeContainer.scrollHeight + 50,
+        // Set specific dimensions
+        width: resumeContainer.offsetWidth,
+        onclone: (clonedDoc) => {
+          // Make sure all elements in the clone are visible
+          const clonedResume = clonedDoc.querySelector('#resume-container');
+          if (clonedResume) {
+            (clonedResume as HTMLElement).style.padding = '20px';
+            (clonedResume as HTMLElement).style.height = 'auto';
+          }
+        }
       });
       
       // Restore original styles
@@ -69,16 +84,44 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         format: "a4",
       });
       
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
+      // Calculate the aspect ratio to maintain proportions
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / canvasWidth, pdfHeight / canvasHeight);
       
-      // Calculate the aspect ratio
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = pdfWidth / imgWidth;
+      // Check if content exceeds a single page
+      const scaledHeight = canvasHeight * ratio;
       
-      // Use the ratio to determine the height
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, imgHeight * ratio);
+      if (scaledHeight > pdfHeight) {
+        // Content is larger than one page - need to handle multi-page
+        const pageCount = Math.ceil(scaledHeight / pdfHeight);
+        
+        for (let i = 0; i < pageCount; i++) {
+          if (i > 0) {
+            pdf.addPage();
+          }
+          
+          // Calculate what portion of the canvas to render on this page
+          const sourceY = (pdfHeight / ratio) * i;
+          const sourceHeight = Math.min((pdfHeight / ratio), canvasHeight - sourceY);
+          
+          pdf.addImage(
+            imgData, 
+            "PNG", 
+            0, 
+            0, 
+            pdfWidth, 
+            (sourceHeight * ratio),
+            null,
+            null,
+            null,
+            sourceY
+          );
+        }
+      } else {
+        // Content fits on a single page
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, scaledHeight);
+      }
       
       pdf.save("resume.pdf");
 
@@ -237,6 +280,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
           <div className="w-full md:w-[130%] border rounded-md p-4 bg-white dark:bg-gray-800">
             <div
               ref={resumeRef}
+              id="resume-container"
               className="font-serif px-4 sm:px-6 md:px-10 text-gray-700 bg-white relative mx-auto max-w-4xl"
               style={{ minHeight: "842px" }} /* A4 height in px */
             >
@@ -248,7 +292,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                   {resumeDataHere.personalInfo.title}
                 </h2>
                 
-                {/* Fixed contact info with flexbox for better alignment */}
+                {/* Fixed contact info with grid for better alignment */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
                   <div className="flex items-center gap-2">
                     <svg
