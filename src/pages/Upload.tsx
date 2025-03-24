@@ -113,7 +113,7 @@ const ResumeUpload = () => {
 
                 // Set resume state
                 setHasResume(true);
-                
+
                 // Set mock resume data
                 setResumeData({
                   name: "John Doe",
@@ -124,17 +124,24 @@ const ResumeUpload = () => {
                       title: "Frontend Developer",
                       company: "Tech Solutions Inc.",
                       date: "Jan 2020 - Present",
-                      description: "Developed responsive web applications using React and TypeScript."
-                    }
+                      description:
+                        "Developed responsive web applications using React and TypeScript.",
+                    },
                   ],
                   education: [
                     {
                       degree: "Bachelor of Science in Computer Science",
                       school: "University of Technology",
-                      date: "2016 - 2020"
-                    }
+                      date: "2016 - 2020",
+                    },
                   ],
-                  skills: ["JavaScript", "React", "TypeScript", "HTML/CSS", "Node.js"]
+                  skills: [
+                    "JavaScript",
+                    "React",
+                    "TypeScript",
+                    "HTML/CSS",
+                    "Node.js",
+                  ],
                 });
 
                 // Navigate to templates page after completion
@@ -183,7 +190,7 @@ const ResumeUpload = () => {
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto mt-20">
+      <div className="max-w-3xl mx-auto mt-20 p-5">
         <div className="text-center mb-10">
           <motion.h1
             initial={{ opacity: 0, y: -10 }}

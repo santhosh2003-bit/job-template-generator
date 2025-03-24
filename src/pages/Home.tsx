@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -191,12 +190,12 @@ const Home = () => {
             ].map((step, index) => (
               <div
                 key={index}
-                className="glass-card p-6 rounded-xl relative flex flex-col items-center text-center"
+                className="glass-card shadow-lg p-6 rounded-xl relative flex flex-col items-center text-center"
               >
                 <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   {step.icon}
                 </div>
-                <div className="absolute -top-4 -right-4 h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
+                <div className="absolute top-1 right-1/2 h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
                   {step.number}
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{step.title}</h3>

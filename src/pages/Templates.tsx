@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -31,24 +30,6 @@ const Templates = () => {
       description: "Formal design for academic and research positions",
       image: "/public/placeholder.svg",
     },
-    {
-      id: "template4",
-      name: "Technical",
-      description: "Structured design for technical positions",
-      image: "/public/placeholder.svg",
-    },
-    {
-      id: "template5",
-      name: "Executive",
-      description: "Elegant design for executive positions",
-      image: "/public/placeholder.svg",
-    },
-    {
-      id: "template6",
-      name: "Minimalist",
-      description: "Simple design for any position",
-      image: "/public/placeholder.svg",
-    },
   ];
 
   const handleTemplateSelect = (templateId: string) => {
@@ -68,22 +49,24 @@ const Templates = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="mt-20"
+        className="mt-20 p-6"
       >
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold mb-2">Choose Your Resume Template</h1>
+          <h1 className="text-3xl font-bold mb-2">
+            Choose Your Resume Template
+          </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Select a template that best represents your professional style and
             career goals.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+        <div className="flex flex-wrap gap-6 mb-10">
           {templates.map((template) => (
             <div
               key={template.id}
               onClick={() => handleTemplateSelect(template.id)}
-              className={`border rounded-lg overflow-hidden transition-all cursor-pointer ${
+              className={`border rounded-lg p-4 h-fit  transition-all  cursor-pointer ${
                 selectedTemplate === template.id
                   ? "ring-2 ring-primary"
                   : "hover:border-primary/50"
@@ -91,9 +74,9 @@ const Templates = () => {
             >
               <div className="relative aspect-[4/5] bg-accent/20">
                 <img
-                  src={template.image}
+                  src="/templates/template1.png"
                   alt={template.name}
-                  className="w-full h-full object-cover"
+                  className=" h-[400px] object-contain"
                 />
                 {selectedTemplate === template.id && (
                   <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
@@ -103,7 +86,7 @@ const Templates = () => {
                   </div>
                 )}
               </div>
-              <div className="p-4">
+              <div className="">
                 <h3 className="font-semibold mb-1">{template.name}</h3>
                 <p className="text-sm text-muted-foreground">
                   {template.description}

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -167,8 +166,7 @@ const Jobs = () => {
     const matchesSearch = job.title
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-    const matchesLocation =
-      location === "" || job.location.includes(location);
+    const matchesLocation = location === "" || job.location.includes(location);
     const matchesType = jobType === "all" || job.type === jobType;
     const jobSalaryMin = parseInt(
       job.salary.replace(/[^0-9]/g, "").substring(0, 6)
@@ -184,10 +182,12 @@ const Jobs = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="mt-10 md:mt-20 px-4 md:px-0"
+        className="mt-20 md:mt-20 px-4 md:px-0"
       >
         <div className="text-center mb-6 md:mb-10">
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">Find Your Perfect Job</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">
+            Find Your Perfect Job
+          </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto text-sm md:text-base">
             Browse through our curated job listings tailored to your skills and
             experience.
@@ -250,10 +250,12 @@ const Jobs = () => {
         </div>
 
         {/* Job Listings */}
-        <div className="space-y-4 mb-10">
+        <div className="space-y-4 mb-10 flex flex-wrap gap-4 px-4">
           {filteredJobs.length === 0 ? (
             <div className="text-center p-6 md:p-12 glass-card rounded-xl">
-              <h3 className="text-lg md:text-xl font-medium mb-2">No Jobs Found</h3>
+              <h3 className="text-lg md:text-xl font-medium mb-2">
+                No Jobs Found
+              </h3>
               <p className="text-muted-foreground text-sm md:text-base">
                 Try adjusting your search criteria or check back later for new
                 postings.
@@ -261,11 +263,13 @@ const Jobs = () => {
             </div>
           ) : (
             filteredJobs.map((job) => (
-              <Card key={job.id} className="overflow-hidden">
+              <Card key={job.id} className="overflow-hidden w-[700px]">
                 <CardHeader className="pb-3 p-4 md:p-6">
                   <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-2">
                     <div>
-                      <CardTitle className="text-lg md:text-xl">{job.title}</CardTitle>
+                      <CardTitle className="text-lg md:text-xl">
+                        {job.title}
+                      </CardTitle>
                       <CardDescription className="flex items-center mt-1">
                         <Briefcase className="mr-1 h-4 w-4" />
                         {job.company}
@@ -294,14 +298,18 @@ const Jobs = () => {
                       {job.posted}
                     </div>
                   </div>
-                  <p className="text-xs md:text-sm line-clamp-2">{job.description}</p>
+                  <p className="text-xs md:text-sm line-clamp-2">
+                    {job.description}
+                  </p>
                 </CardContent>
                 <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-3 border-t p-4 md:p-6">
                   <div>
-                    <p className="text-xs md:text-sm font-medium">{job.salary}</p>
+                    <p className="text-xs md:text-sm font-medium">
+                      {job.salary}
+                    </p>
                   </div>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => handlePreview(job)}
                     className="w-full sm:w-auto"
                   >
@@ -313,7 +321,7 @@ const Jobs = () => {
           )}
         </div>
       </motion.div>
-      
+
       {selectedJob && (
         <ResumePreview
           open={showPreview}
