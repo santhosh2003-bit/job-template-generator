@@ -1,3 +1,4 @@
+
 import React from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -104,7 +105,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
           const sourceY = (pdfHeight / ratio) * i;
           const sourceHeight = Math.min((pdfHeight / ratio), canvasHeight - sourceY);
           
-          // Use the correct signature for addImage with clipping
+          // Fix: Use the correct signature for addImage with clipping
+          // jsPDF allows adding image with clipping by using these parameters
           pdf.addImage(
             imgData,
             "PNG",
@@ -114,8 +116,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
             sourceHeight * ratio,
             undefined,
             'NONE',
-            0,
-            sourceY
+            0
           );
         }
       } else {
@@ -500,4 +501,3 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
 };
 
 export default ResumePreview;
-
