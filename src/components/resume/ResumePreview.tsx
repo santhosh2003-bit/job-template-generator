@@ -1,4 +1,3 @@
-
 import React from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -105,18 +104,19 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
           const sourceY = (pdfHeight / ratio) * i;
           const sourceHeight = Math.min((pdfHeight / ratio), canvasHeight - sourceY);
           
-          // Fix: Use the correct signature for addImage with clipping
-          pdf.addImage({
-            imageData: imgData,
-            format: 'PNG',
-            x: 0,
-            y: 0,
-            width: pdfWidth,
-            height: sourceHeight * ratio,
-            alias: undefined,
-            compression: 'NONE',
-            rotation: 0
-          }, '', 0, 0, 0, 0, 0, sourceY);
+          // Use the correct signature for addImage with clipping
+          pdf.addImage(
+            imgData,
+            "PNG",
+            0,
+            0,
+            pdfWidth,
+            sourceHeight * ratio,
+            undefined,
+            'NONE',
+            0,
+            sourceY
+          );
         }
       } else {
         // Content fits on a single page
@@ -500,3 +500,4 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
 };
 
 export default ResumePreview;
+
