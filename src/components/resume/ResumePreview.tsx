@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { Mail } from "lucide-react";
+
 interface ResumePreviewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -34,11 +35,11 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
     try {
       const element = resumeRef.current;
       const canvas = await html2canvas(element, {
-        scale: 2, // Reduced from 3 to maintain quality while managing size
+        scale: 2,
         useCORS: true,
         logging: false,
         width: element.scrollWidth,
-        height: element.scrollHeight, // Capture full content height
+        height: element.scrollHeight,
       });
 
       const imgData = canvas.toDataURL("image/png", 1.0);
@@ -53,16 +54,13 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
 
-      // Calculate the ratio to fit width to A4
       const ratio = pdfWidth / imgWidth;
       const scaledWidth = imgWidth * ratio;
       const scaledHeight = imgHeight * ratio;
 
-      // Calculate how many pages are needed
-      const pageHeight = pdfHeight / ratio; // Height of one page in canvas pixels
+      const pageHeight = pdfHeight / ratio;
       const totalPages = Math.ceil(imgHeight / pageHeight);
 
-      // Add pages and content
       for (let i = 0; i < totalPages; i++) {
         if (i > 0) pdf.addPage();
 
@@ -113,7 +111,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
 
   const handleApply = async () => {
     try {
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       toast({
@@ -130,6 +127,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       });
     }
   };
+
   const resumeDataHere = {
     personalInfo: {
       name: "Alex Johnson",
@@ -218,6 +216,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       },
     ],
   };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[1400px] max-h-[90vh] overflow-auto">
@@ -239,16 +238,15 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         </DialogHeader>
 
         <div className="flex md:flex-row flex-col gap-6 mt-4">
-          {/* Left side - Resume preview */}
           <div className="w-[130%]  border rounded-md p-4 bg-white dark:bg-gray-800">
             <div
-              className="font-[calibri] px-4 sm:px-6 md:px-10 text-gray-700 bg-white max-w-[210mm] mx-auto" // Set width to A4 width
+              className="font-[calibri] px-4 sm:px-6 md:px-10 text-gray-700 bg-white max-w-[210mm] mx-auto"
               ref={resumeRef}
               style={{
-                width: "210mm", // A4 width
-                padding: "20mm", // Standard A4 margins
+                width: "210mm",
+                padding: "20mm",
                 boxSizing: "border-box",
-                overflow: "visible", // Ensure content isn't clipped
+                overflow: "visible",
               }}
             >
               <div className="py-4 sm:py-2 md:py-2">
@@ -414,7 +412,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
             </div>
           </div>
 
-          {/* Right side - Job details */}
           <div className="border rounded-md p-4 h-fit">
             <h2 className="text-xl font-bold mb-2">{jobData.title}</h2>
             <p className="text-muted-foreground mb-1">{jobData.company}</p>

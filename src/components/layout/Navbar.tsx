@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -15,11 +16,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { useToast } from "@/hooks/use-toast";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [signInData, setSignInData] = useState({ email: "", password: "" });
+  const [signUpData, setSignUpData] = useState({ name: "", email: "", password: "" });
+  const { toast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
   const { checkResumeStatus } = useResume();
@@ -64,6 +70,119 @@ const Navbar = () => {
     if (link.onClick && !link.onClick()) {
       e.preventDefault();
     }
+  };
+
+  const handleSignInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    const fieldName = id.replace("email-signin", "email").replace("password-signin", "password");
+    setSignInData({ ...signInData, [fieldName]: value });
+  };
+
+  const handleSignUpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    const fieldName = id.replace("name-signup", "name")
+      .replace("email-signup", "email")
+      .replace("password-signup", "password");
+    setSignUpData({ ...signUpData, [fieldName]: value });
+  };
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      // API INTEGRATION COMMENT:
+      // 1. Implement actual API call here to authenticate user
+      // Example API call:
+      // const response = await fetch('https://api.example.com/auth/signin', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(signInData),
+      // });
+      // const data = await response.json();
+      // if (!response.ok) throw new Error(data.message || 'Sign in failed');
+      
+      // Simulate API response delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mock successful authentication
+      toast({
+        title: "Welcome back!",
+        description: "You've been signed in successfully."
+      });
+      
+      // Close dialog and potentially redirect user
+      setIsAuthDialogOpen(false);
+      // navigate('/dashboard');
+    } catch (error) {
+      toast({
+        title: "Sign in failed",
+        description: error instanceof Error ? error.message : "Please check your credentials and try again",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      // API INTEGRATION COMMENT:
+      // 1. Implement actual API call here to register user
+      // Example API call:
+      // const response = await fetch('https://api.example.com/auth/signup', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(signUpData),
+      // });
+      // const data = await response.json();
+      // if (!response.ok) throw new Error(data.message || 'Sign up failed');
+      
+      // Simulate API response delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mock successful registration
+      toast({
+        title: "Account created!",
+        description: "Your account has been created successfully."
+      });
+      
+      // Close dialog and potentially redirect user
+      setIsAuthDialogOpen(false);
+      // navigate('/dashboard');
+    } catch (error) {
+      toast({
+        title: "Sign up failed",
+        description: error instanceof Error ? error.message : "Please check your information and try again",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    // API INTEGRATION COMMENT:
+    // Implement password reset functionality
+    // const response = await fetch('https://api.example.com/auth/reset-password', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({ email: signInData.email }),
+    // });
+    
+    toast({
+      title: "Password reset",
+      description: "If your email is registered, you'll receive reset instructions."
+    });
   };
 
   return (
@@ -156,7 +275,7 @@ const Navbar = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-center text-2xl">
-              Welcome to ResumeCraft
+              Welcome to EzeApply
             </DialogTitle>
             <DialogDescription className="text-center">
               Sign in to your account or create a new one to get started
@@ -170,70 +289,96 @@ const Navbar = () => {
             </TabsList>
 
             <TabsContent value="signin" className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email-signin">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="email-signin"
-                    placeholder="name@example.com"
-                    type="email"
-                    className="pl-10"
-                  />
+              <form onSubmit={handleSignIn} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email-signin">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email-signin"
+                      placeholder="name@example.com"
+                      type="email"
+                      className="pl-10"
+                      value={signInData.email}
+                      onChange={handleSignInChange}
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label htmlFor="password-signin">Password</Label>
-                  <Link to="#" className="text-xs text-primary hover:underline">
-                    Forgot password?
-                  </Link>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <Label htmlFor="password-signin">Password</Label>
+                    <button 
+                      type="button"
+                      onClick={handleForgotPassword}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password-signin"
+                      type="password"
+                      className="pl-10"
+                      value={signInData.password}
+                      onChange={handleSignInChange}
+                      required
+                    />
+                  </div>
                 </div>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password-signin"
-                    type="password"
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              <Button className="w-full" type="submit">
-                Sign In
-              </Button>
+                <Button className="w-full" type="submit" disabled={isLoading}>
+                  {isLoading ? "Signing In..." : "Sign In"}
+                </Button>
+              </form>
             </TabsContent>
 
             <TabsContent value="signup" className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name-signup">Full Name</Label>
-                <Input id="name-signup" placeholder="John Doe" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email-signup">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="email-signup"
-                    placeholder="name@example.com"
-                    type="email"
-                    className="pl-10"
+              <form onSubmit={handleSignUp} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name-signup">Full Name</Label>
+                  <Input 
+                    id="name-signup" 
+                    placeholder="John Doe" 
+                    value={signUpData.name}
+                    onChange={handleSignUpChange}
+                    required
                   />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password-signup">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password-signup"
-                    type="password"
-                    className="pl-10"
-                  />
+                <div className="space-y-2">
+                  <Label htmlFor="email-signup">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email-signup"
+                      placeholder="name@example.com"
+                      type="email"
+                      className="pl-10"
+                      value={signUpData.email}
+                      onChange={handleSignUpChange}
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
-              <Button className="w-full" type="submit">
-                Create Account
-              </Button>
+                <div className="space-y-2">
+                  <Label htmlFor="password-signup">Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password-signup"
+                      type="password"
+                      className="pl-10"
+                      value={signUpData.password}
+                      onChange={handleSignUpChange}
+                      required
+                    />
+                  </div>
+                </div>
+                <Button className="w-full" type="submit" disabled={isLoading}>
+                  {isLoading ? "Creating Account..." : "Create Account"}
+                </Button>
+              </form>
             </TabsContent>
           </Tabs>
 
