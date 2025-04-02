@@ -4,6 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Layout from "@/components/layout/Layout";
 import { useResume } from "@/context/ResumeContext";
 import {
@@ -15,9 +17,64 @@ import {
   Loader2,
 } from "lucide-react";
 
+// API function to upload resume - to be implemented
+const uploadResumeAPI = async (
+  file: File,
+  jobProfile: string,
+  onProgressUpdate: (progress: number) => void
+): Promise<any> => {
+  // Create FormData for the API request
+  const formData = new FormData();
+  formData.append("resume", file);
+  formData.append("jobProfile", jobProfile);
+
+  // In a real implementation, this would use fetch or axios with upload progress
+  // Example API endpoint: https://api.example.com/v1/resumes/upload
+  // For now we'll simulate the API call
+  
+  return new Promise((resolve, reject) => {
+    // Simulate API upload with progress
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += 5;
+      onProgressUpdate(progress);
+      
+      if (progress >= 100) {
+        clearInterval(interval);
+        
+        // Mock successful response
+        resolve({
+          success: true,
+          resumeId: "mock-resume-id-" + Date.now(),
+          name: "John Doe",
+          email: "john.doe@example.com",
+          phone: "(123) 456-7890",
+          experience: [
+            {
+              title: "Frontend Developer",
+              company: "Tech Solutions Inc.",
+              date: "Jan 2020 - Present",
+              description: "Developed responsive web applications using React and TypeScript.",
+            },
+          ],
+          education: [
+            {
+              degree: "Bachelor of Science in Computer Science",
+              school: "University of Technology",
+              date: "2016 - 2020",
+            },
+          ],
+          skills: ["JavaScript", "React", "TypeScript", "HTML/CSS", "Node.js"],
+        });
+      }
+    }, 100);
+  });
+};
+
 const ResumeUpload = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [jobProfile, setJobProfile] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [step, setStep] = useState(0);
@@ -87,7 +144,77 @@ const ResumeUpload = () => {
     }
   };
 
+  const handleApiUpload = async () => {
+    if (!file || !jobProfile.trim()) {
+      toast({
+        title: "Missing information",
+        description: file ? "Please enter a job profile" : "Please select a file to upload",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+    setStep(1);
+
+    try {
+      // Call the API with progress callback
+      const response = await uploadResumeAPI(
+        file,
+        jobProfile,
+        (progress) => setUploadProgress(progress)
+      );
+
+      // Process successful response
+      if (response.success) {
+        // Set mock data from response
+        setResumeData(response);
+        setHasResume(true);
+        
+        // Move to next steps like in the original flow
+        setTimeout(() => {
+          setStep(2); // Analyzing
+          setTimeout(() => {
+            setStep(3); // Extracting
+            setTimeout(() => {
+              setStep(4); // Formatting
+              setTimeout(() => {
+                setStep(5); // Complete
+                setUploading(false);
+                
+                toast({
+                  title: "Resume processed successfully",
+                  description: "Taking you to templates...",
+                });
+
+                // Navigate to templates page after completion
+                setTimeout(() => {
+                  navigate("/templates");
+                }, 1000);
+              }, 1000);
+            }, 1500);
+          }, 1500);
+        }, 500);
+      }
+    } catch (error) {
+      setUploading(false);
+      setStep(0);
+      
+      toast({
+        title: "Upload failed",
+        description: "There was an error processing your resume. Please try again.",
+        variant: "destructive",
+      });
+      
+      console.error("Resume upload error:", error);
+    }
+  };
+
   const simulateUpload = useCallback(() => {
+    // This is the original simulation function, kept for reference
+    // In real implementation, use handleApiUpload instead
+    console.log("Using legacy simulation - should use API integration instead");
+    
     setUploading(true);
     setStep(1);
 
@@ -164,7 +291,8 @@ const ResumeUpload = () => {
       description: "We're processing your resume...",
     });
 
-    simulateUpload();
+    // Call the new API integration method instead of simulation
+    handleApiUpload();
   };
 
   const steps = [
@@ -326,8 +454,27 @@ const ResumeUpload = () => {
                   </Button>
                 </div>
 
+                {/* Added job profile input field */}
+                <div className="mt-4">
+                  <Label htmlFor="job-profile">Job Profile</Label>
+                  <Input
+                    id="job-profile"
+                    value={jobProfile}
+                    onChange={(e) => setJobProfile(e.target.value)}
+                    placeholder="Enter the job profile (e.g., Software Engineer)"
+                    className="mt-1"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    We'll optimize your resume for this job profile
+                  </p>
+                </div>
+
                 <div className="mt-6">
-                  <Button onClick={handleUpload} className="w-full">
+                  <Button 
+                    onClick={handleUpload} 
+                    className="w-full"
+                    disabled={!jobProfile.trim()}
+                  >
                     Process Resume
                   </Button>
                 </div>
