@@ -181,6 +181,8 @@ const ResumeUpload = () => {
             }, 1500);
           }, 1500);
         }, 500);
+      } else {
+        throw new Error("Resume processing failed");
       }
     } catch (error) {
       setUploading(false);
