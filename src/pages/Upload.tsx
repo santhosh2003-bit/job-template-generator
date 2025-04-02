@@ -17,23 +17,16 @@ import {
   Loader2,
 } from "lucide-react";
 
-// API function to upload resume - to be implemented
 const uploadResumeAPI = async (
   file: File,
   jobProfile: string,
   onProgressUpdate: (progress: number) => void
 ): Promise<any> => {
-  // Create FormData for the API request
   const formData = new FormData();
   formData.append("resume", file);
   formData.append("jobProfile", jobProfile);
 
-  // In a real implementation, this would use fetch or axios with upload progress
-  // Example API endpoint: https://api.example.com/v1/resumes/upload
-  // For now we'll simulate the API call
-  
   return new Promise((resolve, reject) => {
-    // Simulate API upload with progress
     let progress = 0;
     const interval = setInterval(() => {
       progress += 5;
@@ -42,7 +35,6 @@ const uploadResumeAPI = async (
       if (progress >= 100) {
         clearInterval(interval);
         
-        // Mock successful response
         resolve({
           success: true,
           resumeId: "mock-resume-id-" + Date.now(),
@@ -125,7 +117,6 @@ const ResumeUpload = () => {
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      // 5MB limit
       toast({
         title: "File too large",
         description: "Maximum file size is 5MB",
@@ -158,20 +149,16 @@ const ResumeUpload = () => {
     setStep(1);
 
     try {
-      // Call the API with progress callback
       const response = await uploadResumeAPI(
         file,
         jobProfile,
         (progress) => setUploadProgress(progress)
       );
 
-      // Process successful response
       if (response.success) {
-        // Set mock data from response
         setResumeData(response);
         setHasResume(true);
         
-        // Move to next steps like in the original flow
         setTimeout(() => {
           setStep(2); // Analyzing
           setTimeout(() => {
@@ -187,7 +174,6 @@ const ResumeUpload = () => {
                   description: "Taking you to templates...",
                 });
 
-                // Navigate to templates page after completion
                 setTimeout(() => {
                   navigate("/templates");
                 }, 1000);
@@ -211,14 +197,11 @@ const ResumeUpload = () => {
   };
 
   const simulateUpload = useCallback(() => {
-    // This is the original simulation function, kept for reference
-    // In real implementation, use handleApiUpload instead
     console.log("Using legacy simulation - should use API integration instead");
     
     setUploading(true);
     setStep(1);
 
-    // Simulate upload progress
     let progress = 0;
     const interval = setInterval(() => {
       progress += 5;
@@ -227,7 +210,6 @@ const ResumeUpload = () => {
       if (progress >= 100) {
         clearInterval(interval);
 
-        // Simulate processing steps
         setTimeout(() => {
           setStep(2); // Analyzing
           setTimeout(() => {
@@ -238,10 +220,8 @@ const ResumeUpload = () => {
                 setStep(5); // Complete
                 setUploading(false);
 
-                // Set resume state
                 setHasResume(true);
 
-                // Set mock resume data
                 setResumeData({
                   name: "John Doe",
                   email: "john.doe@example.com",
@@ -271,7 +251,6 @@ const ResumeUpload = () => {
                   ],
                 });
 
-                // Navigate to templates page after completion
                 setTimeout(() => {
                   navigate("/templates");
                 }, 1000);
@@ -291,7 +270,6 @@ const ResumeUpload = () => {
       description: "We're processing your resume...",
     });
 
-    // Call the new API integration method instead of simulation
     handleApiUpload();
   };
 
@@ -339,7 +317,6 @@ const ResumeUpload = () => {
           </motion.p>
         </div>
 
-        {/* Progress Steps */}
         <div className="mb-10">
           <div className="flex items-center justify-between max-w-2xl mx-auto relative">
             <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-muted z-0" />
@@ -454,7 +431,6 @@ const ResumeUpload = () => {
                   </Button>
                 </div>
 
-                {/* Added job profile input field */}
                 <div className="mt-4">
                   <Label htmlFor="job-profile">Job Profile</Label>
                   <Input
