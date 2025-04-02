@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -24,7 +23,10 @@ const Navbar = () => {
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [signInData, setSignInData] = useState({ email: "", password: "" });
-  const [signUpData, setSignUpData] = useState({ name: "", email: "", password: "" });
+  const [signUpData, setSignUpData] = useState({
+    email: "",
+    password: "",
+  });
   const { toast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
@@ -45,27 +47,27 @@ const Navbar = () => {
 
   const navLinks = [
     { name: "Home", path: "/" },
-    { 
-      name: "Upload Resume", 
+    {
+      name: "Upload Resume",
       path: "/upload",
-      onClick: () => true 
+      onClick: () => true,
     },
-    { 
-      name: "Templates", 
+    {
+      name: "Templates",
       path: "/templates",
-      onClick: () => checkResumeStatus()
+      onClick: () => checkResumeStatus(),
     },
-    { 
-      name: "Jobs", 
+    {
+      name: "Jobs",
       path: "/jobs",
-      onClick: () => checkResumeStatus()
+      onClick: () => checkResumeStatus(),
     },
   ];
 
   const handleGetStarted = () => {
     setIsAuthDialogOpen(true);
   };
-  
+
   const handleNavLinkClick = (e: React.MouseEvent, link: any) => {
     if (link.onClick && !link.onClick()) {
       e.preventDefault();
@@ -74,13 +76,16 @@ const Navbar = () => {
 
   const handleSignInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    const fieldName = id.replace("email-signin", "email").replace("password-signin", "password");
+    const fieldName = id
+      .replace("email-signin", "email")
+      .replace("password-signin", "password");
     setSignInData({ ...signInData, [fieldName]: value });
   };
 
   const handleSignUpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    const fieldName = id.replace("name-signup", "name")
+    const fieldName = id
+      .replace("name-signup", "name")
       .replace("email-signup", "email")
       .replace("password-signup", "password");
     setSignUpData({ ...signUpData, [fieldName]: value });
@@ -89,38 +94,41 @@ const Navbar = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
       // API INTEGRATION COMMENT:
       // 1. Implement actual API call here to authenticate user
       // Example API call:
-      // const response = await fetch('https://api.example.com/auth/signin', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(signInData),
-      // });
-      // const data = await response.json();
-      // if (!response.ok) throw new Error(data.message || 'Sign in failed');
-      
+      const response = await fetch("http://127.0.0.1:3012/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(signInData),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Sign in failed");
+
       // Simulate API response delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Mock successful authentication
       toast({
         title: "Welcome back!",
-        description: "You've been signed in successfully."
+        description: "You've been signed in successfully.",
       });
-      
+
       // Close dialog and potentially redirect user
       setIsAuthDialogOpen(false);
-      // navigate('/dashboard');
+      navigate("/dashboard");
     } catch (error) {
       toast({
         title: "Sign in failed",
-        description: error instanceof Error ? error.message : "Please check your credentials and try again",
-        variant: "destructive"
+        description:
+          error instanceof Error
+            ? error.message
+            : "Please check your credentials and try again",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -129,39 +137,42 @@ const Navbar = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
+    // setIsLoading(true);
+    console.log(signUpData);
     try {
       // API INTEGRATION COMMENT:
       // 1. Implement actual API call here to register user
       // Example API call:
-      // const response = await fetch('https://api.example.com/auth/signup', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(signUpData),
-      // });
-      // const data = await response.json();
-      // if (!response.ok) throw new Error(data.message || 'Sign up failed');
-      
+      const response = await fetch("http://127.0.0.1:3012/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(signUpData),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Sign up failed");
+      console.log(response);
       // Simulate API response delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Mock successful registration
       toast({
         title: "Account created!",
-        description: "Your account has been created successfully."
+        description: "Your account has been created successfully.",
       });
-      
+
       // Close dialog and potentially redirect user
       setIsAuthDialogOpen(false);
-      // navigate('/dashboard');
+      navigate("/dashboard");
     } catch (error) {
       toast({
         title: "Sign up failed",
-        description: error instanceof Error ? error.message : "Please check your information and try again",
-        variant: "destructive"
+        description:
+          error instanceof Error
+            ? error.message
+            : "Please check your information and try again",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -178,10 +189,11 @@ const Navbar = () => {
     //   },
     //   body: JSON.stringify({ email: signInData.email }),
     // });
-    
+
     toast({
       title: "Password reset",
-      description: "If your email is registered, you'll receive reset instructions."
+      description:
+        "If your email is registered, you'll receive reset instructions.",
     });
   };
 
@@ -308,7 +320,7 @@ const Navbar = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <Label htmlFor="password-signin">Password</Label>
-                    <button 
+                    <button
                       type="button"
                       onClick={handleForgotPassword}
                       className="text-xs text-primary hover:underline"
@@ -336,16 +348,16 @@ const Navbar = () => {
 
             <TabsContent value="signup" className="space-y-4">
               <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label htmlFor="name-signup">Full Name</Label>
-                  <Input 
-                    id="name-signup" 
-                    placeholder="John Doe" 
+                  <Input
+                    id="name-signup"
+                    placeholder="John Doe"
                     value={signUpData.name}
                     onChange={handleSignUpChange}
                     required
                   />
-                </div>
+                </div> */}
                 <div className="space-y-2">
                   <Label htmlFor="email-signup">Email</Label>
                   <div className="relative">
