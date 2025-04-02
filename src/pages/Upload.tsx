@@ -1,3 +1,4 @@
+
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +17,60 @@ import {
   X,
   Loader2,
 } from "lucide-react";
+
+/**
+ * API for uploading resume to server
+ * 
+ * @param {File} file - Resume file to upload
+ * @param {string} jobProfile - Job profile for resume optimization
+ * @param {Function} onProgressUpdate - Callback for progress updates
+ * @param {Function} onSuccess - Success callback
+ * @param {Function} onError - Error callback
+ * 
+ * Implementation Notes:
+ * 1. Use FormData to build the request
+ * 2. Use XMLHttpRequest for progress tracking
+ * 3. In production, replace this with your actual API endpoint
+ * 
+ * Example implementation:
+ * 
+ * function uploadResumeAPI(file, jobProfile, onProgressUpdate, onSuccess, onError) {
+ *   // Create form data
+ *   const formData = new FormData();
+ *   formData.append("resume", file);
+ *   formData.append("jobProfile", jobProfile);
+ *   
+ *   // Create XHR request for progress tracking
+ *   const xhr = new XMLHttpRequest();
+ *   
+ *   // Track upload progress
+ *   xhr.upload.addEventListener("progress", (event) => {
+ *     if (event.lengthComputable) {
+ *       const percentComplete = Math.round((event.loaded / event.total) * 100);
+ *       onProgressUpdate(percentComplete);
+ *     }
+ *   });
+ *   
+ *   // Handle response
+ *   xhr.onload = function() {
+ *     if (xhr.status === 200) {
+ *       const response = JSON.parse(xhr.responseText);
+ *       onSuccess(response);
+ *     } else {
+ *       onError(new Error("Upload failed with status: " + xhr.status));
+ *     }
+ *   };
+ *   
+ *   // Handle errors
+ *   xhr.onerror = function() {
+ *     onError(new Error("Network error occurred"));
+ *   };
+ *   
+ *   // Open connection and send data
+ *   xhr.open("POST", "https://api.example.com/resume/upload", true);
+ *   xhr.send(formData);
+ * }
+ */
 
 const uploadResumeAPI = async (
   file: File,
@@ -62,6 +117,85 @@ const uploadResumeAPI = async (
     }, 100);
   });
 };
+
+/**
+ * Implementation for handleApiUpload when using the real API
+ * 
+ * This function should:
+ * 1. Validate inputs
+ * 2. Show appropriate loading states
+ * 3. Call the API with proper callbacks
+ * 4. Handle success and error cases
+ * 
+ * Example implementation:
+ * 
+ * function handleApiUpload() {
+ *   if (!file || !jobProfile.trim()) {
+ *     toast({
+ *       title: "Missing information",
+ *       description: file ? "Please enter a job profile" : "Please select a file to upload",
+ *       variant: "destructive",
+ *     });
+ *     return;
+ *   }
+ * 
+ *   setUploading(true);
+ *   setStep(1);
+ * 
+ *   // Define success callback
+ *   const handleSuccess = (response) => {
+ *     setResumeData(response);
+ *     setHasResume(true);
+ *     
+ *     // Continue with the UI flow
+ *     setTimeout(() => {
+ *       setStep(2); // Analyzing
+ *       setTimeout(() => {
+ *         setStep(3); // Extracting
+ *         setTimeout(() => {
+ *           setStep(4); // Formatting
+ *           setTimeout(() => {
+ *             setStep(5); // Complete
+ *             setUploading(false);
+ *             
+ *             toast({
+ *               title: "Resume processed successfully",
+ *               description: "Taking you to templates...",
+ *             });
+ * 
+ *             setTimeout(() => {
+ *               navigate("/templates");
+ *             }, 1000);
+ *           }, 1000);
+ *         }, 1500);
+ *       }, 1500);
+ *     }, 500);
+ *   };
+ * 
+ *   // Define error callback
+ *   const handleError = (error) => {
+ *     setUploading(false);
+ *     setStep(0);
+ *     
+ *     toast({
+ *       title: "Upload failed",
+ *       description: "There was an error processing your resume. Please try again.",
+ *       variant: "destructive",
+ *     });
+ *     
+ *     console.error("Resume upload error:", error);
+ *   };
+ * 
+ *   // Call the API
+ *   uploadResumeAPI(
+ *     file,
+ *     jobProfile,
+ *     (progress) => setUploadProgress(progress),
+ *     handleSuccess,
+ *     handleError
+ *   );
+ * }
+ */
 
 const ResumeUpload = () => {
   const [isDragging, setIsDragging] = useState(false);
