@@ -107,8 +107,9 @@ const Navbar = () => {
         body: JSON.stringify(signInData),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Sign in failed");
-
+      if (!response.ok)
+        throw new Error(data.message || "Please Enter Correct details");
+      // console.log(data);
       // Simulate API response delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -120,7 +121,7 @@ const Navbar = () => {
 
       // Close dialog and potentially redirect user
       setIsAuthDialogOpen(false);
-      navigate("/dashboard");
+      navigate("/");
     } catch (error) {
       toast({
         title: "Sign in failed",
@@ -138,7 +139,7 @@ const Navbar = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     // setIsLoading(true);
-    console.log(signUpData);
+    // console.log(signUpData);
     try {
       // API INTEGRATION COMMENT:
       // 1. Implement actual API call here to register user
@@ -152,19 +153,19 @@ const Navbar = () => {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Sign up failed");
-      console.log(response);
+      // console.log(response);
       // Simulate API response delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Mock successful registration
       toast({
-        title: "Account created!",
+        title: "Please Check Your Email",
         description: "Your account has been created successfully.",
       });
 
       // Close dialog and potentially redirect user
       setIsAuthDialogOpen(false);
-      navigate("/dashboard");
+      navigate("/");
     } catch (error) {
       toast({
         title: "Sign up failed",
