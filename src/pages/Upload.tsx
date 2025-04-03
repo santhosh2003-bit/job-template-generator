@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Layout from "@/components/layout/Layout";
 import { useResume } from "@/context/ResumeContext";
-
 import {
   Check,
   FileText,
@@ -17,59 +16,131 @@ import {
   X,
   Loader2,
 } from "lucide-react";
-import Templates from "./Templates";
 
-// API implementation for resume upload using fetch
-
-// Example implementation:
+/*
+ * API implementation for resume upload using fetch
+ *
+ * Example implementation:
+ *
+ * const handleUpload = async () => {
+ *   if (!file || !jobProfile.trim()) {
+ *     toast({
+ *       title: "Missing information",
+ *       description: file ? "Please enter a job profile" : "Please select a file to upload",
+ *       variant: "destructive",
+ *     });
+ *     return;
+ *   }
+ *
+ *   try {
+ *     setUploading(true);
+ *     setStep(1);
+ *
+ *     const formData = new FormData();
+ *     formData.append("resume", file);
+ *     formData.append("jobProfile", jobProfile);
+ *
+ *     const response = await fetch("https://api.yourdomain.com/api/upload", {
+ *       method: "POST",
+ *       body: formData,
+ *     });
+ *
+ *     if (!response.ok) {
+ *       throw new Error(`Server responded with ${response.status}`);
+ *     }
+ *
+ *     const data = await response.json();
+ *
+ *     // Set resume data and update state
+ *     setResumeData(data);
+ *     setHasResume(true);
+ *
+ *     // Process completion steps
+ *     setTimeout(() => {
+ *       setStep(2); // Analyzing
+ *       setTimeout(() => {
+ *         setStep(3); // Extracting
+ *         setTimeout(() => {
+ *           setStep(4); // Formatting
+ *           setTimeout(() => {
+ *             setStep(5); // Complete
+ *             setUploading(false);
+ *
+ *             toast({
+ *               title: "Resume processed successfully",
+ *               description: "Taking you to templates...",
+ *             });
+ *
+ *             setTimeout(() => {
+ *               navigate("/templates");
+ *             }, 1000);
+ *           }, 1000);
+ *         }, 1500);
+ *       }, 1500);
+ *     }, 500);
+ *
+ *   } catch (error) {
+ *     console.error("Upload failed:", error);
+ *
+ *     setUploading(false);
+ *     setStep(0);
+ *
+ *     toast({
+ *       title: "Upload failed",
+ *       description: "There was an error processing your resume. Please try again.",
+ *       variant: "destructive",
+ *     });
+ *   }
+ * };
+ */
 
 // Keeping the existing mock implementation for now
-// const uploadResumeAPI = async (
-//   file: File,
-//   jobProfile: string,
-//   onProgressUpdate: (progress: number) => void
-// ): Promise<any> => {
-//   const formData = new FormData();
-//   formData.append("resume", file);
-//   formData.append("jobProfile", jobProfile);
+const uploadResumeAPI = async (
+  file: File,
+  jobProfile: string,
+  onProgressUpdate: (progress: number) => void
+): Promise<any> => {
+  const formData = new FormData();
+  formData.append("resume", file);
+  formData.append("jobProfile", jobProfile);
 
-//   return new Promise((resolve, reject) => {
-//     let progress = 0;
-//     const interval = setInterval(() => {
-//       progress += 5;
-//       onProgressUpdate(progress);
+  return new Promise((resolve, reject) => {
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += 5;
+      onProgressUpdate(progress);
 
-//       if (progress >= 100) {
-//         clearInterval(interval);
+      if (progress >= 100) {
+        clearInterval(interval);
 
-//         resolve({
-//           success: true,
-//           resumeId: "mock-resume-id-" + Date.now(),
-//           name: "John Doe",
-//           email: "john.doe@example.com",
-//           phone: "(123) 456-7890",
-//           experience: [
-//             {
-//               title: "Frontend Developer",
-//               company: "Tech Solutions Inc.",
-//               date: "Jan 2020 - Present",
-//               description:
-//                 "Developed responsive web applications using React and TypeScript.",
-//             },
-//           ],
-//           education: [
-//             {
-//               degree: "Bachelor of Science in Computer Science",
-//               school: "University of Technology",
-//               date: "2016 - 2020",
-//             },
-//           ],
-//           skills: ["JavaScript", "React", "TypeScript", "HTML/CSS", "Node.js"],
-//         });
-//       }
-//     }, 100);
-//   });
-// };
+        resolve({
+          success: true,
+          resumeId: "mock-resume-id-" + Date.now(),
+          name: "John Doe",
+          email: "john.doe@example.com",
+          phone: "(123) 456-7890",
+          experience: [
+            {
+              title: "Frontend Developer",
+              company: "Tech Solutions Inc.",
+              date: "Jan 2020 - Present",
+              description:
+                "Developed responsive web applications using React and TypeScript.",
+            },
+          ],
+          education: [
+            {
+              degree: "Bachelor of Science in Computer Science",
+              school: "University of Technology",
+              date: "2016 - 2020",
+            },
+          ],
+          skills: ["JavaScript", "React", "TypeScript", "HTML/CSS", "Node.js"],
+        });
+      }
+    }, 100);
+  });
+};
 
 const ResumeUpload = () => {
   const [isDragging, setIsDragging] = useState(false);
@@ -108,6 +179,181 @@ const ResumeUpload = () => {
     }
   };
 
+  const validateAndSetFile = (file: File) => {
+    const allowedTypes = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload a PDF or Word document (.doc, .docx)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Maximum file size is 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setFile(file);
+  };
+
+  const handleRemoveFile = () => {
+    setFile(null);
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+  };
+
+  const handleApiUpload = async () => {
+    if (!file || !jobProfile.trim()) {
+      toast({
+        title: "Missing information",
+        description: file
+          ? "Please enter a job profile"
+          : "Please select a file to upload",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+    setStep(1);
+
+    try {
+      const response = await uploadResumeAPI(file, jobProfile, (progress) =>
+        setUploadProgress(progress)
+      );
+
+      if (response.success) {
+        setResumeData(response);
+        setHasResume(true);
+
+        setTimeout(() => {
+          setStep(2); // Analyzing
+          setTimeout(() => {
+            setStep(3); // Extracting
+            setTimeout(() => {
+              setStep(4); // Formatting
+              setTimeout(() => {
+                setStep(5); // Complete
+                setUploading(false);
+
+                toast({
+                  title: "Resume processed successfully",
+                  description: "Taking you to templates...",
+                });
+
+                setTimeout(() => {
+                  navigate("/templates");
+                }, 1000);
+              }, 1000);
+            }, 1500);
+          }, 1500);
+        }, 500);
+      } else {
+        throw new Error("Resume processing failed");
+      }
+    } catch (error) {
+      setUploading(false);
+      setStep(0);
+
+      toast({
+        title: "Upload failed",
+        description:
+          "There was an error processing your resume. Please try again.",
+        variant: "destructive",
+      });
+
+      console.error("Resume upload error:", error);
+    }
+  };
+
+  const simulateUpload = useCallback(() => {
+    console.log("Using legacy simulation - should use API integration instead");
+
+    setUploading(true);
+    setStep(1);
+
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += 5;
+      setUploadProgress(progress);
+
+      if (progress >= 100) {
+        clearInterval(interval);
+
+        setTimeout(() => {
+          setStep(2); // Analyzing
+          setTimeout(() => {
+            setStep(3); // Extracting
+            setTimeout(() => {
+              setStep(4); // Formatting
+              setTimeout(() => {
+                setStep(5); // Complete
+                setUploading(false);
+
+                setHasResume(true);
+
+                setResumeData({
+                  name: "John Doe",
+                  email: "john.doe@example.com",
+                  phone: "(123) 456-7890",
+                  experience: [
+                    {
+                      title: "Frontend Developer",
+                      company: "Tech Solutions Inc.",
+                      date: "Jan 2020 - Present",
+                      description:
+                        "Developed responsive web applications using React and TypeScript.",
+                    },
+                  ],
+                  education: [
+                    {
+                      degree: "Bachelor of Science in Computer Science",
+                      school: "University of Technology",
+                      date: "2016 - 2020",
+                    },
+                  ],
+                  skills: [
+                    "JavaScript",
+                    "React",
+                    "TypeScript",
+                    "HTML/CSS",
+                    "Node.js",
+                  ],
+                });
+
+                setTimeout(() => {
+                  navigate("/templates");
+                }, 1000);
+              }, 1000);
+            }, 1500);
+          }, 1500);
+        }, 500);
+      }
+    }, 100);
+  }, [navigate, setHasResume, setResumeData]);
+
+  const handleUpload = () => {
+    if (!file) return;
+
+    toast({
+      title: "Resume upload started",
+      description: "We're processing your resume...",
+    });
+    handleUploadResume();
+    // handleApiUpload();
+  };
   const handleUploadResume = async () => {
     if (!file || !jobProfile.trim()) {
       toast({
@@ -180,184 +426,6 @@ const ResumeUpload = () => {
       });
     }
   };
-
-  const validateAndSetFile = (file: File) => {
-    const allowedTypes = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ];
-
-    if (!allowedTypes.includes(file.type)) {
-      toast({
-        title: "Invalid file type",
-        description: "Please upload a PDF or Word document (.doc, .docx)",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: "File too large",
-        description: "Maximum file size is 5MB",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setFile(file);
-  };
-
-  const handleRemoveFile = () => {
-    setFile(null);
-    if (inputRef.current) {
-      inputRef.current.value = "";
-    }
-  };
-
-  // const handleApiUpload = async () => {
-  //   if (!file || !jobProfile.trim()) {
-  //     toast({
-  //       title: "Missing information",
-  //       description: file
-  //         ? "Please enter a job profile"
-  //         : "Please select a file to upload",
-  //       variant: "destructive",
-  //     });
-  //     return;
-  //   }
-
-  //   setUploading(true);
-  //   setStep(1);
-
-  //   try {
-  //     const response = await uploadResumeAPI(file, jobProfile, (progress) =>
-  //       setUploadProgress(progress)
-  //     );
-
-  //     if (response.success) {
-  //       setResumeData(response);
-  //       setHasResume(true);
-
-  //       setTimeout(() => {
-  //         setStep(2); // Analyzing
-  //         setTimeout(() => {
-  //           setStep(3); // Extracting
-  //           setTimeout(() => {
-  //             setStep(4); // Formatting
-  //             setTimeout(() => {
-  //               setStep(5); // Complete
-  //               setUploading(false);
-
-  //               toast({
-  //                 title: "Resume processed successfully",
-  //                 description: "Taking you to templates...",
-  //               });
-
-  //               setTimeout(() => {
-  //                 navigate("/templates");
-  //               }, 1000);
-  //             }, 1000);
-  //           }, 1500);
-  //         }, 1500);
-  //       }, 500);
-  //     } else {
-  //       throw new Error("Resume processing failed");
-  //     }
-  //   } catch (error) {
-  //     setUploading(false);
-  //     setStep(0);
-
-  //     toast({
-  //       title: "Upload failed",
-  //       description:
-  //         "There was an error processing your resume. Please try again.",
-  //       variant: "destructive",
-  //     });
-
-  //     console.error("Resume upload error:", error);
-  //   }
-  // };
-
-  // const simulateUpload = useCallback(() => {
-  //   console.log("Using legacy simulation - should use API integration instead");
-
-  //   setUploading(true);
-  //   setStep(1);
-
-  //   let progress = 0;
-  //   const interval = setInterval(() => {
-  //     progress += 5;
-  //     setUploadProgress(progress);
-
-  //     if (progress >= 100) {
-  //       clearInterval(interval);
-
-  //       setTimeout(() => {
-  //         setStep(2); // Analyzing
-  //         setTimeout(() => {
-  //           setStep(3); // Extracting
-  //           setTimeout(() => {
-  //             setStep(4); // Formatting
-  //             setTimeout(() => {
-  //               setStep(5); // Complete
-  //               setUploading(false);
-
-  //               setHasResume(true);
-
-  //               setResumeData({
-  //                 name: "John Doe",
-  //                 email: "john.doe@example.com",
-  //                 phone: "(123) 456-7890",
-  //                 experience: [
-  //                   {
-  //                     title: "Frontend Developer",
-  //                     company: "Tech Solutions Inc.",
-  //                     date: "Jan 2020 - Present",
-  //                     description:
-  //                       "Developed responsive web applications using React and TypeScript.",
-  //                   },
-  //                 ],
-  //                 education: [
-  //                   {
-  //                     degree: "Bachelor of Science in Computer Science",
-  //                     school: "University of Technology",
-  //                     date: "2016 - 2020",
-  //                   },
-  //                 ],
-  //                 skills: [
-  //                   "JavaScript",
-  //                   "React",
-  //                   "TypeScript",
-  //                   "HTML/CSS",
-  //                   "Node.js",
-  //                 ],
-  //               });
-
-  //               setTimeout(() => {
-  //                 navigate("/templates");
-  //               }, 1000);
-  //             }, 1000);
-  //           }, 1500);
-  //         }, 1500);
-  //       }, 500);
-  //     }
-  //   }, 100);
-  // }, [navigate, setHasResume, setResumeData]);
-
-  const handleUpload = () => {
-    if (!file) return;
-
-    toast({
-      title: "Resume upload started",
-      description: "We're processing your resume...",
-    });
-
-    // handleApiUpload();
-    handleUploadResume();
-  };
-
   const steps = [
     { label: "Upload", icon: <UploadIcon className="h-[18px] w-[18px]" /> },
     {
@@ -638,7 +706,6 @@ const ResumeUpload = () => {
           </motion.div>
         )}
       </div>
-      <Templates />
     </Layout>
   );
 };
