@@ -23,6 +23,7 @@ import Layout from "@/components/layout/Layout";
 import ResumePreview from "@/components/resume/ResumePreview";
 import { Briefcase, MapPin, Clock, BarChart3, Search } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useResume } from "@/context/ResumeContext";
 
 const Jobs = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -33,143 +34,165 @@ const Jobs = () => {
   const [showPreview, setShowPreview] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
-
-  const mockJobs = [
-    {
-      id: "1",
-      title: "Senior Frontend Developer",
-      company: "TechCorp Inc.",
-      location: "San Francisco, CA",
-      type: "Full-time",
-      salary: "$120,000 - $150,000",
-      posted: "2 days ago",
-      description:
-        "We are looking for an experienced Frontend Developer to join our team. You will be responsible for building and maintaining web applications using React and TypeScript.",
-      requirements: [
-        "5+ years of experience with frontend development",
-        "Strong knowledge of React, TypeScript, and modern JavaScript",
-        "Experience with responsive design and CSS frameworks",
-        "Bachelor's degree in Computer Science or related field",
-      ],
-      benefits: [
-        "Competitive salary and benefits package",
-        "Remote work options",
-        "Flexible working hours",
-        "Professional development opportunities",
-      ],
-      match: 95,
-    },
-    {
-      id: "2",
-      title: "UX/UI Designer",
-      company: "DesignHub",
-      location: "New York, NY",
-      type: "Full-time",
-      salary: "$90,000 - $110,000",
-      posted: "1 week ago",
-      description:
-        "DesignHub is seeking a talented UX/UI Designer to create beautiful, intuitive interfaces for our clients. You will work closely with product managers and engineers to design engaging experiences.",
-      requirements: [
-        "3+ years of experience in UX/UI design",
-        "Proficiency with design tools such as Figma and Adobe Creative Suite",
-        "Portfolio showcasing your design process and solutions",
-        "Excellent communication and collaboration skills",
-      ],
-      benefits: [
-        "Health, dental, and vision insurance",
-        "Unlimited PTO",
-        "Gym membership",
-        "Catered lunches",
-      ],
-      match: 82,
-    },
-    {
-      id: "3",
-      title: "Backend Developer",
-      company: "ServerLogic",
-      location: "Remote",
-      type: "Contract",
-      salary: "$100,000 - $130,000",
-      posted: "3 days ago",
-      description:
-        "ServerLogic is looking for a Backend Developer to build and maintain server-side applications. You will be responsible for database design, API development, and server optimization.",
-      requirements: [
-        "4+ years of experience with backend development",
-        "Proficiency in Node.js, Python, or Java",
-        "Experience with database systems (SQL, NoSQL)",
-        "Knowledge of cloud services (AWS, Azure, GCP)",
-      ],
-      benefits: [
-        "Flexible working hours",
-        "Project completion bonuses",
-        "Weekly team events",
-        "Professional development stipend",
-      ],
-      match: 78,
-    },
-    {
-      id: "4",
-      title: "Full Stack Developer",
-      company: "OmniTech Solutions",
-      location: "Austin, TX",
-      type: "Full-time",
-      salary: "$110,000 - $140,000",
-      posted: "1 day ago",
-      description:
-        "OmniTech is seeking a Full Stack Developer to work on our flagship product. You will be involved in all aspects of development, from database design to frontend implementation.",
-      requirements: [
-        "4+ years of full stack development experience",
-        "Proficiency in React, Node.js, and SQL/NoSQL databases",
-        "Experience with cloud services and deployment",
-        "Ability to work in a fast-paced environment",
-      ],
-      benefits: [
-        "Competitive salary",
-        "Stock options",
-        "Health and wellness programs",
-        "Continued education assistance",
-      ],
-      match: 88,
-    },
-    {
-      id: "5",
-      title: "Data Scientist",
-      company: "Analytix",
-      location: "Boston, MA",
-      type: "Full-time",
-      salary: "$130,000 - $160,000",
-      posted: "5 days ago",
-      description:
-        "Analytix is looking for a Data Scientist to help analyze and interpret complex data sets. You will build models and algorithms to extract insights and drive business decisions.",
-      requirements: [
-        "Master's or PhD in a quantitative field",
-        "Experience with Python, R, and SQL",
-        "Knowledge of machine learning algorithms",
-        "Strong statistical background",
-      ],
-      benefits: [
-        "Comprehensive benefits package",
-        "Relocation assistance",
-        "Flexible schedule",
-        "Learning and development budget",
-      ],
-      match: 72,
-    },
-  ];
+  const { jobOpportunities } = useResume();
 
   const handlePreview = (job: any) => {
     setSelectedJob(job);
     setShowPreview(true);
   };
 
-  const filteredJobs = mockJobs.filter((job) => {
-    const matchesSearch = job.title
+  const jobsToDisplay = jobOpportunities.length > 0 
+    ? jobOpportunities 
+    : [
+        {
+          id: "1",
+          job_id: "1",
+          job_title: "Senior Frontend Developer",
+          company: "TechCorp Inc.",
+          location: "San Francisco, CA",
+          place: "San Francisco, CA",
+          type: "Full-time",
+          salary: "$120,000 - $150,000",
+          posted_date: "2 days ago",
+          job_description:
+            "We are looking for an experienced Frontend Developer to join our team. You will be responsible for building and maintaining web applications using React and TypeScript.",
+          requirements: [
+            "5+ years of experience with frontend development",
+            "Strong knowledge of React, TypeScript, and modern JavaScript",
+            "Experience with responsive design and CSS frameworks",
+            "Bachelor's degree in Computer Science or related field",
+          ],
+          benefits: [
+            "Competitive salary and benefits package",
+            "Remote work options",
+            "Flexible working hours",
+            "Professional development opportunities",
+          ],
+          match: 95,
+          job_url: "#",
+        },
+        {
+          id: "2",
+          job_id: "2",
+          job_title: "UX/UI Designer",
+          company: "DesignHub",
+          location: "New York, NY",
+          place: "New York, NY",
+          type: "Full-time",
+          salary: "$90,000 - $110,000",
+          posted_date: "1 week ago",
+          job_description:
+            "DesignHub is seeking a talented UX/UI Designer to create beautiful, intuitive interfaces for our clients. You will work closely with product managers and engineers to design engaging experiences.",
+          requirements: [
+            "3+ years of experience in UX/UI design",
+            "Proficiency with design tools such as Figma and Adobe Creative Suite",
+            "Portfolio showcasing your design process and solutions",
+            "Excellent communication and collaboration skills",
+          ],
+          benefits: [
+            "Health, dental, and vision insurance",
+            "Unlimited PTO",
+            "Gym membership",
+            "Catered lunches",
+          ],
+          match: 82,
+        },
+        {
+          id: "3",
+          job_id: "3",
+          job_title: "Backend Developer",
+          company: "ServerLogic",
+          location: "Remote",
+          place: "Remote",
+          type: "Contract",
+          salary: "$100,000 - $130,000",
+          posted_date: "3 days ago",
+          job_description:
+            "ServerLogic is looking for a Backend Developer to build and maintain server-side applications. You will be responsible for database design, API development, and server optimization.",
+          requirements: [
+            "4+ years of experience with backend development",
+            "Proficiency in Node.js, Python, or Java",
+            "Experience with database systems (SQL, NoSQL)",
+            "Knowledge of cloud services (AWS, Azure, GCP)",
+          ],
+          benefits: [
+            "Flexible working hours",
+            "Project completion bonuses",
+            "Weekly team events",
+            "Professional development stipend",
+          ],
+          match: 78,
+        },
+        {
+          id: "4",
+          job_id: "4",
+          job_title: "Full Stack Developer",
+          company: "OmniTech Solutions",
+          location: "Austin, TX",
+          place: "Austin, TX",
+          type: "Full-time",
+          salary: "$110,000 - $140,000",
+          posted_date: "1 day ago",
+          job_description:
+            "OmniTech is seeking a Full Stack Developer to work on our flagship product. You will be involved in all aspects of development, from database design to frontend implementation.",
+          requirements: [
+            "4+ years of full stack development experience",
+            "Proficiency in React, Node.js, and SQL/NoSQL databases",
+            "Experience with cloud services and deployment",
+            "Ability to work in a fast-paced environment",
+          ],
+          benefits: [
+            "Competitive salary",
+            "Stock options",
+            "Health and wellness programs",
+            "Continued education assistance",
+          ],
+          match: 88,
+        },
+        {
+          id: "5",
+          job_id: "5",
+          job_title: "Data Scientist",
+          company: "Analytix",
+          location: "Boston, MA",
+          place: "Boston, MA",
+          type: "Full-time",
+          salary: "$130,000 - $160,000",
+          posted_date: "5 days ago",
+          job_description:
+            "Analytix is looking for a Data Scientist to help analyze and interpret complex data sets. You will build models and algorithms to extract insights and drive business decisions.",
+          requirements: [
+            "Master's or PhD in a quantitative field",
+            "Experience with Python, R, and SQL",
+            "Knowledge of machine learning algorithms",
+            "Strong statistical background",
+          ],
+          benefits: [
+            "Comprehensive benefits package",
+            "Relocation assistance",
+            "Flexible schedule",
+            "Learning and development budget",
+          ],
+          match: 72,
+        },
+      ];
+
+  const filteredJobs = jobsToDisplay.filter((job) => {
+    const jobTitle = job.job_title || "";
+    const jobLocation = job.location || job.place || "";
+    
+    const matchesSearch = jobTitle
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-    const matchesLocation = location === "" || job.location.includes(location);
+    const matchesLocation = location === "" || jobLocation.includes(location);
+    
+    if (jobOpportunities.length > 0) {
+      return matchesSearch && matchesLocation;
+    }
+    
     const matchesType = jobType === "all" || job.type === jobType;
     const jobSalaryMin = parseInt(
-      job.salary.replace(/[^0-9]/g, "").substring(0, 6)
+      (job.salary || "$0").replace(/[^0-9]/g, "").substring(0, 6)
     );
     const matchesSalary = salary[0] * 2000 <= jobSalaryMin;
 
@@ -263,50 +286,56 @@ const Jobs = () => {
             </div>
           ) : (
             filteredJobs.map((job) => (
-              <Card key={job.id} className="overflow-hidden w-[700px]">
+              <Card key={job.job_id} className="overflow-hidden w-[700px]">
                 <CardHeader className="pb-3 p-4 md:p-6">
                   <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-2">
                     <div>
                       <CardTitle className="text-lg md:text-xl">
-                        {job.title}
+                        {job.job_title}
                       </CardTitle>
                       <CardDescription className="flex items-center mt-1">
                         <Briefcase className="mr-1 h-4 w-4" />
                         {job.company}
                       </CardDescription>
                     </div>
-                    <div className="flex items-start md:items-end md:flex-col">
-                      <div className="bg-primary/10 text-primary rounded-full px-3 py-1 text-sm flex items-center">
-                        <BarChart3 className="mr-1 h-4 w-4" />
-                        {job.match}% Match
+                    {job.match && (
+                      <div className="flex items-start md:items-end md:flex-col">
+                        <div className="bg-primary/10 text-primary rounded-full px-3 py-1 text-sm flex items-center">
+                          <BarChart3 className="mr-1 h-4 w-4" />
+                          {job.match}% Match
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent className="pb-3 p-4 md:p-6 pt-0">
                   <div className="flex flex-wrap gap-3 text-xs md:text-sm text-muted-foreground mb-4">
                     <div className="flex items-center">
                       <MapPin className="mr-1 h-4 w-4" />
-                      {job.location}
+                      {job.location || job.place}
                     </div>
-                    <div className="flex items-center">
-                      <Briefcase className="mr-1 h-4 w-4" />
-                      {job.type}
-                    </div>
+                    {job.type && (
+                      <div className="flex items-center">
+                        <Briefcase className="mr-1 h-4 w-4" />
+                        {job.type}
+                      </div>
+                    )}
                     <div className="flex items-center">
                       <Clock className="mr-1 h-4 w-4" />
-                      {job.posted}
+                      {job.posted_date || "Recently posted"}
                     </div>
                   </div>
                   <p className="text-xs md:text-sm line-clamp-2">
-                    {job.description}
+                    {job.job_description?.substring(0, 150)}...
                   </p>
                 </CardContent>
                 <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-3 border-t p-4 md:p-6">
                   <div>
-                    <p className="text-xs md:text-sm font-medium">
-                      {job.salary}
-                    </p>
+                    {job.salary && (
+                      <p className="text-xs md:text-sm font-medium">
+                        {job.salary}
+                      </p>
+                    )}
                   </div>
                   <Button
                     variant="outline"

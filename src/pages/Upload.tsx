@@ -17,84 +17,6 @@ import {
   Loader2,
 } from "lucide-react";
 
-/*
- * API implementation for resume upload using fetch
- *
- * Example implementation:
- *
- * const handleUpload = async () => {
- *   if (!file || !jobProfile.trim()) {
- *     toast({
- *       title: "Missing information",
- *       description: file ? "Please enter a job profile" : "Please select a file to upload",
- *       variant: "destructive",
- *     });
- *     return;
- *   }
- *
- *   try {
- *     setUploading(true);
- *     setStep(1);
- *
- *     const formData = new FormData();
- *     formData.append("resume", file);
- *     formData.append("jobProfile", jobProfile);
- *
- *     const response = await fetch("https://api.yourdomain.com/api/upload", {
- *       method: "POST",
- *       body: formData,
- *     });
- *
- *     if (!response.ok) {
- *       throw new Error(`Server responded with ${response.status}`);
- *     }
- *
- *     const data = await response.json();
- *
- *     // Set resume data and update state
- *     setResumeData(data);
- *     setHasResume(true);
- *
- *     // Process completion steps
- *     setTimeout(() => {
- *       setStep(2); // Analyzing
- *       setTimeout(() => {
- *         setStep(3); // Extracting
- *         setTimeout(() => {
- *           setStep(4); // Formatting
- *           setTimeout(() => {
- *             setStep(5); // Complete
- *             setUploading(false);
- *
- *             toast({
- *               title: "Resume processed successfully",
- *               description: "Taking you to templates...",
- *             });
- *
- *             setTimeout(() => {
- *               navigate("/templates");
- *             }, 1000);
- *           }, 1000);
- *         }, 1500);
- *       }, 1500);
- *     }, 500);
- *
- *   } catch (error) {
- *     console.error("Upload failed:", error);
- *
- *     setUploading(false);
- *     setStep(0);
- *
- *     toast({
- *       title: "Upload failed",
- *       description: "There was an error processing your resume. Please try again.",
- *       variant: "destructive",
- *     });
- *   }
- * };
- */
-
-// Keeping the existing mock implementation for now
 const uploadResumeAPI = async (
   file: File,
   jobProfile: string,
@@ -152,7 +74,7 @@ const ResumeUpload = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { setHasResume, setResumeData } = useResume();
+  const { setHasResume, setResumeData, setJobOpportunities, setPersonalDetails } = useResume();
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -274,7 +196,7 @@ const ResumeUpload = () => {
         variant: "destructive",
       });
 
-      console.error("Resume upload error:", error);
+      console.error("Upload failed:", error);
     }
   };
 
@@ -354,6 +276,7 @@ const ResumeUpload = () => {
     handleUploadResume();
     // handleApiUpload();
   };
+
   const handleUploadResume = async () => {
     if (!file || !jobProfile.trim()) {
       toast({
@@ -385,11 +308,18 @@ const ResumeUpload = () => {
 
       const data = await response.json();
       console.log(data);
-      // Set resume data and update state
+      
+      if (data.job_opportunities) {
+        setJobOpportunities(data.job_opportunities);
+      }
+      
+      if (data.personal_details) {
+        setPersonalDetails(data.personal_details);
+      }
+      
       setResumeData(data);
       setHasResume(true);
 
-      // Process completion steps
       setTimeout(() => {
         setStep(2); // Analyzing
         setTimeout(() => {
@@ -426,6 +356,7 @@ const ResumeUpload = () => {
       });
     }
   };
+
   const steps = [
     { label: "Upload", icon: <UploadIcon className="h-[18px] w-[18px]" /> },
     {
