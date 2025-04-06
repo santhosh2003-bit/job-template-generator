@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Github, Linkedin, MapPin, Phone, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -116,7 +115,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
 
       // If we have a job URL, redirect to it
       if (jobData.job_url) {
-        window.open(jobData.job_url, '_blank');
+        window.open(jobData.job_url, "_blank");
       }
 
       toast({
@@ -144,12 +143,19 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       title: personalDetails?.current_position || "Senior Software Engineer",
       email: personalDetails?.email || "alex@example.com",
       phone: personalDetails?.phone_number || "(555) 123-4567",
-      github: personalDetails?.github === "None" ? "Github" : personalDetails?.github || "Alex Johnson",
-      linkedin: personalDetails?.linkedin === "None" ? "LinkedIn" : personalDetails?.linkedin || "alex-johnson",
+      github:
+        personalDetails?.github === "None"
+          ? "Github"
+          : personalDetails?.github || "Alex Johnson",
+      linkedin:
+        personalDetails?.linkedin === "None"
+          ? "LinkedIn"
+          : personalDetails?.linkedin || "alex-johnson",
       location: personalDetails?.physical_address || "San Francisco, CA",
-      summary: personalDetails?.brief_summary === "None" 
-        ? "Experienced professional with expertise in relevant technologies. Passionate about building scalable solutions that solve real-world problems."
-        : personalDetails?.brief_summary,
+      summary:
+        personalDetails?.brief_summary === "None"
+          ? "Experienced professional with expertise in relevant technologies. Passionate about building scalable solutions that solve real-world problems."
+          : personalDetails?.brief_summary,
     },
     skills: customizedResume?.modified_skills || [
       "JavaScript",
@@ -163,8 +169,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       "CI/CD",
       "Agile Methodologies",
     ],
-    experience: customizedResume?.modified_work_experience 
-      ? customizedResume.modified_work_experience.map(exp => ({
+    experience: customizedResume?.modified_work_experience
+      ? customizedResume.modified_work_experience.map((exp) => ({
           title: exp["Job Title"],
           company: exp.Company,
           location: "",
@@ -347,7 +353,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                       )}
                     </div>
                     <div className="text-gray-600 text-[10px] sm:text-xs">
-                      {exp.company}{exp.location ? `, ${exp.location}` : ''}
+                      {exp.company}
+                      {exp.location ? `, ${exp.location}` : ""}
                     </div>
                     <ul className="m-0 pl-4 sm:pl-5 text-black">
                       {exp.highlights.map((highlight, idx) => (
@@ -399,13 +406,14 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                       key={index}
                       className="text-xs sm:text-sm md:text-base"
                     >
-                      {skill}{index < resumeDataToShow.skills.length - 1 ? "," : ""}
+                      {skill}
+                      {index < resumeDataToShow.skills.length - 1 ? "," : ""}
                     </span>
                   ))}
                 </div>
               </div>
 
-              {resumeDataToShow.projects && resumeDataToShow.projects.length > 0 && (
+              {/* {resumeDataToShow.projects && resumeDataToShow.projects.length > 0 && (
                 <div className="mb-4 sm:mb-1">
                   <h3 className="text-black border-b border-black pb-1 sm:pb-1 font-bold text-sm sm:text-base md:text-lg">
                     Projects
@@ -423,7 +431,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                     ))}
                   </div>
                 </div>
-              )}
+              )} */}
             </div>
             <div className="mt-4 flex justify-center">
               <Button onClick={handleDownload}>Download Resume</Button>
@@ -433,11 +441,15 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
           <div className="border rounded-md p-4 h-fit">
             <h2 className="text-xl font-bold mb-2">{jobData.job_title}</h2>
             <p className="text-muted-foreground mb-1">{jobData.company}</p>
-            <p className="text-muted-foreground mb-4">{jobData.location || jobData.place}</p>
+            <p className="text-muted-foreground mb-4">
+              {jobData.location || jobData.place}
+            </p>
 
             <div className="mb-4">
               <h3 className="font-semibold mb-2">Job Description</h3>
-              <p className="text-sm whitespace-pre-line">{jobData.job_description}</p>
+              <p className="text-sm whitespace-pre-line">
+                {jobData.job_description}
+              </p>
             </div>
 
             {jobData.requirements && (
