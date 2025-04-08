@@ -8,18 +8,20 @@ import { FileUploader } from "react-drag-drop-files";
 import { Progress } from "@/components/ui/progress";
 import { useResume } from "@/context/ResumeContext";
 import { useAuth } from "@/context/AuthContext";
-import { FileText, Upload, Briefcase } from "lucide-react";
+import { FileText, Upload as UploadIcon, Briefcase } from "lucide-react";
+
+type FileType = File | null;
 
 const ResumeUpload = () => {
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState<FileType>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const { toast } = useToast();
-  const { setResumeData, setPersonalDetails, setJobOpportunities } = useResume();
+  const { setResumeData, setPersonalDetails, setJobOpportunities, setHasResume } = useResume();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
-  const handleChange = (file) => {
+  const handleChange = (file: File) => {
     setFile(file);
   };
 
@@ -188,6 +190,7 @@ const ResumeUpload = () => {
       setPersonalDetails(mockApiResponse.personal_details);
       setResumeData(mockApiResponse.resume_data);
       setJobOpportunities(mockApiResponse.job_opportunities);
+      setHasResume(true);
 
       setUploadProgress(100);
       toast({
@@ -237,7 +240,7 @@ const ResumeUpload = () => {
               <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors">
                 <div className="flex justify-center mb-4">
                   <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center">
-                    <Upload className="h-8 w-8 text-primary" />
+                    <UploadIcon className="h-8 w-8 text-primary" />
                   </div>
                 </div>
                 <h3 className="text-lg font-semibold mb-2">
@@ -295,7 +298,7 @@ const ResumeUpload = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
-                icon: <Upload className="h-6 w-6 text-primary" />,
+                icon: <UploadIcon className="h-6 w-6 text-primary" />,
                 title: "1. Upload Your Resume",
                 description:
                   "Upload your existing resume in PDF format. Our AI will automatically extract your information.",
