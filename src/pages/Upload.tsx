@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -7,6 +8,7 @@ import { FileUploader } from "react-drag-drop-files";
 import { Progress } from "@/components/ui/progress";
 import { useResume } from "@/context/ResumeContext";
 import { useAuth } from "@/context/AuthContext";
+import { FileText, Upload, Briefcase } from "lucide-react";
 
 const ResumeUpload = () => {
   const [file, setFile] = useState(null);
@@ -106,73 +108,81 @@ const ResumeUpload = () => {
 
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
+      const mockJobOpportunities = [
+        {
+          job_id: "1",
+          job_title: "Senior Frontend Engineer",
+          company: "Tech Solutions Inc.",
+          location: "Remote",
+          job_description: "Looking for an experienced frontend engineer...",
+          job_url: "https://example.com/jobs/1",
+          apply_link: "",
+          place: "Remote",
+          posted_date: "2025-04-01",
+          customized_resume: {
+            modified_skills: ["JavaScript", "React", "TypeScript", "Redux", "CSS-in-JS"],
+            modified_work_experience: [
+              {
+                Company: "Tech Innovations Inc.",
+                "Job Title": "Senior Software Engineer",
+                Responsibilities: [
+                  "Led React-based frontend development for multiple projects",
+                  "Implemented responsive design patterns that improved mobile conversion by 25%",
+                  "Optimized rendering performance resulting in 40% faster page loads",
+                ],
+              },
+              {
+                Company: "DataSystems LLC",
+                "Job Title": "Software Engineer",
+                Responsibilities: [
+                  "Built React components for financial dashboards",
+                  "Collaborated with UX designers to implement pixel-perfect interfaces",
+                  "Reduced bundle size by 35% through code splitting techniques",
+                ],
+              },
+            ],
+          },
+        },
+        {
+          job_id: "2",
+          job_title: "Full Stack Developer",
+          company: "Global Innovations",
+          location: "New York, NY",
+          job_description: "We're seeking a talented full stack developer...",
+          job_url: "https://example.com/jobs/2",
+          apply_link: "",
+          place: "New York, NY",
+          posted_date: "2025-04-02",
+          customized_resume: {
+            modified_skills: ["JavaScript", "Node.js", "Express", "React", "MongoDB", "AWS"],
+            modified_work_experience: [
+              {
+                Company: "Tech Innovations Inc.",
+                "Job Title": "Senior Software Engineer",
+                Responsibilities: [
+                  "Built and maintained RESTful APIs using Node.js and Express",
+                  "Integrated MongoDB for scalable data storage solutions",
+                  "Deployed microservices on AWS using Docker containers",
+                ],
+              },
+              {
+                Company: "DataSystems LLC",
+                "Job Title": "Software Engineer",
+                Responsibilities: [
+                  "Developed full stack applications with MERN stack",
+                  "Implemented secure authentication systems",
+                  "Conducted code reviews and provided technical leadership",
+                ],
+              },
+            ],
+          },
+        },
+      ];
+
       const mockApiResponse = {
         personal_details: mockPersonalDetails,
         resume_data: mockResumeData,
-        job_opportunities: [
-          {
-            job_id: "1",
-            job_title: "Senior Frontend Engineer",
-            company: "Tech Solutions Inc.",
-            location: "Remote",
-            job_description: "Looking for an experienced frontend engineer...",
-            job_url: "https://example.com/jobs/1",
-            customized_resume: {
-              modified_skills: ["JavaScript", "React", "TypeScript", "Redux", "CSS-in-JS"],
-              modified_work_experience: [
-                {
-                  Company: "Tech Innovations Inc.",
-                  "Job Title": "Senior Software Engineer",
-                  Responsibilities: [
-                    "Led React-based frontend development for multiple projects",
-                    "Implemented responsive design patterns that improved mobile conversion by 25%",
-                    "Optimized rendering performance resulting in 40% faster page loads",
-                  ],
-                },
-                {
-                  Company: "DataSystems LLC",
-                  "Job Title": "Software Engineer",
-                  Responsibilities: [
-                    "Built React components for financial dashboards",
-                    "Collaborated with UX designers to implement pixel-perfect interfaces",
-                    "Reduced bundle size by 35% through code splitting techniques",
-                  ],
-                },
-              ],
-            },
-          },
-          {
-            job_id: "2",
-            job_title: "Full Stack Developer",
-            company: "Global Innovations",
-            location: "New York, NY",
-            job_description: "We're seeking a talented full stack developer...",
-            job_url: "https://example.com/jobs/2",
-            customized_resume: {
-              modified_skills: ["JavaScript", "Node.js", "Express", "React", "MongoDB", "AWS"],
-              modified_work_experience: [
-                {
-                  Company: "Tech Innovations Inc.",
-                  "Job Title": "Senior Software Engineer",
-                  Responsibilities: [
-                    "Built and maintained RESTful APIs using Node.js and Express",
-                    "Integrated MongoDB for scalable data storage solutions",
-                    "Deployed microservices on AWS using Docker containers",
-                  ],
-                },
-                {
-                  Company: "DataSystems LLC",
-                  "Job Title": "Software Engineer",
-                  Responsibilities: [
-                    "Developed full stack applications with MERN stack",
-                    "Implemented secure authentication systems",
-                    "Conducted code reviews and provided technical leadership",
-                  ],
-                },
-              ],
-            },
-          },
-        ],
+        job_opportunities: mockJobOpportunities,
       };
 
       setPersonalDetails(mockApiResponse.personal_details);
@@ -227,7 +237,7 @@ const ResumeUpload = () => {
               <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors">
                 <div className="flex justify-center mb-4">
                   <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center">
-                    <FileUploader className="h-8 w-8 text-primary" />
+                    <Upload className="h-8 w-8 text-primary" />
                   </div>
                 </div>
                 <h3 className="text-lg font-semibold mb-2">
@@ -285,7 +295,7 @@ const ResumeUpload = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
-                icon: <FileUploader className="h-6 w-6 text-primary" />,
+                icon: <Upload className="h-6 w-6 text-primary" />,
                 title: "1. Upload Your Resume",
                 description:
                   "Upload your existing resume in PDF format. Our AI will automatically extract your information.",
