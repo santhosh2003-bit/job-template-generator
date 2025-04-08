@@ -1,9 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Menu, X, Mail, Lock } from "lucide-react";
+import { Menu, X, Mail, Lock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useResume } from "@/context/ResumeContext";
+import { useAuth } from "@/context/AuthContext";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +18,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -31,6 +42,7 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { checkResumeStatus } = useResume();
+  const { isAuthenticated, user, logout, setIsAuthenticated, setUser } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,17 +62,35 @@ const Navbar = () => {
     {
       name: "Upload Resume",
       path: "/upload",
-      onClick: () => true,
+      onClick: () => {
+        if (!isAuthenticated) {
+          setIsAuthDialogOpen(true);
+          return false;
+        }
+        return true;
+      },
     },
     {
       name: "Templates",
       path: "/templates",
-      onClick: () => checkResumeStatus(),
+      onClick: () => {
+        if (!isAuthenticated) {
+          setIsAuthDialogOpen(true);
+          return false;
+        }
+        return checkResumeStatus();
+      },
     },
     {
       name: "Jobs",
       path: "/jobs",
-      onClick: () => checkResumeStatus(),
+      onClick: () => {
+        if (!isAuthenticated) {
+          setIsAuthDialogOpen(true);
+          return false;
+        }
+        return checkResumeStatus();
+      },
     },
   ];
 
@@ -109,11 +139,14 @@ const Navbar = () => {
       const data = await response.json();
       if (!response.ok)
         throw new Error(data.message || "Please Enter Correct details");
-      // console.log(data);
+      
       // Simulate API response delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Mock successful authentication
+      // Set user as authenticated
+      setIsAuthenticated(true);
+      setUser({ email: signInData.email });
+
       toast({
         title: "Welcome back!",
         description: "You've been signed in successfully.",
@@ -138,8 +171,8 @@ const Navbar = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    // setIsLoading(true);
-    // console.log(signUpData);
+    setIsLoading(true);
+    
     try {
       // API INTEGRATION COMMENT:
       // 1. Implement actual API call here to register user
@@ -153,13 +186,16 @@ const Navbar = () => {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Sign up failed");
-      // console.log(response);
+      
       // Simulate API response delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Mock successful registration
+      // Set user as authenticated after successful signup
+      setIsAuthenticated(true);
+      setUser({ email: signUpData.email });
+
       toast({
-        title: "Please Check Your Email",
+        title: "Account Created",
         description: "Your account has been created successfully.",
       });
 
@@ -195,6 +231,14 @@ const Navbar = () => {
       title: "Password reset",
       description:
         "If your email is registered, you'll receive reset instructions.",
+    });
+  };
+
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Logged out",
+      description: "You have been logged out successfully.",
     });
   };
 
@@ -237,13 +281,54 @@ const Navbar = () => {
               </Link>
             ))}
             <ThemeToggle />
-            <Button size="sm" onClick={handleGetStarted}>
-              Get Started
-            </Button>
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {user?.email?.charAt(0).toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>{user?.email}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button size="sm" onClick={handleGetStarted}>
+                Get Started
+              </Button>
+            )}
           </nav>
 
           <div className="md:hidden flex items-center gap-2">
             <ThemeToggle />
+            {isAuthenticated && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {user?.email?.charAt(0).toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>{user?.email}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
             <button
               className="p-2 text-foreground"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -273,12 +358,14 @@ const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
-              <Button
-                className="animate-slide-in animate-stagger-5"
-                onClick={handleGetStarted}
-              >
-                Get Started
-              </Button>
+              {!isAuthenticated && (
+                <Button
+                  className="animate-slide-in animate-stagger-5"
+                  onClick={handleGetStarted}
+                >
+                  Get Started
+                </Button>
+              )}
             </div>
           </nav>
         )}
@@ -349,16 +436,6 @@ const Navbar = () => {
 
             <TabsContent value="signup" className="space-y-4">
               <form onSubmit={handleSignUp} className="space-y-4">
-                {/* <div className="space-y-2">
-                  <Label htmlFor="name-signup">Full Name</Label>
-                  <Input
-                    id="name-signup"
-                    placeholder="John Doe"
-                    value={signUpData.name}
-                    onChange={handleSignUpChange}
-                    required
-                  />
-                </div> */}
                 <div className="space-y-2">
                   <Label htmlFor="email-signup">Email</Label>
                   <div className="relative">

@@ -55,42 +55,46 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       const imgHeight = canvas.height;
 
       const ratio = pdfWidth / imgWidth;
-      const scaledWidth = imgWidth * ratio;
-      const scaledHeight = imgHeight * ratio;
-
-      const pageHeight = pdfHeight / ratio;
-      const totalPages = Math.ceil(imgHeight / pageHeight);
-
+      const adjustedHeight = imgHeight * ratio;
+      
+      const totalPages = Math.ceil(adjustedHeight / pdfHeight);
+      
       for (let i = 0; i < totalPages; i++) {
-        if (i > 0) pdf.addPage();
-
-        const srcY = i * pageHeight;
-        const canvasSection = document.createElement("canvas");
-        canvasSection.width = imgWidth;
-        canvasSection.height = Math.min(pageHeight, imgHeight - srcY);
-
-        const ctx = canvasSection.getContext("2d");
-        ctx?.drawImage(
-          canvas,
-          0,
-          srcY,
-          imgWidth,
-          Math.min(pageHeight, imgHeight - srcY),
-          0,
-          0,
-          imgWidth,
-          Math.min(pageHeight, imgHeight - srcY)
-        );
-
-        const sectionData = canvasSection.toDataURL("image/png", 1.0);
-        pdf.addImage(
-          sectionData,
-          "PNG",
-          0,
-          0,
-          pdfWidth,
-          Math.min(pdfHeight, (imgHeight - srcY) * ratio)
-        );
+        if (i > 0) {
+          pdf.addPage();
+        }
+        
+        const sourceY = i * (pdfHeight / ratio);
+        const sourceHeight = Math.min(pdfHeight / ratio, imgHeight - sourceY);
+        
+        const pageCanvas = document.createElement("canvas");
+        pageCanvas.width = imgWidth;
+        pageCanvas.height = sourceHeight;
+        
+        const ctx = pageCanvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(
+            canvas,
+            0,
+            sourceY,
+            imgWidth,
+            sourceHeight,
+            0,
+            0,
+            imgWidth,
+            sourceHeight
+          );
+          
+          const pageImgData = pageCanvas.toDataURL("image/png", 1.0);
+          pdf.addImage(
+            pageImgData,
+            "PNG",
+            0,
+            0,
+            pdfWidth,
+            (sourceHeight * ratio)
+          );
+        }
       }
 
       pdf.save("resume.pdf");
@@ -113,7 +117,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // If we have a job URL, redirect to it
       if (jobData.job_url) {
         window.open(jobData.job_url, "_blank");
       }
@@ -133,10 +136,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
     }
   };
 
-  // Get the customized resume for this job if available
   const customizedResume = jobData.customized_resume || null;
 
-  // Use a combination of customized resume data and user's personal details
   const resumeDataToShow = {
     personalInfo: {
       name: personalDetails?.full_name || "Alex Johnson",
@@ -412,26 +413,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                   ))}
                 </div>
               </div>
-
-              {/* {resumeDataToShow.projects && resumeDataToShow.projects.length > 0 && (
-                <div className="mb-4 sm:mb-1">
-                  <h3 className="text-black border-b border-black pb-1 sm:pb-1 font-bold text-sm sm:text-base md:text-lg">
-                    Projects
-                  </h3>
-                  <div className="flex flex-col gap-2 sm:gap-3">
-                    {resumeDataToShow.projects.map((pro, index) => (
-                      <div key={index}>
-                        <h1 className="text-xs sm:text-sm md:text-base font-semibold">
-                          {pro.title}
-                        </h1>
-                        <p className="text-[10px] sm:text-xs md:text-sm">
-                          {pro.description}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )} */}
             </div>
             <div className="mt-4 flex justify-center">
               <Button onClick={handleDownload}>Download Resume</Button>

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
 import { ResumeProvider } from "./context/ResumeContext";
+import { AuthProvider } from "./context/AuthContext";
 import Home from "./pages/Home";
 import Dummy from "./pages/Dummy";
 import ResumeUpload from "./pages/Upload";
@@ -20,18 +21,20 @@ const App = () => (
     <ThemeProvider>
       <TooltipProvider>
         <BrowserRouter>
-          <ResumeProvider>
-            <Toaster />
-            <Sonner />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/upload" element={<ResumeUpload />} />
-              <Route path="/templates" element={<Templates />} />
-              <Route path="/jobs" element={<Jobs />} />
-              <Route path="/dummy" element={<Dummy />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </ResumeProvider>
+          <AuthProvider>
+            <ResumeProvider>
+              <Toaster />
+              <Sonner />
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/upload" element={<ResumeUpload />} />
+                <Route path="/templates" element={<Templates />} />
+                <Route path="/jobs" element={<Jobs />} />
+                <Route path="/dummy" element={<Dummy />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </ResumeProvider>
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
