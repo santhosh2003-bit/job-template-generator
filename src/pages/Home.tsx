@@ -18,6 +18,7 @@ import {
   Send,
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
+import BubbleBackground from "@/components/animations/BubbleBackground";
 
 const Home = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -100,6 +101,9 @@ const Home = () => {
     <Layout fullWidth>
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-b from-background to-accent/50 pt-32 pb-16 md:py-32">
+        {/* Add the BubbleBackground component here */}
+        <BubbleBackground />
+        
         <div className="absolute inset-0 z-0 opacity-30">
           <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-primary/10 to-transparent" />
           <div className="absolute h-40 w-40 rounded-full bg-primary/20 blur-3xl -top-10 -left-10" />

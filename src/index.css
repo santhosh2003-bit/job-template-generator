@@ -107,7 +107,14 @@
       color var(--transition-duration) ease;
   }
 
-  /* ... keep existing code (glass, glass-card, content-transition, etc.) */
+  /* Add this class for bubble animation smoothness */
+  .bubble-animation {
+    will-change: transform, opacity;
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+  }
+
+  /* ... keep existing code */
 }
 
-/* ... keep existing code (font-face, scrollbar styles, etc.) */
+/* ... keep existing code */
+
