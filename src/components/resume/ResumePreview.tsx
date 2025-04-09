@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Github, Linkedin, MapPin, Phone, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { Mail } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ResumePreviewProps {
   open: boolean;
@@ -28,12 +30,18 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   const { selectedTemplate, resumeData, personalDetails } = useResume();
   const { toast } = useToast();
   const resumeRef = React.useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const handleDownload = async () => {
     if (!resumeRef.current) return;
 
     try {
       const element = resumeRef.current;
+      toast({
+        title: "Preparing PDF",
+        description: "Please wait while we prepare your resume...",
+      });
+
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
@@ -236,8 +244,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[1400px] max-h-[90vh] overflow-auto">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[1400px] max-h-[90vh] overflow-auto p-0">
+        <DialogHeader className="p-4 sm:p-6">
           <DialogTitle className="text-xl font-bold">
             Resume Preview
           </DialogTitle>
@@ -254,82 +262,60 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
           </Button>
         </DialogHeader>
 
-        <div className="flex md:flex-row flex-col gap-6 mt-4">
-          <div className="w-[130%]  border rounded-md p-4 bg-white dark:bg-gray-800">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 p-4 sm:p-6">
+          <div className="w-full lg:w-2/3 border rounded-md p-4 bg-white dark:bg-gray-800 overflow-hidden">
             <div
-              className="font-[calibri] px-4 sm:px-6 md:px-10 text-gray-700 bg-white max-w-[210mm] mx-auto"
+              className="font-[calibri] text-gray-700 bg-white max-w-full mx-auto"
               ref={resumeRef}
               style={{
-                width: "210mm",
-                padding: "20mm",
+                width: "100%",
+                padding: "10px",
                 boxSizing: "border-box",
-                overflow: "visible",
               }}
             >
-              <div className="py-4 sm:py-2 md:py-2">
-                <h1 className="text-black font-bold text-lg sm:text-xl md:text-3xl lg:text-4xl mb-0 break-words">
+              <div className="py-2">
+                <h1 className="text-black font-bold text-lg sm:text-xl md:text-3xl mb-0 break-words">
                   {resumeDataToShow.personalInfo.name}
                 </h1>
-                <h2 className="text-blue-500 text-xs sm:text-sm md:text-base lg:text-lg mb-0">
+                <h2 className="text-purple-500 text-xs sm:text-sm md:text-base mb-0">
                   ({resumeDataToShow.personalInfo.title})
                 </h2>
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs sm:text-sm mt-2 sm:mt-1 gap-2 sm:gap-0">
-                  <div className="flex items-center justify-center gap-1 sm:gap-2 relative">
-                    <div>
-                      <Mail />
-                    </div>
-                    <div>
-                      <span className="text-[10px] sm:text-xs md:text-sm break-all">
-                        {resumeDataToShow.personalInfo.email}
-                      </span>
-                    </div>
+                <div className="flex flex-wrap gap-2 sm:gap-3 mt-2 sm:mt-1">
+                  <div className="flex items-center gap-1 text-[10px] sm:text-xs md:text-sm">
+                    <Mail className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="break-all">
+                      {resumeDataToShow.personalInfo.email}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-1 sm:gap-2">
-                    <div>
-                      <Phone />
-                    </div>
-                    <div>
-                      <span className="text-[10px] sm:text-xs md:text-sm break-all">
-                        {resumeDataToShow.personalInfo.phone}
-                      </span>
-                    </div>
+                  <div className="flex items-center gap-1 text-[10px] sm:text-xs md:text-sm">
+                    <Phone className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="break-all">
+                      {resumeDataToShow.personalInfo.phone}
+                    </span>
                   </div>
-
-                  <div className="flex items-center gap-1 sm:gap-2">
-                    <div>
-                      <Github />
-                    </div>
-                    <div>
-                      <p className="text-[10px] sm:text-xs md:text-sm break-all">
-                        {resumeDataToShow.personalInfo.github}
-                      </p>
-                    </div>
+                  <div className="flex items-center gap-1 text-[10px] sm:text-xs md:text-sm">
+                    <Github className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="break-all">
+                      {resumeDataToShow.personalInfo.github}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-1 sm:gap-2">
-                    <div>
-                      <Linkedin />
-                    </div>
-                    <div>
-                      <span className="text-[10px] sm:text-xs md:text-sm break-all">
-                        {resumeDataToShow.personalInfo.linkedin}
-                      </span>
-                    </div>
+                  <div className="flex items-center gap-1 text-[10px] sm:text-xs md:text-sm">
+                    <Linkedin className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="break-all">
+                      {resumeDataToShow.personalInfo.linkedin}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-1 sm:gap-2">
-                    <div>
-                      <MapPin />
-                    </div>
-                    <div>
-                      <span className="text-[10px] sm:text-xs md:text-sm">
-                        {resumeDataToShow.personalInfo.location}
-                      </span>
-                    </div>
+                  <div className="flex items-center gap-1 text-[10px] sm:text-xs md:text-sm">
+                    <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span>
+                      {resumeDataToShow.personalInfo.location}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              <div className="mb-2 sm:mb-1">
-                <h3 className="text-black border-b border-black pb-1 sm:pb-2 font-bold text-sm sm:text-base md:text-lg">
+              <div className="mb-2">
+                <h3 className="text-black border-b border-black pb-1 font-bold text-sm sm:text-base md:text-lg">
                   Summary
                 </h3>
                 <p className="text-xs sm:text-sm md:text-base">
@@ -337,13 +323,13 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                 </p>
               </div>
 
-              <div className="mb-4 sm:mb-1">
-                <h3 className="text-black border-b border-black pb-1 sm:pb-1 font-bold text-sm sm:text-base md:text-lg">
+              <div className="mb-2">
+                <h3 className="text-black border-b border-black pb-1 font-bold text-sm sm:text-base md:text-lg">
                   Work Experience
                 </h3>
                 {resumeDataToShow.experience.map((exp, index) => (
-                  <div key={index} className="mb-3 sm:mb-1">
-                    <div className="flex flex-col sm:flex-row justify-between mb-1">
+                  <div key={index} className="mb-2">
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center">
                       <h4 className="m-0 text-sm sm:text-[15px] font-semibold">
                         {exp.title}
                       </h4>
@@ -357,12 +343,9 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                       {exp.company}
                       {exp.location ? `, ${exp.location}` : ""}
                     </div>
-                    <ul className="m-0 pl-4 sm:pl-5 text-black">
+                    <ul className="m-0 pl-4 text-black">
                       {exp.highlights.map((highlight, idx) => (
-                        <li
-                          key={idx}
-                          className="mb-1 text-xs sm:text-sm md:text-base"
-                        >
+                        <li key={idx} className="mb-1 text-xs sm:text-sm md:text-base">
                           {" --> "}
                           {highlight}
                         </li>
@@ -372,13 +355,13 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                 ))}
               </div>
 
-              <div className="mb-2 sm:mb-1">
-                <h3 className="text-black border-b border-black pb-1 sm:pb-2 font-bold text-sm sm:text-base md:text-lg">
+              <div className="mb-2">
+                <h3 className="text-black border-b border-black pb-1 font-bold text-sm sm:text-base md:text-lg">
                   Education
                 </h3>
                 {resumeDataToShow.education.map((edu, index) => (
-                  <div key={index} className="mb-3 sm:mb-1">
-                    <div className="flex flex-col sm:flex-row justify-between mb-1">
+                  <div key={index} className="mb-2">
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center">
                       <h4 className="m-0 text-sm sm:text-[15px] font-semibold">
                         {edu.degree}
                       </h4>
@@ -397,16 +380,13 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                 ))}
               </div>
 
-              <div className="mb-4 sm:mb-1">
-                <h3 className="text-black border-b border-black pb-1 sm:pb-1 font-bold text-sm sm:text-base md:text-lg">
+              <div className="mb-2">
+                <h3 className="text-black border-b border-black pb-1 font-bold text-sm sm:text-base md:text-lg">
                   Skills
                 </h3>
                 <div className="flex flex-wrap gap-1 sm:gap-2">
                   {resumeDataToShow.skills.map((skill, index) => (
-                    <span
-                      key={index}
-                      className="text-xs sm:text-sm md:text-base"
-                    >
+                    <span key={index} className="text-xs sm:text-sm md:text-base">
                       {skill}
                       {index < resumeDataToShow.skills.length - 1 ? "," : ""}
                     </span>
@@ -415,11 +395,11 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
               </div>
             </div>
             <div className="mt-4 flex justify-center">
-              <Button onClick={handleDownload}>Download Resume</Button>
+              <Button onClick={handleDownload} className="bg-purple-500 hover:bg-purple-600">Download Resume</Button>
             </div>
           </div>
 
-          <div className="border rounded-md p-4 h-fit">
+          <div className="w-full lg:w-1/3 border rounded-md p-4 h-fit">
             <h2 className="text-xl font-bold mb-2">{jobData.job_title}</h2>
             <p className="text-muted-foreground mb-1">{jobData.company}</p>
             <p className="text-muted-foreground mb-4">
@@ -456,7 +436,9 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
             )}
 
             <div className="mt-6">
-              <Button onClick={handleApply} className="w-full">
+              <Button 
+                onClick={handleApply} 
+                className="w-full bg-purple-500 hover:bg-purple-600">
                 Apply Now
               </Button>
             </div>
