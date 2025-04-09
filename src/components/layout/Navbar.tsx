@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -42,7 +41,8 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { checkResumeStatus } = useResume();
-  const { isAuthenticated, user, logout, setIsAuthenticated, setUser } = useAuth();
+  const { isAuthenticated, user, logout, setIsAuthenticated, setUser } =
+    useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -139,7 +139,7 @@ const Navbar = () => {
       const data = await response.json();
       if (!response.ok)
         throw new Error(data.message || "Please Enter Correct details");
-      
+
       // Simulate API response delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -172,7 +172,7 @@ const Navbar = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+    console.log(signUpData);
     try {
       // API INTEGRATION COMMENT:
       // 1. Implement actual API call here to register user
@@ -185,8 +185,9 @@ const Navbar = () => {
         body: JSON.stringify(signUpData),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Sign up failed");
-      
+      console.log(data);
+      if (!response.ok) throw new Error(data.warning || "Sign up failed");
+
       // Simulate API response delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -284,7 +285,10 @@ const Navbar = () => {
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="bg-primary text-primary-foreground">
                         {user?.email?.charAt(0).toUpperCase() || "U"}
@@ -312,7 +316,10 @@ const Navbar = () => {
             {isAuthenticated && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="bg-primary text-primary-foreground">
                         {user?.email?.charAt(0).toUpperCase() || "U"}
