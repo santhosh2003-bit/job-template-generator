@@ -3,10 +3,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
 import { ResumeProvider } from "./context/ResumeContext";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import Home from "./pages/Home";
 import Dummy from "./pages/Dummy";
 import ResumeUpload from "./pages/Upload";
@@ -15,6 +15,31 @@ import Jobs from "./pages/Jobs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+// Protected route component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// App routes with authentication
+const AppRoutes = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/upload" element={<ProtectedRoute><ResumeUpload /></ProtectedRoute>} />
+      <Route path="/templates" element={<ProtectedRoute><Templates /></ProtectedRoute>} />
+      <Route path="/jobs" element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
+      <Route path="/dummy" element={<Dummy />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -25,14 +50,7 @@ const App = () => (
             <ResumeProvider>
               <Toaster />
               <Sonner />
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/upload" element={<ResumeUpload />} />
-                <Route path="/templates" element={<Templates />} />
-                <Route path="/jobs" element={<Jobs />} />
-                <Route path="/dummy" element={<Dummy />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <AppRoutes />
             </ResumeProvider>
           </AuthProvider>
         </BrowserRouter>

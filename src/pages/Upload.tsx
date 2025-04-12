@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -10,6 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 import { FileText, Upload as UploadIcon, Briefcase } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { analyzeResume } from "@/lib/api";
 
 type FileType = File | null;
 
@@ -79,157 +81,13 @@ const ResumeUpload = () => {
     }, 500);
 
     try {
-      const formData = new FormData();
-      formData.append("resume", file);
-      formData.append("job_profile", jobProfile);
-
-      // Normally we would send this to an API
-      const response = await fetch("http://127.0.0.1:3012/find_job", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await response.json();
-      console.log(data);
-      const mockPersonalDetails = {
-        brief_summary:
-          "Experienced software engineer with a passion for building scalable web applications.",
-        current_company: "Tech Innovations Inc.",
-        current_position: "Senior Software Engineer",
-        education: "MS in Computer Science, Stanford University",
-        email: "alex@example.com",
-        experience_years: "5",
-        full_name: "Alex Johnson",
-        github: "github.com/alexj",
-        languages: ["JavaScript", "Python", "Java"],
-        linkedin: "linkedin.com/in/alexj",
-        personal_website: "alexj.dev",
-        phone_number: "(555) 123-4567",
-        physical_address: "San Francisco, CA",
-      };
-
-      const mockResumeData = {
-        skills: ["JavaScript", "React", "Node.js", "Python", "AWS", "Docker"],
-        experience: [
-          {
-            title: "Senior Software Engineer",
-            company: "Tech Innovations Inc.",
-            period: "2020 - Present",
-            responsibilities: [
-              "Led development of a microservices architecture",
-              "Reduced API response time by 40% through optimizations",
-              "Mentored junior developers on best practices",
-            ],
-          },
-          {
-            title: "Software Engineer",
-            company: "DataSystems LLC",
-            period: "2018 - 2020",
-            responsibilities: [
-              "Developed RESTful APIs for financial data analysis",
-              "Implemented CI/CD pipeline reducing deployment time by 30%",
-              "Collaborated with UX team on frontend optimizations",
-            ],
-          },
-        ],
-      };
-
-      // Simulating API delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Jobs based on input job profile
-      const mockJobOpportunities = [
-        {
-          job_id: "1",
-          job_title: `Senior ${jobProfile}`,
-          company: "Tech Solutions Inc.",
-          location: "Remote",
-          job_description: `Looking for an experienced ${jobProfile} with strong technical skills and leadership abilities...`,
-          job_url: "https://example.com/jobs/1",
-          apply_link: "",
-          place: "Remote",
-          posted_date: "2025-04-01",
-          customized_resume: {
-            modified_skills: [
-              "JavaScript",
-              "React",
-              "TypeScript",
-              "Redux",
-              "CSS-in-JS",
-            ],
-            modified_work_experience: [
-              {
-                Company: "Tech Innovations Inc.",
-                "Job Title": "Senior Software Engineer",
-                Responsibilities: [
-                  `Led ${jobProfile}-focused development for multiple projects`,
-                  "Implemented responsive design patterns that improved mobile conversion by 25%",
-                  "Optimized rendering performance resulting in 40% faster page loads",
-                ],
-              },
-              {
-                Company: "DataSystems LLC",
-                "Job Title": "Software Engineer",
-                Responsibilities: [
-                  `Built ${jobProfile} components for financial dashboards`,
-                  "Collaborated with UX designers to implement pixel-perfect interfaces",
-                  "Reduced bundle size by 35% through code splitting techniques",
-                ],
-              },
-            ],
-          },
-        },
-        {
-          job_id: "2",
-          job_title: `${jobProfile} Developer`,
-          company: "Global Innovations",
-          location: "New York, NY",
-          job_description: `We're seeking a talented ${jobProfile} developer with experience in modern frameworks...`,
-          job_url: "https://example.com/jobs/2",
-          apply_link: "",
-          place: "New York, NY",
-          posted_date: "2025-04-02",
-          customized_resume: {
-            modified_skills: [
-              "JavaScript",
-              "Node.js",
-              "Express",
-              "React",
-              "MongoDB",
-              "AWS",
-            ],
-            modified_work_experience: [
-              {
-                Company: "Tech Innovations Inc.",
-                "Job Title": "Senior Software Engineer",
-                Responsibilities: [
-                  `Built and maintained ${jobProfile} applications using modern frameworks`,
-                  "Integrated MongoDB for scalable data storage solutions",
-                  "Deployed microservices on AWS using Docker containers",
-                ],
-              },
-              {
-                Company: "DataSystems LLC",
-                "Job Title": "Software Engineer",
-                Responsibilities: [
-                  `Developed full stack applications focusing on ${jobProfile}`,
-                  "Implemented secure authentication systems",
-                  "Conducted code reviews and provided technical leadership",
-                ],
-              },
-            ],
-          },
-        },
-      ];
-
-      const mockApiResponse = {
-        personal_details: mockPersonalDetails,
-        resume_data: mockResumeData,
-        job_opportunities: mockJobOpportunities,
-      };
-
-      setPersonalDetails(mockApiResponse.personal_details);
-      setResumeData(mockApiResponse.resume_data);
-      setJobOpportunities(mockApiResponse.job_opportunities);
+      // Use the analyzeResume function from the API
+      const response = await analyzeResume(file, jobProfile);
+      
+      // Set the data from the API response
+      setPersonalDetails(response.personal_details);
+      setResumeData(response.resume_data);
+      setJobOpportunities(response.job_opportunities);
       setHasResume(true);
 
       setUploadProgress(100);
