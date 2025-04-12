@@ -1,4 +1,3 @@
-
 import { toast } from "@/hooks/use-toast";
 
 const API_BASE_URL = "http://127.0.0.1:3012";
@@ -49,25 +48,28 @@ export interface ResumeAnalysisResponse {
   }[];
 }
 
-export async function analyzeResume(resumeFile: File, jobProfile: string): Promise<ResumeAnalysisResponse> {
+export async function analyzeResume(
+  resume: File,
+  job_profile: string
+): Promise<ResumeAnalysisResponse> {
   try {
     const formData = new FormData();
-    formData.append("resume", resumeFile);
-    formData.append("job_profile", jobProfile);
-    
-    console.log(`Analyzing resume for ${jobProfile} position`);
-    
+    formData.append("resume", resume);
+    formData.append("job_profile", job_profile);
+
+    console.log(`Analyzing resume for ${job_profile} position`);
+
     try {
       // Use the real API endpoint
-      const response = await fetch(`${API_BASE_URL}/analyze-resume`, {
-        method: 'POST',
-        body: formData
+      const response = await fetch(`${API_BASE_URL}/find_job`, {
+        method: "POST",
+        body: formData,
       });
-      
+
       if (!response.ok) {
         throw new Error(`API returned ${response.status}`);
       }
-      
+
       return await response.json();
     } catch (apiError) {
       console.error("Error fetching from API:", apiError);
@@ -89,21 +91,28 @@ export async function analyzeResume(resumeFile: File, jobProfile: string): Promi
   }
 }
 
-export async function fetchJobListings(query: string, location: string = ""): Promise<any[]> {
+export async function fetchJobListings(
+  query: string,
+  location: string = ""
+): Promise<any[]> {
   try {
-    console.log(`Searching for ${query} jobs in ${location || 'all locations'}`);
-    
+    console.log(
+      `Searching for ${query} jobs in ${location || "all locations"}`
+    );
+
     try {
       // Use the actual API endpoint provided by the user
       const response = await fetch(`${API_BASE_URL}/find_job`);
-      
+
       if (!response.ok) {
-        throw new Error(`API returned ${response.status}: ${response.statusText}`);
+        throw new Error(
+          `API returned ${response.status}: ${response.statusText}`
+        );
       }
-      
+
       const data = await response.json();
       console.log("API Response:", data);
-      
+
       // Return the job_opportunities array
       return data.job_opportunities || [];
     } catch (apiError) {
