@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Github, Linkedin, MapPin, Phone, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -149,6 +150,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   const customizedResume = jobData.customized_resume || null;
   console.log("Customized resume:", customizedResume);
 
+  // Use the customized resume data from the API if available
   const resumeDataToShow = {
     personalInfo: {
       name: personalDetails?.full_name || "Alex Johnson",
@@ -157,29 +159,23 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       phone: personalDetails?.phone_number || "(555) 123-4567",
       github:
         personalDetails?.github === "None"
-          ? "Github"
-          : personalDetails?.github || "Alex Johnson",
+          ? ""
+          : personalDetails?.github || "",
       linkedin:
         personalDetails?.linkedin === "None"
-          ? "LinkedIn"
-          : personalDetails?.linkedin || "alex-johnson",
+          ? ""
+          : personalDetails?.linkedin || "",
       location: personalDetails?.physical_address || "San Francisco, CA",
       summary:
         personalDetails?.brief_summary === "None"
-          ? "Experienced professional with expertise in relevant technologies. Passionate about building scalable solutions that solve real-world problems."
+          ? "Experienced professional with expertise in relevant technologies."
           : personalDetails?.brief_summary,
     },
-    skills: customizedResume?.modified_skills || [
+    skills: customizedResume?.modified_skills || resumeData?.skills || [
       "JavaScript",
       "TypeScript",
       "React",
       "Node.js",
-      "AWS",
-      "Docker",
-      "GraphQL",
-      "RESTful APIs",
-      "CI/CD",
-      "Agile Methodologies",
     ],
     experience: customizedResume?.modified_work_experience
       ? customizedResume.modified_work_experience.map((exp) => ({
@@ -189,25 +185,15 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
           period: "",
           highlights: exp.Responsibilities,
         }))
-      : [
-          {
-            title: "Senior Frontend Engineer",
-            company: "Tech Innovations Inc.",
-            location: "San Francisco, CA",
-            period: "Jan 2021 - Present",
-            highlights: [
-              "Led development of company's flagship React application, improving performance by 40%",
-              "Mentored junior developers and conducted code reviews",
-            ],
-          },
+      : resumeData?.experience || [
           {
             title: "Software Engineer",
-            company: "DataSystems LLC",
-            location: "Portland, OR",
-            period: "Mar 2018 - Dec 2020",
+            company: "Example Company",
+            location: "Remote",
+            period: "2021 - Present",
             highlights: [
-              "Developed and maintained multiple Node.js microservices",
-              "Reduced server costs by 30% through optimization efforts",
+              "Developed web applications",
+              "Collaborated with team members",
             ],
           },
         ],
@@ -221,28 +207,11 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         ]
       : [
           {
-            degree: "Master of Science in Computer Science",
-            school: "University of California, Berkeley",
-            period: "2016 - 2018",
-          },
-          {
             degree: "Bachelor of Science in Computer Science",
-            school: "University of Washington",
+            school: "University",
             period: "2012 - 2016",
           },
         ],
-    projects: [
-      {
-        title: "LIBRARY MANAGEMENT SYSTEM:",
-        description:
-          "Developed a full-featured library management system using Node.js, Express.js, React, andMongoDB.",
-      },
-      {
-        title: "COURSE ENROLLMENT APPLICATION PROJECT:",
-        description:
-          "I also built a Course Enrollment Application that streamlines the registration process for students",
-      },
-    ],
   };
 
   return (
@@ -296,18 +265,22 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                       {resumeDataToShow.personalInfo.phone}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1 text-[10px] sm:text-xs md:text-sm">
-                    <Github className="h-3 w-3 sm:h-4 sm:w-4" />
-                    <span className="break-all">
-                      {resumeDataToShow.personalInfo.github}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1 text-[10px] sm:text-xs md:text-sm">
-                    <Linkedin className="h-3 w-3 sm:h-4 sm:w-4" />
-                    <span className="break-all">
-                      {resumeDataToShow.personalInfo.linkedin}
-                    </span>
-                  </div>
+                  {resumeDataToShow.personalInfo.github && (
+                    <div className="flex items-center gap-1 text-[10px] sm:text-xs md:text-sm">
+                      <Github className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="break-all">
+                        {resumeDataToShow.personalInfo.github}
+                      </span>
+                    </div>
+                  )}
+                  {resumeDataToShow.personalInfo.linkedin && (
+                    <div className="flex items-center gap-1 text-[10px] sm:text-xs md:text-sm">
+                      <Linkedin className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="break-all">
+                        {resumeDataToShow.personalInfo.linkedin}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-1 text-[10px] sm:text-xs md:text-sm">
                     <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
                     <span>

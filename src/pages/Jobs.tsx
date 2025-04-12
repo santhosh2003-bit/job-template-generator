@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/layout/Layout";
 import ResumePreview from "@/components/resume/ResumePreview";
@@ -29,7 +27,7 @@ import { fetchJobListings } from "@/lib/api";
 
 // Define a job type that includes all potential properties
 interface Job {
-  id: string;
+  id?: string;
   job_id: string;
   job_title: string;
   company: string;
@@ -71,15 +69,15 @@ const Jobs = () => {
     // If we have job opportunities from resume upload, use those
     if (jobOpportunities && jobOpportunities.length > 0) {
       console.log("Using job opportunities from resume context:", jobOpportunities);
-      setJobListings(jobOpportunities as unknown as Job[]);
+      setJobListings(jobOpportunities);
     } 
     // Otherwise fetch jobs based on default search
     else {
-      loadJobs("software developer");
+      loadJobs();
     }
   }, [jobOpportunities]);
 
-  const loadJobs = async (query: string, loc: string = "") => {
+  const loadJobs = async (query: string = "software developer", loc: string = "") => {
     setIsLoading(true);
     try {
       const jobs = await fetchJobListings(query, loc);
@@ -267,7 +265,7 @@ const Jobs = () => {
                       {job.posted_date || "Recently posted"}
                     </div>
                   </div>
-                  <p className="text-xs md:text-sm line-clamp-2">
+                  <p className="text-xs md:text-sm line-clamp-3">
                     {job.job_description?.substring(0, 150)}...
                   </p>
                 </CardContent>
