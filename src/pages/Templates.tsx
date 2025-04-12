@@ -66,13 +66,13 @@ const Templates = () => {
             <div
               key={template.id}
               onClick={() => handleTemplateSelect(template.id)}
-              className={`border rounded-lg p-3 sm:p-4 h-fit transition-all cursor-pointer ${
+              className={`border rounded-lg p-1 sm:p-4 h-fit transition-all cursor-pointer ${
                 selectedTemplate === template.id
                   ? "ring-2 ring-primary"
                   : "hover:border-primary/50"
               }`}
             >
-              <div className="relative aspect-[4/5] bg-accent/20">
+              <div className="relative aspect-[5/5] bg-accent/20">
                 <img
                   src="/templates/template1.png"
                   alt={template.name}

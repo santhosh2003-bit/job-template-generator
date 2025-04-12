@@ -16,6 +16,8 @@ import {
   FileCheck,
   Edit3,
   Send,
+  TrendingUp,
+  BookOpenCheck,
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import BubbleBackground from "@/components/animations/BubbleBackground";
@@ -52,27 +54,27 @@ const Home = () => {
   const features = [
     {
       icon: <FileUp className="h-6 w-6 text-primary" />,
-      title: "Easy Resume Upload",
+      title: "AI Job Scraper",
       description:
-        "Upload your existing resume and let our AI analyze it within seconds.",
+        "Pulls job listings from LinkedIn, Indeed, Glassdoor, and more automatically.",
     },
     {
       icon: <LayoutTemplate className="h-6 w-6 text-primary" />,
-      title: "Beautiful Templates",
+      title: "Overleaf ATS friendly Templates",
       description:
-        "Choose from dozens of professionally designed templates to make your resume stand out.",
+        "Choose from professionally designed templates to make your resume stand out.",
     },
     {
       icon: <Briefcase className="h-6 w-6 text-primary" />,
-      title: "Job Matching",
+      title: "Job-Specific Tailoring",
       description:
-        "Get matched with jobs that align with your skills and experience.",
+        "Customize your resume for each job description with one click,highlighting relevant skills.",
     },
     {
       icon: <CheckCircle className="h-6 w-6 text-primary" />,
-      title: "Expert Recommendations",
+      title: "ATS-Friendly Optimization",
       description:
-        "Receive tailored advice to improve your resume and boost your chances.",
+        "AI scores and suggests improvements for better results with Applicant Tracking Systems.",
     },
   ];
 
@@ -103,7 +105,7 @@ const Home = () => {
       <section className="relative overflow-hidden bg-gradient-to-b from-background to-accent/50 pt-32 pb-16 md:py-32">
         {/* Add the BubbleBackground component here */}
         <BubbleBackground />
-        
+
         <div className="absolute inset-0 z-0 opacity-30">
           <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-primary/10 to-transparent" />
           <div className="absolute h-40 w-40 rounded-full bg-primary/20 blur-3xl -top-10 -left-10" />
@@ -119,8 +121,8 @@ const Home = () => {
               className="space-y-6"
             >
               <motion.div variants={fadeInUp}>
-                <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary mb-4">
-                  Craft Your Career
+                <span className="inline-block px-3 border border-white py-1 rounded-full text-xs font-medium bg-primary/10 text-primary mb-4">
+                  Get Interview calls with <span>Ezeapply</span>
                 </span>
               </motion.div>
 
@@ -128,16 +130,17 @@ const Home = () => {
                 variants={fadeInUp}
                 className="text-4xl md:text-6xl font-bold tracking-tight"
               >
-                Your Resume, <span className="text-primary">Perfected</span>
+                Generate custom resumes for every desired job
               </motion.h1>
 
               <motion.p
                 variants={fadeInUp}
                 className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto"
               >
-                Transform your resume instantly with our AI-powered platform.
-                Upload your current resume, get personalized templates, and
-                connect with your dream job.
+                The place where you can find job openings matching your resume
+                from multiple job boards within a few clicks.Our AI analyzes
+                your resume, matches you to jobs, and helps you apply in within
+                few clicks
               </motion.p>
 
               <motion.div
@@ -149,9 +152,9 @@ const Home = () => {
                     Upload Your Resume <FileText className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild>
+                {/* <Button size="lg" variant="outline" asChild>
                   <Link to="/templates">View Templates</Link>
-                </Button>
+                </Button> */}
               </motion.div>
             </motion.div>
           </div>
@@ -194,7 +197,7 @@ const Home = () => {
             ].map((step, index) => (
               <div
                 key={index}
-                className="glass-card shadow-lg p-6 rounded-xl relative flex flex-col items-center text-center"
+                className="glass-card shadow-lg p-6 border border-white rounded-xl relative flex flex-col items-center text-center"
               >
                 <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   {step.icon}
@@ -222,10 +225,11 @@ const Home = () => {
       <section className="py-20 bg-accent/50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Powerful Features</h2>
+            <h2 className="text-3xl font-bold mb-4">Our Features</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to create professional resumes and land your
-              dream job.
+              Find & Apply to the matching Jobs across LinkedIn, Indeed, Naukri
+              in Seconds Tailor your job application to increase chances of
+              landing interviews.
             </p>
           </div>
 
@@ -233,7 +237,7 @@ const Home = () => {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="glass-card p-6 rounded-xl shadow-xl transition-shadow duration-300"
+                className="glass-card p-6 rounded-xl shadow-xl border border-white transition-shadow duration-300"
               >
                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   {feature.icon}
@@ -250,47 +254,42 @@ const Home = () => {
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Success Stories</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of professionals who've accelerated their careers
-              with ResumeCraft.
-            </p>
+            <h2 className="text-3xl font-bold mb-4">
+              Benefits of Tailoring Your Resume
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="glass-card p-6 rounded-xl shadow-lg">
-                <div className="mb-4 text-primary ">
-                  <svg
-                    width="36"
-                    height="36"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M11.605 4.5C8.69833 4.5 6.35 6.84833 6.35 9.755V19.5H16.095C18.9983 19.5 21.35 17.1517 21.35 14.245C21.35 11.3417 19.0017 9 16.095 9H14.35V11.5H16.095C17.615 11.5 18.85 12.735 18.85 14.255C18.85 15.7683 17.6083 17 16.095 17H8.84167V9.755C8.84167 8.235 10.0767 7 11.5967 7H14.3417V4.5H11.605Z"
-                      fill="currentColor"
-                    />
-                    <path
-                      d="M5.25 12.5C4.56 12.5 4 11.94 4 11.25V7.75C4 7.06 4.56 6.5 5.25 6.5C5.94 6.5 6.5 7.06 6.5 7.75V11.25C6.5 11.94 5.94 12.5 5.25 12.5Z"
-                      fill="currentColor"
-                    />
-                    <path
-                      d="M2.25 10.5C1.56 10.5 1 9.94 1 9.25V7.75C1 7.06 1.56 6.5 2.25 6.5C2.94 6.5 3.5 7.06 3.5 7.75V9.25C3.5 9.94 2.94 10.5 2.25 10.5Z"
-                      fill="currentColor"
-                    />
-                  </svg>
+            {[
+              {
+                icon: <TrendingUp className="h-10 w-10 text-primary" />,
+                title: "Increased Visibility",
+                description:
+                  "By highlighting the most relevant skills and experiences, your resume stands out more to hiring managers.",
+              },
+              {
+                icon: <FileText className="h-10 w-10 text-primary" />,
+                title: "Better ATS Compatibility",
+                description:
+                  "Applicant Tracking Systems (ATS) often scan resumes for keywords, so tailoring can help your resume pass through the initial screening.",
+              },
+              {
+                icon: <BookOpenCheck className="h-10 w-10 text-primary" />,
+                title: "Demonstrates Interest",
+                description:
+                  "Taking the time to tailor your resume shows the employer you've carefully considered the job and company.",
+              },
+            ].map((benefits, index) => (
+              <div
+                key={index}
+                className="glass-card shadow-lg p-6 border border-white rounded-xl relative flex flex-col items-center text-center"
+              >
+                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  {benefits.icon}
                 </div>
-                <p className="text-foreground italic mb-4">
-                  {testimonial.quote}
-                </p>
-                <div>
-                  <p className="font-semibold">{testimonial.author}</p>
-                  <p className="text-muted-foreground text-sm">
-                    {testimonial.role}
-                  </p>
-                </div>
+
+                <h3 className="text-xl font-semibold mb-2">{benefits.title}</h3>
+                <p className="text-muted-foreground">{benefits.description}</p>
               </div>
             ))}
           </div>
@@ -301,15 +300,18 @@ const Home = () => {
       <section className="py-20 bg-primary/10">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">
-            Ready to Elevate Your Career?
+            Start your AI-powered job search now!
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
-            Join thousands of professionals who've found their dream job using
-            ResumeCraft.
+            We are curating the best end to end job searching and applying
+            experience for you, if you have any suggestions and feedback, feel
+            free to connect with us on socials and tag us to share your
+            experience.
           </p>
           <Button size="lg" asChild>
             <Link to="/upload">
-              Upload Your Resume <FileText className="ml-2 h-4 w-4" />
+              Upload Your Resume & Get started{" "}
+              <FileText className="ml-2 h-4 w-4" />
             </Link>
           </Button>
         </div>

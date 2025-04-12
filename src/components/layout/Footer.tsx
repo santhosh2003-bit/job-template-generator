@@ -49,8 +49,12 @@ const Footer = () => {
               </span>
             </Link>
             <p className="text-muted-foreground text-sm">
-              Craft the perfect resume and find your dream job with our
-              AI-powered platform.
+              AI-powered platform helping job seekers land their dream jobs
+              faster.
+            </p>
+            <p className="text-muted-foreground text-sm">
+              Land multiple interview calls at the same time faster and reduce
+              your time of getting hired.
             </p>
           </div>
 

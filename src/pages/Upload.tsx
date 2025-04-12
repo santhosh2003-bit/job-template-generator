@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -20,7 +19,12 @@ const ResumeUpload = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [jobProfile, setJobProfile] = useState("");
   const { toast } = useToast();
-  const { setResumeData, setPersonalDetails, setJobOpportunities, setHasResume } = useResume();
+  const {
+    setResumeData,
+    setPersonalDetails,
+    setJobOpportunities,
+    setHasResume,
+  } = useResume();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
@@ -86,7 +90,8 @@ const ResumeUpload = () => {
       // });
 
       const mockPersonalDetails = {
-        brief_summary: "Experienced software engineer with a passion for building scalable web applications.",
+        brief_summary:
+          "Experienced software engineer with a passion for building scalable web applications.",
         current_company: "Tech Innovations Inc.",
         current_position: "Senior Software Engineer",
         education: "MS in Computer Science, Stanford University",
@@ -143,7 +148,13 @@ const ResumeUpload = () => {
           place: "Remote",
           posted_date: "2025-04-01",
           customized_resume: {
-            modified_skills: ["JavaScript", "React", "TypeScript", "Redux", "CSS-in-JS"],
+            modified_skills: [
+              "JavaScript",
+              "React",
+              "TypeScript",
+              "Redux",
+              "CSS-in-JS",
+            ],
             modified_work_experience: [
               {
                 Company: "Tech Innovations Inc.",
@@ -177,7 +188,14 @@ const ResumeUpload = () => {
           place: "New York, NY",
           posted_date: "2025-04-02",
           customized_resume: {
-            modified_skills: ["JavaScript", "Node.js", "Express", "React", "MongoDB", "AWS"],
+            modified_skills: [
+              "JavaScript",
+              "Node.js",
+              "Express",
+              "React",
+              "MongoDB",
+              "AWS",
+            ],
             modified_work_experience: [
               {
                 Company: "Tech Innovations Inc.",
@@ -270,18 +288,20 @@ const ResumeUpload = () => {
                 <p className="text-muted-foreground mb-4">
                   PDF format up to 5MB
                 </p>
-                <Button className="bg-purple-500 hover:bg-purple-600">Select Resume</Button>
+                <Button className="bg-purple-500 hover:bg-purple-600">
+                  Select Resume
+                </Button>
               </div>
             </FileUploader>
           ) : (
             <div className="space-y-6">
-              <div className="bg-purple-500/10 rounded-lg p-6 flex items-center justify-between">
+              <div className="bg-purple-500/10 rounded-lg p-6 w-fit flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="h-10 w-10 bg-purple-500/20 rounded-full flex items-center justify-center">
                     <FileText className="h-5 w-5 text-purple-500" />
                   </div>
                   <div>
-                    <p className="font-medium">{file.name}</p>
+                    <p className="font-medium text-sm">{file.name}</p>
                     <p className="text-xs text-muted-foreground">
                       {(file.size / 1024 / 1024).toFixed(2)} MB
                     </p>
@@ -312,7 +332,10 @@ const ResumeUpload = () => {
                     <span>{uploadProgress}%</span>
                   </div>
                   <Progress value={uploadProgress} className="h-2 bg-gray-200">
-                    <div className="h-full bg-purple-500 rounded-full" style={{ width: `${uploadProgress}%` }} />
+                    <div
+                      className="h-full bg-purple-500 rounded-full"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
                   </Progress>
                   <p className="text-xs text-muted-foreground">
                     {uploadProgress < 100
@@ -322,7 +345,12 @@ const ResumeUpload = () => {
                 </div>
               ) : (
                 <div className="flex justify-end">
-                  <Button onClick={handleUpload} className="bg-purple-500 hover:bg-purple-600">Upload & Analyze</Button>
+                  <Button
+                    onClick={handleUpload}
+                    className="bg-purple-500 hover:bg-purple-600"
+                  >
+                    Upload & Analyze
+                  </Button>
                 </div>
               )}
             </div>
