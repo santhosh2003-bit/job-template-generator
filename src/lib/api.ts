@@ -1,7 +1,7 @@
 
 import { toast } from "@/hooks/use-toast";
 
-const API_BASE_URL = "https://api.resumeai.org/v1";
+const API_BASE_URL = "http://127.0.0.1:3012";
 
 export interface ResumeAnalysisResponse {
   personal_details: {
@@ -85,86 +85,26 @@ export async function fetchJobListings(query: string, location: string = ""): Pr
   try {
     console.log(`Searching for ${query} jobs in ${location || 'all locations'}`);
     
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // In a real-world scenario:
-    // const response = await fetch(
-    //   `${API_BASE_URL}/jobs?query=${encodeURIComponent(query)}&location=${encodeURIComponent(location)}`
-    // );
-    // return await response.json();
-    
-    // Generate 5-8 jobs based on the query
-    const numberOfJobs = Math.floor(Math.random() * 4) + 5; // 5-8 jobs
-    const jobs = [];
-    
-    const companies = [
-      "TechCorp Inc.", "DesignHub", "ServerLogic", 
-      "OmniTech Solutions", "Analytix", "Global Innovations",
-      "DevSphere", "InnovateTech", "DataDynamics", "CloudMasters"
-    ];
-    
-    const locations = [
-      "San Francisco, CA", "New York, NY", "Austin, TX", 
-      "Seattle, WA", "Boston, MA", "Chicago, IL", 
-      "Remote", "London, UK", "Berlin, Germany", "Toronto, Canada"
-    ];
-    
-    const jobTypes = ["Full-time", "Part-time", "Contract", "Freelance"];
-    
-    for (let i = 0; i < numberOfJobs; i++) {
-      const company = companies[Math.floor(Math.random() * companies.length)];
-      const jobLocation = location || locations[Math.floor(Math.random() * locations.length)];
-      const jobType = jobTypes[Math.floor(Math.random() * jobTypes.length)];
-      const minSalary = Math.floor(Math.random() * 50) + 70; // 70-120k
-      const maxSalary = minSalary + Math.floor(Math.random() * 30) + 10; // 10-40k more
-      const match = Math.floor(Math.random() * 30) + 70; // 70-100% match
-      const daysAgo = Math.floor(Math.random() * 10); // 0-10 days ago
+    try {
+      // Use the actual API endpoint
+      const response = await fetch(`${API_BASE_URL}/find_job`);
       
-      jobs.push({
-        id: `job-${i + 1}`,
-        job_id: `job-${i + 1}`,
-        job_title: `${query} ${i % 3 === 0 ? 'Senior ' : i % 3 === 1 ? 'Mid-Level ' : ''}Developer`,
-        company,
-        location: jobLocation,
-        place: jobLocation,
-        type: jobType,
-        salary: `$${minSalary},000 - $${maxSalary},000`,
-        posted_date: daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`,
-        job_description: `We are looking for a talented ${query} developer to join our team. You will be responsible for developing and maintaining high-quality applications.`,
-        requirements: [
-          `${Math.floor(Math.random() * 5) + 2}+ years of experience with ${query} development`,
-          "Strong problem-solving skills",
-          "Excellent communication and teamwork abilities",
-          "Bachelor's degree in Computer Science or related field"
-        ],
-        benefits: [
-          "Competitive salary and benefits package",
-          "Remote work options",
-          "Professional development opportunities",
-          "Great team environment"
-        ],
-        match,
-        job_url: "#",
-        apply_link: "#",
-        customized_resume: {
-          modified_skills: ["JavaScript", "React", "TypeScript", "Node.js", "API Integration", "Git", "Agile"],
-          modified_work_experience: [
-            {
-              Company: "Previous Company",
-              "Job Title": `${query} Developer`,
-              Responsibilities: [
-                `Built and maintained ${query} applications`,
-                "Collaborated with cross-functional teams",
-                "Implemented responsive design patterns"
-              ]
-            }
-          ]
-        }
-      });
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log("API Response:", data);
+      
+      // Return the job_opportunities array
+      return data.job_opportunities || [];
+    } catch (apiError) {
+      console.error("Error fetching from real API:", apiError);
+      console.log("Falling back to mock data");
+      
+      // Fall back to mock data if the API call fails
+      return generateMockJobs(query, location);
     }
-    
-    return jobs;
   } catch (error) {
     console.error("Error fetching jobs:", error);
     toast({
@@ -174,6 +114,80 @@ export async function fetchJobListings(query: string, location: string = ""): Pr
     });
     return [];
   }
+}
+
+// Helper function to generate mock jobs (fallback)
+function generateMockJobs(query: string, location: string): any[] {
+  const numberOfJobs = Math.floor(Math.random() * 4) + 5; // 5-8 jobs
+  const jobs = [];
+  
+  const companies = [
+    "TechCorp Inc.", "DesignHub", "ServerLogic", 
+    "OmniTech Solutions", "Analytix", "Global Innovations",
+    "DevSphere", "InnovateTech", "DataDynamics", "CloudMasters"
+  ];
+  
+  const locations = [
+    "San Francisco, CA", "New York, NY", "Austin, TX", 
+    "Seattle, WA", "Boston, MA", "Chicago, IL", 
+    "Remote", "London, UK", "Berlin, Germany", "Toronto, Canada"
+  ];
+  
+  const jobTypes = ["Full-time", "Part-time", "Contract", "Freelance"];
+  
+  for (let i = 0; i < numberOfJobs; i++) {
+    const company = companies[Math.floor(Math.random() * companies.length)];
+    const jobLocation = location || locations[Math.floor(Math.random() * locations.length)];
+    const jobType = jobTypes[Math.floor(Math.random() * jobTypes.length)];
+    const minSalary = Math.floor(Math.random() * 50) + 70; // 70-120k
+    const maxSalary = minSalary + Math.floor(Math.random() * 30) + 10; // 10-40k more
+    const match = Math.floor(Math.random() * 30) + 70; // 70-100% match
+    const daysAgo = Math.floor(Math.random() * 10); // 0-10 days ago
+    
+    jobs.push({
+      id: `job-${i + 1}`,
+      job_id: `job-${i + 1}`,
+      job_title: `${query} ${i % 3 === 0 ? 'Senior ' : i % 3 === 1 ? 'Mid-Level ' : ''}Developer`,
+      company,
+      location: jobLocation,
+      place: jobLocation,
+      type: jobType,
+      salary: `$${minSalary},000 - $${maxSalary},000`,
+      posted_date: daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`,
+      job_description: `We are looking for a talented ${query} developer to join our team. You will be responsible for developing and maintaining high-quality applications.`,
+      requirements: [
+        `${Math.floor(Math.random() * 5) + 2}+ years of experience with ${query} development`,
+        "Strong problem-solving skills",
+        "Excellent communication and teamwork abilities",
+        "Bachelor's degree in Computer Science or related field"
+      ],
+      benefits: [
+        "Competitive salary and benefits package",
+        "Remote work options",
+        "Professional development opportunities",
+        "Great team environment"
+      ],
+      match,
+      job_url: "#",
+      apply_link: "#",
+      customized_resume: {
+        modified_skills: ["JavaScript", "React", "TypeScript", "Node.js", "API Integration", "Git", "Agile"],
+        modified_work_experience: [
+          {
+            Company: "Previous Company",
+            "Job Title": `${query} Developer`,
+            Responsibilities: [
+              `Built and maintained ${query} applications`,
+              "Collaborated with cross-functional teams",
+              "Implemented responsive design patterns"
+            ]
+          }
+        ]
+      }
+    });
+  }
+  
+  return jobs;
 }
 
 // Helper function to generate mock response

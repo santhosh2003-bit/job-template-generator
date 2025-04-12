@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -69,6 +70,7 @@ const Jobs = () => {
   useEffect(() => {
     // If we have job opportunities from resume upload, use those
     if (jobOpportunities && jobOpportunities.length > 0) {
+      console.log("Using job opportunities from resume context:", jobOpportunities);
       setJobListings(jobOpportunities as unknown as Job[]);
     } 
     // Otherwise fetch jobs based on default search
@@ -81,6 +83,7 @@ const Jobs = () => {
     setIsLoading(true);
     try {
       const jobs = await fetchJobListings(query, loc);
+      console.log("Loaded jobs:", jobs);
       setJobListings(jobs);
     } catch (error) {
       console.error("Error loading jobs:", error);

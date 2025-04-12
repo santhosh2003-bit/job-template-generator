@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Github, Linkedin, MapPin, Phone, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,6 +30,9 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   const { toast } = useToast();
   const resumeRef = React.useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+  
+  console.log("Job data in preview:", jobData);
+  console.log("Personal details in preview:", personalDetails);
 
   const handleDownload = async () => {
     if (!resumeRef.current) return;
@@ -145,6 +147,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   };
 
   const customizedResume = jobData.customized_resume || null;
+  console.log("Customized resume:", customizedResume);
 
   const resumeDataToShow = {
     personalInfo: {
