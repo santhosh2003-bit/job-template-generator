@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 interface JobOpportunity {
   apply_link: string;
   company: string;
-  customized_resume: {
+  customized_resume?: {  // Changed from required to optional with ?
     modified_skills: string[];
     modified_work_experience: {
       Company: string;
