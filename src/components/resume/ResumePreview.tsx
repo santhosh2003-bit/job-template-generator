@@ -57,11 +57,11 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   const CONTENT_WIDTH = A4_WIDTH - (PAGE_MARGIN * 2);
   const CONTENT_HEIGHT = A4_HEIGHT - (PAGE_MARGIN * 2);
 
-  // Moved the declaration of resumeDataToShow before its usage in useEffect
+  // Process customized resume data from the API if available
   const customizedResume = jobData.customized_resume || null;
   console.log("Customized resume:", customizedResume);
 
-  // Use the customized resume data from the API if available
+  // Create the resume data structure with all available information
   const resumeDataToShow = {
     personalInfo: {
       name: personalDetails?.full_name || "Alex Johnson",
@@ -337,67 +337,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         variant: "destructive",
       });
     }
-  };
-
-  const customizedResume = jobData.customized_resume || null;
-  console.log("Customized resume:", customizedResume);
-
-  // Use the customized resume data from the API if available
-  const resumeDataToShow = {
-    personalInfo: {
-      name: personalDetails?.full_name || "Alex Johnson",
-      title: personalDetails?.current_position || "Senior Software Engineer",
-      email: personalDetails?.email || "alex@example.com",
-      phone: personalDetails?.phone_number || "(555) 123-4567",
-      github:
-        personalDetails?.github === "None" ? "" : personalDetails?.github || "",
-      linkedin:
-        personalDetails?.linkedin === "None"
-          ? ""
-          : personalDetails?.linkedin || "",
-      location: personalDetails?.physical_address || "San Francisco, CA",
-      summary:
-        personalDetails?.brief_summary === "None"
-          ? "Experienced professional with expertise in relevant technologies."
-          : personalDetails?.brief_summary,
-    },
-    skills: customizedResume?.modified_skills ||
-      resumeData?.skills || ["JavaScript", "TypeScript", "React", "Node.js"],
-    experience: customizedResume?.modified_work_experience
-      ? customizedResume.modified_work_experience.map((exp) => ({
-          title: exp["Job Title"],
-          company: exp.Company,
-          location: "",
-          period: "",
-          highlights: exp.Responsibilities,
-        }))
-      : resumeData?.experience || [
-          {
-            title: "Software Engineer",
-            company: "Example Company",
-            location: "Remote",
-            period: "2021 - Present",
-            highlights: [
-              "Developed web applications",
-              "Collaborated with team members",
-            ],
-          },
-        ],
-    education: personalDetails?.education
-      ? [
-          {
-            degree: personalDetails.education,
-            school: "",
-            period: "",
-          },
-        ]
-      : [
-          {
-            degree: "Bachelor of Science in Computer Science",
-            school: "University",
-            period: "2012 - 2016",
-          },
-        ],
   };
 
   return (
