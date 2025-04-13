@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
-import { Github, Linkedin, MapPin, Phone, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Github, Linkedin, MapPin, Phone, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,7 +18,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { 
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -39,10 +38,10 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   const { selectedTemplate, resumeData, personalDetails } = useResume();
   const { toast } = useToast();
   const resumePagesRef = useRef<HTMLDivElement>(null);
+  const resumeContentRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [resumePages, setResumePages] = useState<HTMLDivElement[]>([]);
   const [pageHeight, setPageHeight] = useState(0);
 
   console.log("Job data in preview:", jobData);
@@ -259,203 +258,59 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   }, [open]);
 
   useEffect(() => {
-    if (resumePagesRef.current && open) {
-      createResumePagination();
+    if (open && resumeContentRef.current) {
+      // Directly set the inner HTML of the content container
+      const htmlContent = document.createElement('div');
+      ReactDOM.render(renderResumeContent(), htmlContent);
+      
+      // Create the initial page
+      createInitialResumePage(htmlContent.innerHTML);
     }
   }, [resumeDataToShow, open]);
-
-  const createResumePagination = () => {
+  
+  // Create the initial resume page directly with the content
+  const createInitialResumePage = (contentHTML) => {
     if (!resumePagesRef.current) return;
-
-    // Clear any existing content
-    while (resumePagesRef.current.firstChild) {
-      resumePagesRef.current.removeChild(resumePagesRef.current.firstChild);
-    }
-
-    // Create a temporary container to measure content height
-    const tempContainer = document.createElement('div');
-    tempContainer.style.width = `${CONTENT_WIDTH}px`;
-    tempContainer.style.position = 'absolute';
-    tempContainer.style.visibility = 'hidden';
-    tempContainer.style.padding = `${PAGE_MARGIN}px`;
-    tempContainer.innerHTML = `<div id="resume-content-measure">${resumePagesRef.current.innerHTML}</div>`;
-    document.body.appendChild(tempContainer);
-
-    // Render the actual content for measurement
-    const contentDiv = document.createElement('div');
-    contentDiv.className = 'resume-content-measure';
-    contentDiv.style.width = `${CONTENT_WIDTH}px`;
     
-    // Create a React root and render the resume content
-    const tempContentDiv = document.getElementById('resume-content-measure');
-    if (tempContentDiv) {
-      // Use innerHTML to add the resume content directly
-      const resumeContentHTML = document.createElement('div');
-      const content = renderResumeContent();
-      const tempRoot = document.createElement('div');
-      document.body.appendChild(tempRoot);
+    // Clear existing content
+    resumePagesRef.current.innerHTML = '';
+    
+    // Create the first page
+    const firstPage = document.createElement('div');
+    firstPage.className = 'resume-page';
+    firstPage.id = 'resume-page-1';
+    firstPage.style.width = `${A4_WIDTH}px`;
+    firstPage.style.height = `${A4_HEIGHT}px`;
+    firstPage.style.backgroundColor = 'white';
+    firstPage.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+    firstPage.style.margin = '0 auto 20px auto';
+    firstPage.style.position = 'relative';
+    firstPage.style.overflow = 'hidden';
+    firstPage.style.color = 'black';
+    
+    // Create content container
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'resume-content';
+    contentDiv.id = 'resume-content';
+    contentDiv.style.padding = `${PAGE_MARGIN}px`;
+    contentDiv.style.fontFamily = 'Calibri, sans-serif';
+    contentDiv.style.maxHeight = `${CONTENT_HEIGHT}px`;
+    contentDiv.style.overflow = 'hidden';
+    contentDiv.innerHTML = contentHTML;
+    
+    firstPage.appendChild(contentDiv);
+    resumePagesRef.current.appendChild(firstPage);
+    
+    // Check if content needs pagination
+    if (contentDiv.scrollHeight > CONTENT_HEIGHT) {
+      const totalPages = Math.ceil(contentDiv.scrollHeight / CONTENT_HEIGHT);
+      setTotalPages(totalPages);
       
-      // Create first page
-      const firstPage = document.createElement('div');
-      firstPage.className = 'resume-page';
-      firstPage.style.width = `${A4_WIDTH}px`;
-      firstPage.style.height = `${A4_HEIGHT}px`;
-      firstPage.style.backgroundColor = 'white';
-      firstPage.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-      firstPage.style.margin = '0 auto 20px auto';
-      firstPage.style.position = 'relative';
-      firstPage.style.overflow = 'hidden';
-      firstPage.style.pageBreakAfter = 'always';
-
-      // Create content container
-      const firstPageContent = document.createElement('div');
-      firstPageContent.className = 'resume-content';
-      firstPageContent.style.padding = `${PAGE_MARGIN}px`;
-      firstPageContent.style.fontFamily = 'Calibri, sans-serif';
-      firstPageContent.style.height = `${CONTENT_HEIGHT}px`;
-      firstPageContent.style.overflow = 'hidden';
-      firstPageContent.style.color = '#000';
-      
-      // Convert React element to HTML and set it
-      const resumeDiv = document.createElement('div');
-      resumeDiv.innerHTML = `
-        <div class="py-4 text-black">
-          <h1 class="font-bold text-2xl sm:text-3xl md:text-4xl break-words">
-            ${resumeDataToShow.personalInfo.name}
-          </h1>
-          <h2 class="text-sm sm:text-base md:text-lg mt-1">
-            ${resumeDataToShow.personalInfo.title}
-          </h2>
-          <div class="flex flex-wrap gap-4 mt-3">
-            <div class="flex items-center gap-2 text-xs sm:text-sm">
-              <span class="inline-block w-4 h-4">✉️</span>
-              <span class="break-all">
-                ${resumeDataToShow.personalInfo.email}
-              </span>
-            </div>
-            <div class="flex items-center gap-2 text-xs sm:text-sm">
-              <span class="inline-block w-4 h-4">📞</span>
-              <span class="break-all">
-                ${resumeDataToShow.personalInfo.phone}
-              </span>
-            </div>
-            ${resumeDataToShow.personalInfo.github ? `
-              <div class="flex items-center gap-2 text-xs sm:text-sm">
-                <span class="inline-block w-4 h-4">🔗</span>
-                <span class="break-all">
-                  ${resumeDataToShow.personalInfo.github}
-                </span>
-              </div>
-            ` : ''}
-            ${resumeDataToShow.personalInfo.linkedin ? `
-              <div class="flex items-center gap-2 text-xs sm:text-sm">
-                <span class="inline-block w-4 h-4">🔗</span>
-                <span class="break-all">
-                  ${resumeDataToShow.personalInfo.linkedin}
-                </span>
-              </div>
-            ` : ''}
-            <div class="flex items-center gap-2 text-xs sm:text-sm">
-              <span class="inline-block w-4 h-4">📍</span>
-              <span>${resumeDataToShow.personalInfo.location}</span>
-            </div>
-          </div>
-
-          <div class="mt-5">
-            <h3 class="border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-2">
-              Summary
-            </h3>
-            <p class="text-sm sm:text-base pl-5">
-              ${resumeDataToShow.personalInfo.summary}
-            </p>
-          </div>
-
-          <div class="mt-6">
-            <h3 class="border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-2">
-              Work Experience
-            </h3>
-            ${resumeDataToShow.experience.map((exp, index) => `
-              <div class="pl-5 mb-5">
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center">
-                  <h4 class="font-semibold text-base sm:text-lg">
-                    ${exp.title}
-                  </h4>
-                  ${exp.period ? `
-                    <div class="text-xs sm:text-sm font-medium">
-                      ${exp.period}
-                    </div>
-                  ` : ''}
-                </div>
-                <div class="text-gray-600 text-xs sm:text-sm font-medium mb-1">
-                  ${exp.company}
-                  ${exp.location ? `, ${exp.location}` : ""}
-                </div>
-                <ul class="pl-8 list-disc space-y-2">
-                  ${exp.highlights.map(highlight => `
-                    <li class="text-sm sm:text-base">
-                      ${highlight}
-                    </li>
-                  `).join('')}
-                </ul>
-              </div>
-            `).join('')}
-          </div>
-
-          <div class="mt-6">
-            <h3 class="border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-2">
-              Education
-            </h3>
-            <div class="flex flex-col gap-2">
-              ${resumeDataToShow.education.map((edu, index) => `
-                <div class="pl-5 mb-3">
-                  <div class="flex flex-col sm:flex-row justify-between sm:items-center">
-                    <h4 class="font-semibold text-base sm:text-lg">
-                      ${edu.degree}
-                    </h4>
-                    ${edu.period ? `
-                      <div class="text-gray-600 text-xs">
-                        ${edu.period}
-                      </div>
-                    ` : ''}
-                  </div>
-                  ${edu.school ? `
-                    <div class="text-gray-600 text-sm sm:text-base">
-                      ${edu.school}
-                    </div>
-                  ` : ''}
-                </div>
-              `).join('')}
-            </div>
-          </div>
-
-          <div class="mt-6">
-            <h3 class="border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-2">
-              Skills
-            </h3>
-            <div class="flex flex-wrap gap-3 pl-5">
-              ${resumeDataToShow.skills.map((skill, index) => `
-                <span class="text-sm sm:text-base inline-block">
-                  ${skill}${index < resumeDataToShow.skills.length - 1 ? "," : ""}
-                </span>
-              `).join('')}
-            </div>
-          </div>
-        </div>
-      `;
-      
-      firstPageContent.appendChild(resumeDiv);
-      firstPage.appendChild(firstPageContent);
-      resumePagesRef.current.appendChild(firstPage);
-
-      // Calculate content height to determine pagination
-      const contentHeight = firstPageContent.scrollHeight;
-      const calculatedTotalPages = Math.ceil(contentHeight / CONTENT_HEIGHT);
-      setTotalPages(calculatedTotalPages);
-      
-      // Create additional pages if needed
-      for (let i = 1; i < calculatedTotalPages; i++) {
+      // Create additional pages
+      for (let i = 1; i < totalPages; i++) {
         const newPage = document.createElement('div');
         newPage.className = 'resume-page';
+        newPage.id = `resume-page-${i + 1}`;
         newPage.style.width = `${A4_WIDTH}px`;
         newPage.style.height = `${A4_HEIGHT}px`;
         newPage.style.backgroundColor = 'white';
@@ -463,19 +318,18 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         newPage.style.margin = '0 auto 20px auto';
         newPage.style.position = 'relative';
         newPage.style.overflow = 'hidden';
-        newPage.style.pageBreakAfter = 'always';
+        newPage.style.display = 'none';
+        newPage.style.color = 'black';
         
         const newContentDiv = document.createElement('div');
-        newContentDiv.className = 'resume-content';
+        newContentDiv.className = 'resume-content-clone';
         newContentDiv.style.padding = `${PAGE_MARGIN}px`;
         newContentDiv.style.fontFamily = 'Calibri, sans-serif';
+        newContentDiv.style.position = 'relative';
         newContentDiv.style.height = `${CONTENT_HEIGHT}px`;
         newContentDiv.style.overflow = 'hidden';
-        newContentDiv.style.color = '#000';
-        newContentDiv.style.position = 'relative';
         
-        // Clone content but adjust position for pagination
-        const contentClone = resumeDiv.cloneNode(true) as HTMLElement;
+        const contentClone = contentDiv.cloneNode(true);
         contentClone.style.position = 'absolute';
         contentClone.style.top = `-${i * CONTENT_HEIGHT}px`;
         
@@ -483,17 +337,14 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         newPage.appendChild(newContentDiv);
         resumePagesRef.current.appendChild(newPage);
       }
-      
-      // Show only current page
-      updateVisiblePage();
+    } else {
+      setTotalPages(1);
     }
-
-    // Clean up the temporary elements
-    if (tempContainer && tempContainer.parentNode) {
-      tempContainer.parentNode.removeChild(tempContainer);
-    }
+    
+    // Show only the current page
+    updateVisiblePage();
   };
-  
+
   const updateVisiblePage = () => {
     if (!resumePagesRef.current) return;
     
@@ -524,53 +375,83 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         description: "Please wait while we prepare your resume...",
       });
 
+      // Create a div to render the complete resume for PDF
+      const pdfContainer = document.createElement('div');
+      pdfContainer.style.position = 'absolute';
+      pdfContainer.style.left = '-9999px';
+      pdfContainer.style.top = '-9999px';
+      document.body.appendChild(pdfContainer);
+      
+      // Create a single page containing all content for PDF generation
+      const pdfPage = document.createElement('div');
+      pdfPage.className = 'pdf-resume-page';
+      pdfPage.style.width = `${A4_WIDTH}px`;
+      pdfPage.style.backgroundColor = 'white';
+      pdfPage.style.padding = `${PAGE_MARGIN}px`;
+      pdfPage.style.fontFamily = 'Calibri, sans-serif';
+      pdfPage.style.color = 'black';
+      
+      // Directly add the content
+      const contentDiv = document.createElement('div');
+      ReactDOM.render(renderResumeContent(), contentDiv);
+      pdfPage.appendChild(contentDiv);
+      pdfContainer.appendChild(pdfPage);
+      
+      // Initialize PDF with A4 size
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
         format: "a4",
       });
-
-      if (!resumePagesRef.current) return;
-      const pages = resumePagesRef.current.querySelectorAll('.resume-page');
       
-      // Make all pages visible for capturing
-      pages.forEach((page) => {
-        (page as HTMLElement).style.display = 'block';
+      // Use html2canvas to capture the page
+      const canvas = await html2canvas(pdfPage, {
+        scale: 2, // Higher scale for better quality
+        useCORS: true,
+        logging: false,
+        backgroundColor: 'white'
       });
-
-      // Process each page
-      for (let i = 0; i < pages.length; i++) {
-        const page = pages[i] as HTMLElement;
-        
-        // Temporarily make this page visible
-        page.style.display = 'block';
-        
-        const canvas = await html2canvas(page, {
-          scale: 2,
-          useCORS: true,
-          logging: false,
-        });
-
-        const imgData = canvas.toDataURL("image/png", 1.0);
-        
+      
+      const contentHeight = canvas.height;
+      const contentWidth = canvas.width;
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      
+      // Determine if we need multiple PDF pages
+      const pageCount = Math.ceil(contentHeight / (CONTENT_HEIGHT * 2)); // Scale factor of 2
+      
+      // Add each page to the PDF
+      for (let i = 0; i < pageCount; i++) {
         if (i > 0) {
           pdf.addPage();
         }
         
-        // Get dimensions
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
+        // Create a temporary canvas for each page
+        const tempCanvas = document.createElement('canvas');
+        const context = tempCanvas.getContext('2d');
+        tempCanvas.width = contentWidth;
+        tempCanvas.height = CONTENT_HEIGHT * 2; // Scale factor of 2
         
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+        // Draw the appropriate portion of the main canvas
+        context.drawImage(
+          canvas, 
+          0, i * CONTENT_HEIGHT * 2, // Source x, y
+          contentWidth, CONTENT_HEIGHT * 2, // Source width, height
+          0, 0, // Destination x, y
+          contentWidth, CONTENT_HEIGHT * 2 // Destination width, height
+        );
+        
+        // Add the image to the PDF
+        const imgData = tempCanvas.toDataURL('image/png');
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       }
       
-      // Restore current page visibility
-      pages.forEach((page, index) => {
-        (page as HTMLElement).style.display = index + 1 === currentPage ? 'block' : 'none';
-      });
-
+      // Clean up
+      document.body.removeChild(pdfContainer);
+      
+      // Save the PDF
       pdf.save("resume.pdf");
-
+      
       toast({
         title: "Success",
         description: "Resume downloaded successfully",
@@ -579,7 +460,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       console.error("Error generating PDF:", error);
       toast({
         title: "Error",
-        description: "Failed to download resume",
+        description: "Failed to download resume. Please try again.",
         variant: "destructive",
       });
     }
@@ -667,6 +548,11 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
             {/* Resume pages container */}
             <div ref={resumePagesRef} className="w-full">
               {/* Pages will be dynamically generated here */}
+            </div>
+            
+            {/* Hidden resume content for reference */}
+            <div ref={resumeContentRef} className="hidden">
+              {renderResumeContent()}
             </div>
             
             {/* Pagination at bottom */}
