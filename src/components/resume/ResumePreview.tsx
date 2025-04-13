@@ -60,30 +60,38 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         format: "a4",
       });
 
+      // Get dimensions
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
-
       const ratio = pdfWidth / imgWidth;
       const adjustedHeight = imgHeight * ratio;
       
+      // Calculate how many pages we need
       const totalPages = Math.ceil(adjustedHeight / pdfHeight);
       
+      // Padding to ensure content doesn't get cut off at page breaks (in PDF points)
+      const pageBreakPadding = 10; // in mm
+      
+      // Create individual page slices and add to PDF
       for (let i = 0; i < totalPages; i++) {
         if (i > 0) {
           pdf.addPage();
         }
         
+        // Calculate source area from the canvas to render on this page
         const sourceY = i * (pdfHeight / ratio);
         const sourceHeight = Math.min(pdfHeight / ratio, imgHeight - sourceY);
         
+        // Create temporary canvas for this page slice
         const pageCanvas = document.createElement("canvas");
         pageCanvas.width = imgWidth;
         pageCanvas.height = sourceHeight;
         
         const ctx = pageCanvas.getContext("2d");
         if (ctx) {
+          // Draw the slice for this page
           ctx.drawImage(
             canvas,
             0,
@@ -97,13 +105,17 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
           );
           
           const pageImgData = pageCanvas.toDataURL("image/png", 1.0);
+          
+          // Use slightly reduced height to account for potential page breaks
+          const renderedHeight = (sourceHeight * ratio) - (i < totalPages - 1 ? pageBreakPadding : 0);
+          
           pdf.addImage(
             pageImgData,
             "PNG",
             0,
             0,
             pdfWidth,
-            (sourceHeight * ratio)
+            renderedHeight
           );
         }
       }
@@ -241,135 +253,139 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
               ref={resumeRef}
               style={{
                 width: "100%",
-                padding: "40px 50px",  // Increased padding for better spacing
-                boxSizing: "border-box",
-                minHeight: "1122px",   // A4 height at 96 DPI
+                minHeight: "1122px", // A4 height at 96 DPI
                 position: "relative",
-                pageBreakAfter: "always",
-                pageBreakInside: "avoid",
+                boxSizing: "border-box",
               }}
             >
-              <div className="py-8">  {/* Increased top padding */}
-                <h1 className="text-black font-bold text-2xl sm:text-3xl md:text-4xl mb-2 break-words">
-                  {resumeDataToShow.personalInfo.name}
-                </h1>
-                <h2 className="text-purple-500 text-sm sm:text-base md:text-lg mb-4">
-                  {resumeDataToShow.personalInfo.title}
-                </h2>
-                <div className="flex flex-wrap gap-3 sm:gap-4 my-4">
-                  <div className="flex items-center gap-1.5 text-xs sm:text-sm">
-                    <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                    <span className="break-all">
-                      {resumeDataToShow.personalInfo.email}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs sm:text-sm">
-                    <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                    <span className="break-all">
-                      {resumeDataToShow.personalInfo.phone}
-                    </span>
-                  </div>
-                  {resumeDataToShow.personalInfo.github && (
-                    <div className="flex items-center gap-1.5 text-xs sm:text-sm">
-                      <Github className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              {/* Creating a container with proper page margins for A4 paper */}
+              <div style={{
+                padding: "25mm 20mm 25mm 20mm", // Top, Right, Bottom, Left margins (standard A4 margins)
+                height: "100%",
+                boxSizing: "border-box",
+              }}>
+                <div className="py-8">
+                  <h1 className="text-black font-bold text-2xl sm:text-3xl md:text-4xl mb-4 break-words">
+                    {resumeDataToShow.personalInfo.name}
+                  </h1>
+                  <h2 className="text-purple-500 text-sm sm:text-base md:text-lg mb-6">
+                    {resumeDataToShow.personalInfo.title}
+                  </h2>
+                  <div className="flex flex-wrap gap-4 my-6">
+                    <div className="flex items-center gap-2 text-xs sm:text-sm">
+                      <Mail className="h-4 w-4" />
                       <span className="break-all">
-                        {resumeDataToShow.personalInfo.github}
+                        {resumeDataToShow.personalInfo.email}
                       </span>
                     </div>
-                  )}
-                  {resumeDataToShow.personalInfo.linkedin && (
-                    <div className="flex items-center gap-1.5 text-xs sm:text-sm">
-                      <Linkedin className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <div className="flex items-center gap-2 text-xs sm:text-sm">
+                      <Phone className="h-4 w-4" />
                       <span className="break-all">
-                        {resumeDataToShow.personalInfo.linkedin}
+                        {resumeDataToShow.personalInfo.phone}
                       </span>
                     </div>
-                  )}
-                  <div className="flex items-center gap-1.5 text-xs sm:text-sm">
-                    <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                    <span>
-                      {resumeDataToShow.personalInfo.location}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mb-8">  {/* Increased section spacing */}
-                <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-4">
-                  Summary
-                </h3>
-                <p className="text-sm sm:text-base pl-4 mb-1">
-                  {resumeDataToShow.personalInfo.summary}
-                </p>
-              </div>
-
-              <div className="mb-8">  {/* Increased section spacing */}
-                <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-4">
-                  Work Experience
-                </h3>
-                {resumeDataToShow.experience.map((exp, index) => (
-                  <div key={index} className="mb-5 pl-4">  {/* Added left padding */}
-                    <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-2">
-                      <h4 className="m-0 font-semibold text-base sm:text-lg">
-                        {exp.title}
-                      </h4>
-                      {exp.period && (
-                        <div className="text-black text-xs sm:text-sm font-medium">
-                          {exp.period}
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-gray-600 text-xs sm:text-sm mb-3 font-medium">
-                      {exp.company}
-                      {exp.location ? `, ${exp.location}` : ""}
-                    </div>
-                    <ul className="m-0 pl-6 text-black list-disc">  {/* Increased bullet indent */}
-                      {exp.highlights.map((highlight, idx) => (
-                        <li key={idx} className="mb-2 text-sm sm:text-base">  {/* Increased spacing between bullets */}
-                          {highlight}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mb-8">  {/* Increased section spacing */}
-                <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-4">
-                  Education
-                </h3>
-                {resumeDataToShow.education.map((edu, index) => (
-                  <div key={index} className="mb-5 pl-4">  {/* Added left padding */}
-                    <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-2">
-                      <h4 className="m-0 font-semibold text-base sm:text-lg">
-                        {edu.degree}
-                      </h4>
-                      {edu.period && (
-                        <div className="text-gray-600 text-xs sm:text-sm font-medium">
-                          {edu.period}
-                        </div>
-                      )}
-                    </div>
-                    {edu.school && (
-                      <div className="text-gray-600 text-sm sm:text-base">
-                        {edu.school}
+                    {resumeDataToShow.personalInfo.github && (
+                      <div className="flex items-center gap-2 text-xs sm:text-sm">
+                        <Github className="h-4 w-4" />
+                        <span className="break-all">
+                          {resumeDataToShow.personalInfo.github}
+                        </span>
                       </div>
                     )}
+                    {resumeDataToShow.personalInfo.linkedin && (
+                      <div className="flex items-center gap-2 text-xs sm:text-sm">
+                        <Linkedin className="h-4 w-4" />
+                        <span className="break-all">
+                          {resumeDataToShow.personalInfo.linkedin}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 text-xs sm:text-sm">
+                      <MapPin className="h-4 w-4" />
+                      <span>
+                        {resumeDataToShow.personalInfo.location}
+                      </span>
+                    </div>
                   </div>
-                ))}
-              </div>
+                </div>
 
-              <div className="mb-8">  {/* Increased section spacing */}
-                <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-4">
-                  Skills
-                </h3>
-                <div className="flex flex-wrap gap-2 sm:gap-3 pl-4">  {/* Added left padding */}
-                  {resumeDataToShow.skills.map((skill, index) => (
-                    <span key={index} className="text-sm sm:text-base inline-block">
-                      {skill}
-                      {index < resumeDataToShow.skills.length - 1 ? "," : ""}
-                    </span>
+                <div className="mb-8">
+                  <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-4">
+                    Summary
+                  </h3>
+                  <p className="text-sm sm:text-base pl-5 mb-1">
+                    {resumeDataToShow.personalInfo.summary}
+                  </p>
+                </div>
+
+                <div className="mb-8">
+                  <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-4">
+                    Work Experience
+                  </h3>
+                  {resumeDataToShow.experience.map((exp, index) => (
+                    <div key={index} className="mb-6 pl-5">
+                      <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-2">
+                        <h4 className="m-0 font-semibold text-base sm:text-lg">
+                          {exp.title}
+                        </h4>
+                        {exp.period && (
+                          <div className="text-black text-xs sm:text-sm font-medium">
+                            {exp.period}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-gray-600 text-xs sm:text-sm mb-3 font-medium">
+                        {exp.company}
+                        {exp.location ? `, ${exp.location}` : ""}
+                      </div>
+                      <ul className="pl-8 text-black list-disc space-y-2">
+                        {exp.highlights.map((highlight, idx) => (
+                          <li key={idx} className="text-sm sm:text-base">
+                            {highlight}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   ))}
+                </div>
+
+                <div className="mb-8">
+                  <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-4">
+                    Education
+                  </h3>
+                  {resumeDataToShow.education.map((edu, index) => (
+                    <div key={index} className="mb-6 pl-5">
+                      <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-2">
+                        <h4 className="m-0 font-semibold text-base sm:text-lg">
+                          {edu.degree}
+                        </h4>
+                        {edu.period && (
+                          <div className="text-gray-600 text-xs sm:text-sm font-medium">
+                            {edu.period}
+                          </div>
+                        )}
+                      </div>
+                      {edu.school && (
+                        <div className="text-gray-600 text-sm sm:text-base">
+                          {edu.school}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mb-8">
+                  <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-4">
+                    Skills
+                  </h3>
+                  <div className="flex flex-wrap gap-3 pl-5">
+                    {resumeDataToShow.skills.map((skill, index) => (
+                      <span key={index} className="text-sm sm:text-base inline-block">
+                        {skill}
+                        {index < resumeDataToShow.skills.length - 1 ? "," : ""}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
