@@ -241,7 +241,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
               ref={resumeRef}
               style={{
                 width: "100%",
-                padding: "20px 30px",  // Increased padding for better spacing
+                padding: "40px 50px",  // Increased padding for better spacing
                 boxSizing: "border-box",
                 minHeight: "1122px",   // A4 height at 96 DPI
                 position: "relative",
@@ -249,44 +249,44 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                 pageBreakInside: "avoid",
               }}
             >
-              <div className="py-6">  {/* Increased top padding */}
-                <h1 className="text-black font-bold text-2xl sm:text-3xl md:text-4xl mb-1 break-words">
+              <div className="py-8">  {/* Increased top padding */}
+                <h1 className="text-black font-bold text-2xl sm:text-3xl md:text-4xl mb-2 break-words">
                   {resumeDataToShow.personalInfo.name}
                 </h1>
-                <h2 className="text-purple-500 text-sm sm:text-base md:text-lg mb-3">
+                <h2 className="text-purple-500 text-sm sm:text-base md:text-lg mb-4">
                   {resumeDataToShow.personalInfo.title}
                 </h2>
-                <div className="flex flex-wrap gap-3 sm:gap-4 my-3">
-                  <div className="flex items-center gap-1 text-xs sm:text-sm">
-                    <Mail className="h-3 w-3 sm:h-4 sm:w-4" />
+                <div className="flex flex-wrap gap-3 sm:gap-4 my-4">
+                  <div className="flex items-center gap-1.5 text-xs sm:text-sm">
+                    <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     <span className="break-all">
                       {resumeDataToShow.personalInfo.email}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1 text-xs sm:text-sm">
-                    <Phone className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <div className="flex items-center gap-1.5 text-xs sm:text-sm">
+                    <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     <span className="break-all">
                       {resumeDataToShow.personalInfo.phone}
                     </span>
                   </div>
                   {resumeDataToShow.personalInfo.github && (
-                    <div className="flex items-center gap-1 text-xs sm:text-sm">
-                      <Github className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <div className="flex items-center gap-1.5 text-xs sm:text-sm">
+                      <Github className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       <span className="break-all">
                         {resumeDataToShow.personalInfo.github}
                       </span>
                     </div>
                   )}
                   {resumeDataToShow.personalInfo.linkedin && (
-                    <div className="flex items-center gap-1 text-xs sm:text-sm">
-                      <Linkedin className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <div className="flex items-center gap-1.5 text-xs sm:text-sm">
+                      <Linkedin className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       <span className="break-all">
                         {resumeDataToShow.personalInfo.linkedin}
                       </span>
                     </div>
                   )}
-                  <div className="flex items-center gap-1 text-xs sm:text-sm">
-                    <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <div className="flex items-center gap-1.5 text-xs sm:text-sm">
+                    <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     <span>
                       {resumeDataToShow.personalInfo.location}
                     </span>
@@ -294,22 +294,22 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                 </div>
               </div>
 
-              <div className="mb-6">  {/* Increased section spacing */}
-                <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-3">
+              <div className="mb-8">  {/* Increased section spacing */}
+                <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-4">
                   Summary
                 </h3>
-                <p className="text-sm sm:text-base pl-2">
+                <p className="text-sm sm:text-base pl-4 mb-1">
                   {resumeDataToShow.personalInfo.summary}
                 </p>
               </div>
 
-              <div className="mb-6">  {/* Increased section spacing */}
-                <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-3">
+              <div className="mb-8">  {/* Increased section spacing */}
+                <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-4">
                   Work Experience
                 </h3>
                 {resumeDataToShow.experience.map((exp, index) => (
-                  <div key={index} className="mb-4 pl-2">  {/* Added left padding */}
-                    <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-1">
+                  <div key={index} className="mb-5 pl-4">  {/* Added left padding */}
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-2">
                       <h4 className="m-0 font-semibold text-base sm:text-lg">
                         {exp.title}
                       </h4>
@@ -319,13 +319,13 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                         </div>
                       )}
                     </div>
-                    <div className="text-gray-600 text-xs sm:text-sm mb-2 font-medium">
+                    <div className="text-gray-600 text-xs sm:text-sm mb-3 font-medium">
                       {exp.company}
                       {exp.location ? `, ${exp.location}` : ""}
                     </div>
-                    <ul className="m-0 pl-5 text-black list-disc">  {/* Changed to list-disc for better bullets */}
+                    <ul className="m-0 pl-6 text-black list-disc">  {/* Increased bullet indent */}
                       {exp.highlights.map((highlight, idx) => (
-                        <li key={idx} className="mb-1.5 text-sm sm:text-base">
+                        <li key={idx} className="mb-2 text-sm sm:text-base">  {/* Increased spacing between bullets */}
                           {highlight}
                         </li>
                       ))}
@@ -334,13 +334,13 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                 ))}
               </div>
 
-              <div className="mb-6">  {/* Increased section spacing */}
-                <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-3">
+              <div className="mb-8">  {/* Increased section spacing */}
+                <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-4">
                   Education
                 </h3>
                 {resumeDataToShow.education.map((edu, index) => (
-                  <div key={index} className="mb-4 pl-2">  {/* Added left padding */}
-                    <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-1">
+                  <div key={index} className="mb-5 pl-4">  {/* Added left padding */}
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-2">
                       <h4 className="m-0 font-semibold text-base sm:text-lg">
                         {edu.degree}
                       </h4>
@@ -359,11 +359,11 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                 ))}
               </div>
 
-              <div className="mb-6">  {/* Increased section spacing */}
-                <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-3">
+              <div className="mb-8">  {/* Increased section spacing */}
+                <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-4">
                   Skills
                 </h3>
-                <div className="flex flex-wrap gap-2 sm:gap-3 pl-2">  {/* Added left padding */}
+                <div className="flex flex-wrap gap-2 sm:gap-3 pl-4">  {/* Added left padding */}
                   {resumeDataToShow.skills.map((skill, index) => (
                     <span key={index} className="text-sm sm:text-base inline-block">
                       {skill}
