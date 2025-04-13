@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Github, Linkedin, MapPin, Phone, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,7 +30,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   const { toast } = useToast();
   const resumeRef = React.useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
-  
+
   console.log("Job data in preview:", jobData);
   console.log("Personal details in preview:", personalDetails);
 
@@ -67,28 +66,28 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       const imgHeight = canvas.height;
       const ratio = pdfWidth / imgWidth;
       const adjustedHeight = imgHeight * ratio;
-      
+
       // Calculate how many pages we need
       const totalPages = Math.ceil(adjustedHeight / pdfHeight);
-      
+
       // Padding to ensure content doesn't get cut off at page breaks (in PDF points)
       const pageBreakPadding = 10; // in mm
-      
+
       // Create individual page slices and add to PDF
       for (let i = 0; i < totalPages; i++) {
         if (i > 0) {
           pdf.addPage();
         }
-        
+
         // Calculate source area from the canvas to render on this page
         const sourceY = i * (pdfHeight / ratio);
         const sourceHeight = Math.min(pdfHeight / ratio, imgHeight - sourceY);
-        
+
         // Create temporary canvas for this page slice
         const pageCanvas = document.createElement("canvas");
         pageCanvas.width = imgWidth;
         pageCanvas.height = sourceHeight;
-        
+
         const ctx = pageCanvas.getContext("2d");
         if (ctx) {
           // Draw the slice for this page
@@ -103,20 +102,14 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
             imgWidth,
             sourceHeight
           );
-          
+
           const pageImgData = pageCanvas.toDataURL("image/png", 1.0);
-          
+
           // Use slightly reduced height to account for potential page breaks
-          const renderedHeight = (sourceHeight * ratio) - (i < totalPages - 1 ? pageBreakPadding : 0);
-          
-          pdf.addImage(
-            pageImgData,
-            "PNG",
-            0,
-            0,
-            pdfWidth,
-            renderedHeight
-          );
+          const renderedHeight =
+            sourceHeight * ratio - (i < totalPages - 1 ? pageBreakPadding : 0);
+
+          pdf.addImage(pageImgData, "PNG", 0, 0, pdfWidth, renderedHeight);
         }
       }
 
@@ -170,9 +163,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       email: personalDetails?.email || "alex@example.com",
       phone: personalDetails?.phone_number || "(555) 123-4567",
       github:
-        personalDetails?.github === "None"
-          ? ""
-          : personalDetails?.github || "",
+        personalDetails?.github === "None" ? "" : personalDetails?.github || "",
       linkedin:
         personalDetails?.linkedin === "None"
           ? ""
@@ -183,12 +174,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
           ? "Experienced professional with expertise in relevant technologies."
           : personalDetails?.brief_summary,
     },
-    skills: customizedResume?.modified_skills || resumeData?.skills || [
-      "JavaScript",
-      "TypeScript",
-      "React",
-      "Node.js",
-    ],
+    skills: customizedResume?.modified_skills ||
+      resumeData?.skills || ["JavaScript", "TypeScript", "React", "Node.js"],
     experience: customizedResume?.modified_work_experience
       ? customizedResume.modified_work_experience.map((exp) => ({
           title: exp["Job Title"],
@@ -249,7 +236,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 p-4 sm:p-6">
           <div className="w-full lg:w-2/3 border rounded-md p-4 bg-white dark:bg-gray-800 overflow-hidden">
             <div
-              className="font-[calibri] text-gray-700 bg-white dark:bg-gray-100 max-w-full mx-auto"
+              className="font-[calibri] text-gray-700 bg-white  max-w-full mx-auto"
               ref={resumeRef}
               style={{
                 width: "100%",
@@ -259,19 +246,21 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
               }}
             >
               {/* Creating a container with proper page margins for A4 paper */}
-              <div style={{
-                padding: "25mm 20mm 25mm 20mm", // Top, Right, Bottom, Left margins (standard A4 margins)
-                height: "100%",
-                boxSizing: "border-box",
-              }}>
-                <div className="py-8">
-                  <h1 className="text-black font-bold text-2xl sm:text-3xl md:text-4xl mb-4 break-words">
+              <div
+                style={{
+                  padding: "25mm 20mm 25mm 20mm", // Top, Right, Bottom, Left margins (standard A4 margins)
+                  height: "100%",
+                  boxSizing: "border-box",
+                }}
+              >
+                <div className="py-2">
+                  <h1 className="text-black font-bold text-2xl sm:text-3xl md:text-4xl  break-words">
                     {resumeDataToShow.personalInfo.name}
                   </h1>
-                  <h2 className="text-purple-500 text-sm sm:text-base md:text-lg mb-6">
+                  <h2 className="text-black text-sm sm:text-base md:text-lg">
                     {resumeDataToShow.personalInfo.title}
                   </h2>
-                  <div className="flex flex-wrap gap-4 my-6">
+                  <div className="flex flex-wrap gap-4 ">
                     <div className="flex items-center gap-2 text-xs sm:text-sm">
                       <Mail className="h-4 w-4" />
                       <span className="break-all">
@@ -302,30 +291,28 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                     )}
                     <div className="flex items-center gap-2 text-xs sm:text-sm">
                       <MapPin className="h-4 w-4" />
-                      <span>
-                        {resumeDataToShow.personalInfo.location}
-                      </span>
+                      <span>{resumeDataToShow.personalInfo.location}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="mb-8">
-                  <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-4">
+                <div className="">
+                  <h3 className="text-black border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-1">
                     Summary
                   </h3>
-                  <p className="text-sm sm:text-base pl-5 mb-1">
+                  <p className="text-sm sm:text-base pl-5">
                     {resumeDataToShow.personalInfo.summary}
                   </p>
                 </div>
 
-                <div className="mb-8">
-                  <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-4">
+                <div className="">
+                  <h3 className="text-black border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl ">
                     Work Experience
                   </h3>
                   {resumeDataToShow.experience.map((exp, index) => (
-                    <div key={index} className="mb-6 pl-5">
-                      <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-2">
-                        <h4 className="m-0 font-semibold text-base sm:text-lg">
+                    <div key={index} className=" pl-5">
+                      <div className="flex flex-col sm:flex-row justify-between sm:items-center ">
+                        <h4 className=" font-semibold text-base sm:text-lg">
                           {exp.title}
                         </h4>
                         {exp.period && (
@@ -334,11 +321,11 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                           </div>
                         )}
                       </div>
-                      <div className="text-gray-600 text-xs sm:text-sm mb-3 font-medium">
+                      <div className="text-gray-600 text-xs sm:text-sm  font-medium">
                         {exp.company}
                         {exp.location ? `, ${exp.location}` : ""}
                       </div>
-                      <ul className="pl-8 text-black list-disc space-y-2">
+                      <ul className="pl-8 text-black list-disc space-y-1">
                         {exp.highlights.map((highlight, idx) => (
                           <li key={idx} className="text-sm sm:text-base">
                             {highlight}
@@ -349,29 +336,31 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                   ))}
                 </div>
 
-                <div className="mb-8">
-                  <h3 className="text-black border-b-2 border-black pb-2 font-bold text-base sm:text-lg md:text-xl mb-4">
+                <div className="">
+                  <h3 className="text-black border-b-2 border-black  font-bold text-base sm:text-lg md:text-xl ">
                     Education
                   </h3>
-                  {resumeDataToShow.education.map((edu, index) => (
-                    <div key={index} className="mb-6 pl-5">
-                      <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-2">
-                        <h4 className="m-0 font-semibold text-base sm:text-lg">
-                          {edu.degree}
-                        </h4>
-                        {edu.period && (
-                          <div className="text-gray-600 text-xs sm:text-sm font-medium">
-                            {edu.period}
+                  <div className="flex flex-col gap-2">
+                    {resumeDataToShow.education.map((edu, index) => (
+                      <div key={index} className="pl-5 ">
+                        <div className="flex flex-col sm:flex-row justify-between sm:items-center ">
+                          <h4 className="font-semibold text-base sm:text-lg">
+                            {edu.degree}
+                          </h4>
+                          {edu.period && (
+                            <div className="text-gray-600 text-xs ">
+                              {edu.period}
+                            </div>
+                          )}
+                        </div>
+                        {edu.school && (
+                          <div className="text-gray-600 text-sm sm:text-base">
+                            {edu.school}
                           </div>
                         )}
                       </div>
-                      {edu.school && (
-                        <div className="text-gray-600 text-sm sm:text-base">
-                          {edu.school}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
 
                 <div className="mb-8">
@@ -380,7 +369,10 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                   </h3>
                   <div className="flex flex-wrap gap-3 pl-5">
                     {resumeDataToShow.skills.map((skill, index) => (
-                      <span key={index} className="text-sm sm:text-base inline-block">
+                      <span
+                        key={index}
+                        className="text-sm sm:text-base inline-block"
+                      >
                         {skill}
                         {index < resumeDataToShow.skills.length - 1 ? "," : ""}
                       </span>
@@ -390,7 +382,12 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
               </div>
             </div>
             <div className="mt-4 flex justify-center">
-              <Button onClick={handleDownload} className="bg-purple-500 hover:bg-purple-600">Download Resume</Button>
+              <Button
+                onClick={handleDownload}
+                className="bg-purple-500 hover:bg-purple-600"
+              >
+                Download Resume
+              </Button>
             </div>
           </div>
 
@@ -431,9 +428,10 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
             )}
 
             <div className="mt-6">
-              <Button 
-                onClick={handleApply} 
-                className="w-full bg-purple-500 hover:bg-purple-600">
+              <Button
+                onClick={handleApply}
+                className="w-full bg-purple-500 hover:bg-purple-600"
+              >
                 Apply Now
               </Button>
             </div>
