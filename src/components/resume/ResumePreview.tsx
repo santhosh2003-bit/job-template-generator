@@ -58,7 +58,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   const CONTENT_HEIGHT = A4_HEIGHT - (PAGE_MARGIN * 2);
 
   // Process customized resume data from the API if available
-  const customizedResume = jobData.customized_resume || null;
+  const customizedResume = jobData?.customized_resume || null;
   console.log("Customized resume:", customizedResume);
 
   // Create the resume data structure with all available information
@@ -119,6 +119,138 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         ],
   };
 
+  // Create and render the resume content directly
+  const renderResumeContent = () => {
+    return (
+      <div className="py-4 text-black">
+        <h1 className="font-bold text-2xl sm:text-3xl md:text-4xl break-words">
+          {resumeDataToShow.personalInfo.name}
+        </h1>
+        <h2 className="text-sm sm:text-base md:text-lg mt-1">
+          {resumeDataToShow.personalInfo.title}
+        </h2>
+        <div className="flex flex-wrap gap-4 mt-3">
+          <div className="flex items-center gap-2 text-xs sm:text-sm">
+            <Mail className="h-4 w-4" />
+            <span className="break-all">
+              {resumeDataToShow.personalInfo.email}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-xs sm:text-sm">
+            <Phone className="h-4 w-4" />
+            <span className="break-all">
+              {resumeDataToShow.personalInfo.phone}
+            </span>
+          </div>
+          {resumeDataToShow.personalInfo.github && (
+            <div className="flex items-center gap-2 text-xs sm:text-sm">
+              <Github className="h-4 w-4" />
+              <span className="break-all">
+                {resumeDataToShow.personalInfo.github}
+              </span>
+            </div>
+          )}
+          {resumeDataToShow.personalInfo.linkedin && (
+            <div className="flex items-center gap-2 text-xs sm:text-sm">
+              <Linkedin className="h-4 w-4" />
+              <span className="break-all">
+                {resumeDataToShow.personalInfo.linkedin}
+              </span>
+            </div>
+          )}
+          <div className="flex items-center gap-2 text-xs sm:text-sm">
+            <MapPin className="h-4 w-4" />
+            <span>{resumeDataToShow.personalInfo.location}</span>
+          </div>
+        </div>
+
+        <div className="mt-5">
+          <h3 className="border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-2">
+            Summary
+          </h3>
+          <p className="text-sm sm:text-base pl-5">
+            {resumeDataToShow.personalInfo.summary}
+          </p>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-2">
+            Work Experience
+          </h3>
+          {resumeDataToShow.experience.map((exp, index) => (
+            <div key={index} className="pl-5 mb-5">
+              <div className="flex flex-col sm:flex-row justify-between sm:items-center">
+                <h4 className="font-semibold text-base sm:text-lg">
+                  {exp.title}
+                </h4>
+                {exp.period && (
+                  <div className="text-xs sm:text-sm font-medium">
+                    {exp.period}
+                  </div>
+                )}
+              </div>
+              <div className="text-gray-600 text-xs sm:text-sm font-medium mb-1">
+                {exp.company}
+                {exp.location ? `, ${exp.location}` : ""}
+              </div>
+              <ul className="pl-8 list-disc space-y-2">
+                {exp.highlights.map((highlight, idx) => (
+                  <li key={idx} className="text-sm sm:text-base">
+                    {highlight}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6">
+          <h3 className="border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-2">
+            Education
+          </h3>
+          <div className="flex flex-col gap-2">
+            {resumeDataToShow.education.map((edu, index) => (
+              <div key={index} className="pl-5 mb-3">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center">
+                  <h4 className="font-semibold text-base sm:text-lg">
+                    {edu.degree}
+                  </h4>
+                  {edu.period && (
+                    <div className="text-gray-600 text-xs">
+                      {edu.period}
+                    </div>
+                  )}
+                </div>
+                {edu.school && (
+                  <div className="text-gray-600 text-sm sm:text-base">
+                    {edu.school}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-2">
+            Skills
+          </h3>
+          <div className="flex flex-wrap gap-3 pl-5">
+            {resumeDataToShow.skills.map((skill, index) => (
+              <span
+                key={index}
+                className="text-sm sm:text-base inline-block"
+              >
+                {skill}
+                {index < resumeDataToShow.skills.length - 1 ? "," : ""}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   useEffect(() => {
     // Reset to first page when dialog opens
     if (open) {
@@ -127,7 +259,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   }, [open]);
 
   useEffect(() => {
-    if (resumePagesRef.current) {
+    if (resumePagesRef.current && open) {
       createResumePagination();
     }
   }, [resumeDataToShow, open]);
@@ -140,89 +272,226 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       resumePagesRef.current.removeChild(resumePagesRef.current.firstChild);
     }
 
-    // Create the first page
-    const firstPage = document.createElement('div');
-    firstPage.className = 'resume-page';
-    firstPage.style.width = `${A4_WIDTH}px`;
-    firstPage.style.height = `${A4_HEIGHT}px`;
-    firstPage.style.backgroundColor = 'white';
-    firstPage.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-    firstPage.style.margin = '0 auto 20px auto';
-    firstPage.style.position = 'relative';
-    firstPage.style.overflow = 'hidden';
-    firstPage.style.pageBreakAfter = 'always';
+    // Create a temporary container to measure content height
+    const tempContainer = document.createElement('div');
+    tempContainer.style.width = `${CONTENT_WIDTH}px`;
+    tempContainer.style.position = 'absolute';
+    tempContainer.style.visibility = 'hidden';
+    tempContainer.style.padding = `${PAGE_MARGIN}px`;
+    tempContainer.innerHTML = `<div id="resume-content-measure">${resumePagesRef.current.innerHTML}</div>`;
+    document.body.appendChild(tempContainer);
 
-    // Create content container with padding
+    // Render the actual content for measurement
     const contentDiv = document.createElement('div');
-    contentDiv.className = 'resume-content';
-    contentDiv.style.padding = `${PAGE_MARGIN}px`;
-    contentDiv.style.fontFamily = 'Calibri, sans-serif';
-    contentDiv.style.color = '#000';
-    contentDiv.style.height = `${CONTENT_HEIGHT}px`;
-    contentDiv.style.overflow = 'hidden';
+    contentDiv.className = 'resume-content-measure';
+    contentDiv.style.width = `${CONTENT_WIDTH}px`;
+    
+    // Create a React root and render the resume content
+    const tempContentDiv = document.getElementById('resume-content-measure');
+    if (tempContentDiv) {
+      // Use innerHTML to add the resume content directly
+      const resumeContentHTML = document.createElement('div');
+      const content = renderResumeContent();
+      const tempRoot = document.createElement('div');
+      document.body.appendChild(tempRoot);
+      
+      // Create first page
+      const firstPage = document.createElement('div');
+      firstPage.className = 'resume-page';
+      firstPage.style.width = `${A4_WIDTH}px`;
+      firstPage.style.height = `${A4_HEIGHT}px`;
+      firstPage.style.backgroundColor = 'white';
+      firstPage.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+      firstPage.style.margin = '0 auto 20px auto';
+      firstPage.style.position = 'relative';
+      firstPage.style.overflow = 'hidden';
+      firstPage.style.pageBreakAfter = 'always';
 
-    // Clone the template content
-    const templateContent = document.getElementById('resume-template');
-    if (templateContent) {
-      contentDiv.appendChild(templateContent.cloneNode(true));
+      // Create content container
+      const firstPageContent = document.createElement('div');
+      firstPageContent.className = 'resume-content';
+      firstPageContent.style.padding = `${PAGE_MARGIN}px`;
+      firstPageContent.style.fontFamily = 'Calibri, sans-serif';
+      firstPageContent.style.height = `${CONTENT_HEIGHT}px`;
+      firstPageContent.style.overflow = 'hidden';
+      firstPageContent.style.color = '#000';
+      
+      // Convert React element to HTML and set it
+      const resumeDiv = document.createElement('div');
+      resumeDiv.innerHTML = `
+        <div class="py-4 text-black">
+          <h1 class="font-bold text-2xl sm:text-3xl md:text-4xl break-words">
+            ${resumeDataToShow.personalInfo.name}
+          </h1>
+          <h2 class="text-sm sm:text-base md:text-lg mt-1">
+            ${resumeDataToShow.personalInfo.title}
+          </h2>
+          <div class="flex flex-wrap gap-4 mt-3">
+            <div class="flex items-center gap-2 text-xs sm:text-sm">
+              <span class="inline-block w-4 h-4">✉️</span>
+              <span class="break-all">
+                ${resumeDataToShow.personalInfo.email}
+              </span>
+            </div>
+            <div class="flex items-center gap-2 text-xs sm:text-sm">
+              <span class="inline-block w-4 h-4">📞</span>
+              <span class="break-all">
+                ${resumeDataToShow.personalInfo.phone}
+              </span>
+            </div>
+            ${resumeDataToShow.personalInfo.github ? `
+              <div class="flex items-center gap-2 text-xs sm:text-sm">
+                <span class="inline-block w-4 h-4">🔗</span>
+                <span class="break-all">
+                  ${resumeDataToShow.personalInfo.github}
+                </span>
+              </div>
+            ` : ''}
+            ${resumeDataToShow.personalInfo.linkedin ? `
+              <div class="flex items-center gap-2 text-xs sm:text-sm">
+                <span class="inline-block w-4 h-4">🔗</span>
+                <span class="break-all">
+                  ${resumeDataToShow.personalInfo.linkedin}
+                </span>
+              </div>
+            ` : ''}
+            <div class="flex items-center gap-2 text-xs sm:text-sm">
+              <span class="inline-block w-4 h-4">📍</span>
+              <span>${resumeDataToShow.personalInfo.location}</span>
+            </div>
+          </div>
+
+          <div class="mt-5">
+            <h3 class="border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-2">
+              Summary
+            </h3>
+            <p class="text-sm sm:text-base pl-5">
+              ${resumeDataToShow.personalInfo.summary}
+            </p>
+          </div>
+
+          <div class="mt-6">
+            <h3 class="border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-2">
+              Work Experience
+            </h3>
+            ${resumeDataToShow.experience.map((exp, index) => `
+              <div class="pl-5 mb-5">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center">
+                  <h4 class="font-semibold text-base sm:text-lg">
+                    ${exp.title}
+                  </h4>
+                  ${exp.period ? `
+                    <div class="text-xs sm:text-sm font-medium">
+                      ${exp.period}
+                    </div>
+                  ` : ''}
+                </div>
+                <div class="text-gray-600 text-xs sm:text-sm font-medium mb-1">
+                  ${exp.company}
+                  ${exp.location ? `, ${exp.location}` : ""}
+                </div>
+                <ul class="pl-8 list-disc space-y-2">
+                  ${exp.highlights.map(highlight => `
+                    <li class="text-sm sm:text-base">
+                      ${highlight}
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="mt-6">
+            <h3 class="border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-2">
+              Education
+            </h3>
+            <div class="flex flex-col gap-2">
+              ${resumeDataToShow.education.map((edu, index) => `
+                <div class="pl-5 mb-3">
+                  <div class="flex flex-col sm:flex-row justify-between sm:items-center">
+                    <h4 class="font-semibold text-base sm:text-lg">
+                      ${edu.degree}
+                    </h4>
+                    ${edu.period ? `
+                      <div class="text-gray-600 text-xs">
+                        ${edu.period}
+                      </div>
+                    ` : ''}
+                  </div>
+                  ${edu.school ? `
+                    <div class="text-gray-600 text-sm sm:text-base">
+                      ${edu.school}
+                    </div>
+                  ` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <h3 class="border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-2">
+              Skills
+            </h3>
+            <div class="flex flex-wrap gap-3 pl-5">
+              ${resumeDataToShow.skills.map((skill, index) => `
+                <span class="text-sm sm:text-base inline-block">
+                  ${skill}${index < resumeDataToShow.skills.length - 1 ? "," : ""}
+                </span>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+      
+      firstPageContent.appendChild(resumeDiv);
+      firstPage.appendChild(firstPageContent);
+      resumePagesRef.current.appendChild(firstPage);
+
+      // Calculate content height to determine pagination
+      const contentHeight = firstPageContent.scrollHeight;
+      const calculatedTotalPages = Math.ceil(contentHeight / CONTENT_HEIGHT);
+      setTotalPages(calculatedTotalPages);
+      
+      // Create additional pages if needed
+      for (let i = 1; i < calculatedTotalPages; i++) {
+        const newPage = document.createElement('div');
+        newPage.className = 'resume-page';
+        newPage.style.width = `${A4_WIDTH}px`;
+        newPage.style.height = `${A4_HEIGHT}px`;
+        newPage.style.backgroundColor = 'white';
+        newPage.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+        newPage.style.margin = '0 auto 20px auto';
+        newPage.style.position = 'relative';
+        newPage.style.overflow = 'hidden';
+        newPage.style.pageBreakAfter = 'always';
+        
+        const newContentDiv = document.createElement('div');
+        newContentDiv.className = 'resume-content';
+        newContentDiv.style.padding = `${PAGE_MARGIN}px`;
+        newContentDiv.style.fontFamily = 'Calibri, sans-serif';
+        newContentDiv.style.height = `${CONTENT_HEIGHT}px`;
+        newContentDiv.style.overflow = 'hidden';
+        newContentDiv.style.color = '#000';
+        newContentDiv.style.position = 'relative';
+        
+        // Clone content but adjust position for pagination
+        const contentClone = resumeDiv.cloneNode(true) as HTMLElement;
+        contentClone.style.position = 'absolute';
+        contentClone.style.top = `-${i * CONTENT_HEIGHT}px`;
+        
+        newContentDiv.appendChild(contentClone);
+        newPage.appendChild(newContentDiv);
+        resumePagesRef.current.appendChild(newPage);
+      }
+      
+      // Show only current page
+      updateVisiblePage();
     }
 
-    firstPage.appendChild(contentDiv);
-    resumePagesRef.current.appendChild(firstPage);
-
-    // Calculate pagination
-    calculatePagination();
-  };
-
-  const calculatePagination = () => {
-    if (!resumePagesRef.current) return;
-    
-    const contentElement = document.querySelector('.resume-content');
-    if (!contentElement) return;
-    
-    const contentHeight = contentElement.scrollHeight;
-    const availableHeight = CONTENT_HEIGHT;
-    const calculatedTotalPages = Math.ceil(contentHeight / availableHeight);
-    
-    setTotalPages(calculatedTotalPages);
-    
-    // Create additional pages if needed
-    const existingPages = resumePagesRef.current.querySelectorAll('.resume-page');
-    
-    for (let i = existingPages.length; i < calculatedTotalPages; i++) {
-      const newPage = document.createElement('div');
-      newPage.className = 'resume-page';
-      newPage.style.width = `${A4_WIDTH}px`;
-      newPage.style.height = `${A4_HEIGHT}px`;
-      newPage.style.backgroundColor = 'white';
-      newPage.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-      newPage.style.margin = '0 auto 20px auto';
-      newPage.style.position = 'relative';
-      newPage.style.overflow = 'hidden';
-      newPage.style.pageBreakAfter = 'always';
-      
-      // Create content container with padding for additional pages
-      const newContentDiv = document.createElement('div');
-      newContentDiv.className = 'resume-content';
-      newContentDiv.style.padding = `${PAGE_MARGIN}px`;
-      newContentDiv.style.fontFamily = 'Calibri, sans-serif';
-      newContentDiv.style.color = '#000';
-      newContentDiv.style.height = `${CONTENT_HEIGHT}px`;
-      newContentDiv.style.overflow = 'hidden';
-      newContentDiv.style.position = 'relative';
-      newContentDiv.style.top = `${-i * CONTENT_HEIGHT}px`;
-      
-      const contentClone = contentElement.cloneNode(true) as HTMLElement;
-      contentClone.style.position = 'absolute';
-      contentClone.style.top = `${i * CONTENT_HEIGHT}px`;
-      
-      newContentDiv.appendChild(contentClone);
-      newPage.appendChild(newContentDiv);
-      resumePagesRef.current.appendChild(newPage);
+    // Clean up the temporary elements
+    if (tempContainer && tempContainer.parentNode) {
+      tempContainer.parentNode.removeChild(tempContainer);
     }
-    
-    // Show only current page
-    updateVisiblePage();
   };
   
   const updateVisiblePage = () => {
@@ -398,136 +667,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
             {/* Resume pages container */}
             <div ref={resumePagesRef} className="w-full">
               {/* Pages will be dynamically generated here */}
-            </div>
-            
-            {/* Hidden template that will be cloned for pagination */}
-            <div id="resume-template" className="hidden">
-              <div className="py-4">
-                <h1 className="text-black font-bold text-2xl sm:text-3xl md:text-4xl break-words">
-                  {resumeDataToShow.personalInfo.name}
-                </h1>
-                <h2 className="text-black text-sm sm:text-base md:text-lg mt-1">
-                  {resumeDataToShow.personalInfo.title}
-                </h2>
-                <div className="flex flex-wrap gap-4 mt-3">
-                  <div className="flex items-center gap-2 text-xs sm:text-sm">
-                    <Mail className="h-4 w-4" />
-                    <span className="break-all">
-                      {resumeDataToShow.personalInfo.email}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs sm:text-sm">
-                    <Phone className="h-4 w-4" />
-                    <span className="break-all">
-                      {resumeDataToShow.personalInfo.phone}
-                    </span>
-                  </div>
-                  {resumeDataToShow.personalInfo.github && (
-                    <div className="flex items-center gap-2 text-xs sm:text-sm">
-                      <Github className="h-4 w-4" />
-                      <span className="break-all">
-                        {resumeDataToShow.personalInfo.github}
-                      </span>
-                    </div>
-                  )}
-                  {resumeDataToShow.personalInfo.linkedin && (
-                    <div className="flex items-center gap-2 text-xs sm:text-sm">
-                      <Linkedin className="h-4 w-4" />
-                      <span className="break-all">
-                        {resumeDataToShow.personalInfo.linkedin}
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2 text-xs sm:text-sm">
-                    <MapPin className="h-4 w-4" />
-                    <span>{resumeDataToShow.personalInfo.location}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-5">
-                <h3 className="text-black border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-2">
-                  Summary
-                </h3>
-                <p className="text-sm sm:text-base pl-5">
-                  {resumeDataToShow.personalInfo.summary}
-                </p>
-              </div>
-
-              <div className="mt-6">
-                <h3 className="text-black border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-2">
-                  Work Experience
-                </h3>
-                {resumeDataToShow.experience.map((exp, index) => (
-                  <div key={index} className="pl-5 mb-5">
-                    <div className="flex flex-col sm:flex-row justify-between sm:items-center">
-                      <h4 className="font-semibold text-base sm:text-lg">
-                        {exp.title}
-                      </h4>
-                      {exp.period && (
-                        <div className="text-black text-xs sm:text-sm font-medium">
-                          {exp.period}
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-gray-600 text-xs sm:text-sm font-medium mb-1">
-                      {exp.company}
-                      {exp.location ? `, ${exp.location}` : ""}
-                    </div>
-                    <ul className="pl-8 text-black list-disc space-y-2">
-                      {exp.highlights.map((highlight, idx) => (
-                        <li key={idx} className="text-sm sm:text-base">
-                          {highlight}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6">
-                <h3 className="text-black border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-2">
-                  Education
-                </h3>
-                <div className="flex flex-col gap-2">
-                  {resumeDataToShow.education.map((edu, index) => (
-                    <div key={index} className="pl-5 mb-3">
-                      <div className="flex flex-col sm:flex-row justify-between sm:items-center">
-                        <h4 className="font-semibold text-base sm:text-lg">
-                          {edu.degree}
-                        </h4>
-                        {edu.period && (
-                          <div className="text-gray-600 text-xs">
-                            {edu.period}
-                          </div>
-                        )}
-                      </div>
-                      {edu.school && (
-                        <div className="text-gray-600 text-sm sm:text-base">
-                          {edu.school}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <h3 className="text-black border-b-2 border-black pb-1 font-bold text-base sm:text-lg md:text-xl mb-2">
-                  Skills
-                </h3>
-                <div className="flex flex-wrap gap-3 pl-5">
-                  {resumeDataToShow.skills.map((skill, index) => (
-                    <span
-                      key={index}
-                      className="text-sm sm:text-base inline-block"
-                    >
-                      {skill}
-                      {index < resumeDataToShow.skills.length - 1 ? "," : ""}
-                    </span>
-                  ))}
-                </div>
-              </div>
             </div>
             
             {/* Pagination at bottom */}
