@@ -23,9 +23,8 @@ import ResumePreview from "@/components/resume/ResumePreview";
 import { Briefcase, MapPin, Clock, BarChart3, Search, Loader2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useResume } from "@/context/ResumeContext";
-import { fetchJobListings } from "@/lib/api";
+import { analyzeResume } from "@/lib/api";
 
-// Define a job type that includes all potential properties
 interface Job {
   id?: string;
   job_id: string;
@@ -66,13 +65,10 @@ const Jobs = () => {
   const { jobOpportunities, personalDetails } = useResume();
 
   useEffect(() => {
-    // If we have job opportunities from resume upload, use those
     if (jobOpportunities && jobOpportunities.length > 0) {
       console.log("Using job opportunities from resume context:", jobOpportunities);
       setJobListings(jobOpportunities);
-    } 
-    // Otherwise fetch jobs based on default search
-    else {
+    } else {
       loadJobs();
     }
   }, [jobOpportunities]);
@@ -80,9 +76,9 @@ const Jobs = () => {
   const loadJobs = async (query: string = "software developer", loc: string = "") => {
     setIsLoading(true);
     try {
-      const jobs = await fetchJobListings(query, loc);
-      console.log("Loaded jobs:", jobs);
-      setJobListings(jobs);
+      const response = await analyzeResume(null, query);
+      console.log("Loaded jobs:", response.job_opportunities);
+      setJobListings(response.job_opportunities || []);
     } catch (error) {
       console.error("Error loading jobs:", error);
       toast({
@@ -104,7 +100,6 @@ const Jobs = () => {
     setShowPreview(true);
   };
 
-  // Filter jobs based on user selections
   const filteredJobs = jobListings.filter((job) => {
     const jobTitle = job.job_title || "";
     const jobLocation = job.location || job.place || "";
@@ -117,10 +112,8 @@ const Jobs = () => {
       ? jobLocation.toLowerCase().includes(location.toLowerCase()) 
       : true;
     
-    // Only apply these filters if job has these properties
     const matchesType = jobType === "all" || job.type === jobType;
     
-    // Safely extract salary value - only apply if job has salary
     const jobSalaryMin = job.salary
       ? parseInt((job.salary).replace(/[^0-9]/g, "").substring(0, 6))
       : 0;
@@ -148,7 +141,6 @@ const Jobs = () => {
           </p>
         </div>
 
-        {/* Search and Filters */}
         <div className="glass-card p-4 md:p-6 rounded-xl mb-6 md:mb-8">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div>
@@ -203,7 +195,6 @@ const Jobs = () => {
           </div>
         </div>
 
-        {/* Job Listings */}
         <div className="space-y-4 mb-10 flex flex-wrap gap-4 px-4">
           {isLoading ? (
             <div className="w-full flex justify-center py-20">
@@ -236,7 +227,6 @@ const Jobs = () => {
                         {job.company}
                       </CardDescription>
                     </div>
-                    {/* Only show match percentage for jobs that have it */}
                     {job.match && (
                       <div className="flex items-start md:items-end md:flex-col">
                         <div className="bg-purple-500/10 text-purple-500 rounded-full px-3 py-1 text-sm flex items-center">
@@ -253,7 +243,6 @@ const Jobs = () => {
                       <MapPin className="mr-1 h-4 w-4" />
                       {job.location || job.place}
                     </div>
-                    {/* Only show type for jobs that have it */}
                     {job.type && (
                       <div className="flex items-center">
                         <Briefcase className="mr-1 h-4 w-4" />
@@ -270,14 +259,11 @@ const Jobs = () => {
                   </p>
                 </CardContent>
                 <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-3 border-t p-4 md:p-6">
-                  <div>
-                    {/* Only show salary for jobs that have it */}
-                    {job.salary && (
-                      <p className="text-xs md:text-sm font-medium">
-                        {job.salary}
-                      </p>
-                    )}
-                  </div>
+                  {job.salary && (
+                    <p className="text-xs md:text-sm font-medium">
+                      {job.salary}
+                    </p>
+                  )}
                   <Button
                     variant="outline"
                     onClick={() => handlePreview(job)}

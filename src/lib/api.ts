@@ -50,94 +50,41 @@ export interface ResumeAnalysisResponse {
 }
 
 export async function analyzeResume(
-  resume: File,
+  resume: File | null = null,
   job_profile: string
 ): Promise<ResumeAnalysisResponse> {
   try {
     const formData = new FormData();
-    formData.append("resume", resume);
+    
+    // If resume is provided, append it (for resume upload flow)
+    if (resume) {
+      formData.append("resume", resume);
+      console.log(`Analyzing resume for ${job_profile} position`);
+    } else {
+      console.log(`Searching for ${job_profile} jobs`);
+    }
+    
+    // Always append job profile
     formData.append("job_profile", job_profile);
 
-    console.log(`Analyzing resume for ${job_profile} position`);
+    // Call the API
+    const response = await fetch(`${API_BASE_URL}/find_job`, {
+      method: "POST",
+      body: formData,
+    });
 
-    try {
-      // Use the real API endpoint
-      const response = await fetch(`${API_BASE_URL}/find_job`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`API returned ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (apiError) {
-      console.error("Error fetching from API:", apiError);
-      toast({
-        title: "API Error",
-        description: "Failed to analyze resume. Please try again later.",
-        variant: "destructive",
-      });
-      throw apiError;
+    if (!response.ok) {
+      throw new Error(`API returned ${response.status}`);
     }
+
+    return await response.json();
   } catch (error) {
-    console.error("Error analyzing resume:", error);
+    console.error("Error with API call:", error);
     toast({
       title: "API Error",
-      description: "Failed to analyze resume. Please try again.",
+      description: "Failed to process request. Please try again later.",
       variant: "destructive",
     });
     throw error;
-  }
-}
-
-export async function fetchJobListings(
-  query: string,
-  location: string = ""
-): Promise<any[]> {
-  try {
-    console.log(
-      `Searching for ${query} jobs in ${location || "all locations"}`
-    );
-
-    try {
-      // Create formData to match the API's expected format
-      const formData = new FormData();
-      formData.append("job_profile", query);
-      
-      if (location) {
-        formData.append("location", location);
-      }
-
-      // Use the same API endpoint with POST method and proper parameters
-      const response = await fetch(`${API_BASE_URL}/find_job`, {
-        method: "POST", 
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          `API returned ${response.status}: ${response.statusText}`
-        );
-      }
-
-      const data = await response.json();
-      console.log("API Response:", data);
-
-      // Return the job_opportunities array
-      return data.job_opportunities || [];
-    } catch (apiError) {
-      console.error("Error fetching from API:", apiError);
-      throw apiError;
-    }
-  } catch (error) {
-    console.error("Error fetching jobs:", error);
-    toast({
-      title: "API Error",
-      description: "Failed to fetch job listings. Please try again.",
-      variant: "destructive",
-    });
-    return [];
   }
 }
