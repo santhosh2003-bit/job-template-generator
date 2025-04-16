@@ -1,3 +1,4 @@
+
 import { toast } from "@/hooks/use-toast";
 
 const API_BASE_URL = "http://127.0.0.1:3012";
@@ -101,8 +102,19 @@ export async function fetchJobListings(
     );
 
     try {
-      // Use the actual API endpoint provided by the user
-      const response = await fetch(`${API_BASE_URL}/find_job`);
+      // Create formData to match the API's expected format
+      const formData = new FormData();
+      formData.append("job_profile", query);
+      
+      if (location) {
+        formData.append("location", location);
+      }
+
+      // Use the same API endpoint with POST method and proper parameters
+      const response = await fetch(`${API_BASE_URL}/find_job`, {
+        method: "POST", 
+        body: formData,
+      });
 
       if (!response.ok) {
         throw new Error(
