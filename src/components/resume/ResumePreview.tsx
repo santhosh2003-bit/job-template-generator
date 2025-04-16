@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { Github, Linkedin, MapPin, Phone, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -48,20 +47,16 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   console.log("Job data in preview:", jobData);
   console.log("Personal details in preview:", personalDetails);
 
-  // A4 dimensions in pixels (at 96 DPI)
   const A4_WIDTH = 794; // ~210mm at 96 DPI
   const A4_HEIGHT = 1123; // ~297mm at 96 DPI
   const PAGE_MARGIN = 50; // 50px margin
 
-  // Calculate effective content area dimensions
   const CONTENT_WIDTH = A4_WIDTH - (PAGE_MARGIN * 2);
   const CONTENT_HEIGHT = A4_HEIGHT - (PAGE_MARGIN * 2);
 
-  // Process customized resume data from the API if available
   const customizedResume = jobData?.customized_resume || null;
   console.log("Customized resume:", customizedResume);
 
-  // Create the resume data structure with all available information
   const resumeDataToShow = {
     personalInfo: {
       name: personalDetails?.full_name || "Alex Johnson",
@@ -119,7 +114,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         ],
   };
 
-  // Format resume content as HTML string
   const getResumeHtml = () => {
     return `
       <div class="py-4 text-black" style="font-family: 'Calibri', sans-serif;">
@@ -240,11 +234,9 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   };
 
   useEffect(() => {
-    // Reset to first page when dialog opens
     if (open) {
       setCurrentPage(1);
       
-      // Create hidden div for PDF content if it doesn't exist
       if (!pdfContainerRef.current) {
         const div = document.createElement('div');
         div.style.position = 'absolute';
@@ -265,13 +257,10 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   const createResumePages = () => {
     if (!resumePagesRef.current) return;
 
-    // Clear existing pages
     resumePagesRef.current.innerHTML = '';
     
-    // Get the HTML content
     const resumeHtml = getResumeHtml();
     
-    // Create a temporary container to measure content height
     const tempContainer = document.createElement('div');
     tempContainer.style.width = `${CONTENT_WIDTH}px`;
     tempContainer.style.position = 'absolute';
@@ -280,16 +269,12 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
     tempContainer.innerHTML = resumeHtml;
     document.body.appendChild(tempContainer);
     
-    // Measure the content height
     const contentHeight = tempContainer.offsetHeight;
     
-    // Calculate number of pages needed
     const pages = Math.max(1, Math.ceil(contentHeight / CONTENT_HEIGHT));
     setTotalPages(pages);
     
-    // Create pages
     for (let i = 0; i < pages; i++) {
-      // Create page container
       const pageDiv = document.createElement('div');
       pageDiv.className = 'resume-page';
       pageDiv.id = `resume-page-${i + 1}`;
@@ -303,7 +288,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       pageDiv.style.display = i + 1 === currentPage ? 'block' : 'none';
       pageDiv.style.color = 'black';
       
-      // Create content container
       const contentDiv = document.createElement('div');
       contentDiv.className = 'resume-content';
       contentDiv.style.padding = `${PAGE_MARGIN}px`;
@@ -312,7 +296,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       contentDiv.style.overflow = 'hidden';
       contentDiv.style.position = 'relative';
       
-      // Create a clone of the resume content for this page
       const contentClone = document.createElement('div');
       contentClone.innerHTML = resumeHtml;
       contentClone.style.position = 'absolute';
@@ -324,7 +307,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       resumePagesRef.current.appendChild(pageDiv);
     }
     
-    // Cleanup
     document.body.removeChild(tempContainer);
   };
 
@@ -358,67 +340,70 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         description: "Please wait while we prepare your resume...",
       });
 
-      // Prepare the PDF content in the hidden div
-      if (pdfContainerRef.current) {
-        // Clear previous content
-        pdfContainerRef.current.innerHTML = '';
-        
-        // Create the PDF content with inline styles
-        const pdfContentDiv = document.createElement('div');
-        pdfContentDiv.style.width = `${A4_WIDTH}px`;
-        pdfContentDiv.style.padding = `${PAGE_MARGIN}px`;
-        pdfContentDiv.style.backgroundColor = 'white';
-        pdfContentDiv.style.color = 'black';
-        pdfContentDiv.style.fontFamily = 'Calibri, sans-serif';
-        pdfContentDiv.innerHTML = getResumeHtml();
-        
-        pdfContainerRef.current.appendChild(pdfContentDiv);
-        
-        // Initialize PDF with A4 size
-        const pdf = new jsPDF({
-          orientation: "portrait",
-          unit: "mm",
-          format: "a4",
-        });
-        
-        // Use html2canvas to capture the content
-        const canvas = await html2canvas(pdfContentDiv, {
-          scale: 2, // Higher scale for better quality
-          useCORS: true,
-          logging: false,
-          backgroundColor: 'white'
-        });
-        
-        // Get dimensions and calculate pages
-        const imgData = canvas.toDataURL('image/png');
-        const imgWidth = pdf.internal.pageSize.getWidth();
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        const pageHeight = pdf.internal.pageSize.getHeight();
+      const tempDiv = document.createElement('div');
+      tempDiv.style.position = 'fixed';
+      tempDiv.style.left = '-9999px';
+      tempDiv.style.top = '0';
+      tempDiv.style.width = `${A4_WIDTH}px`;
+      tempDiv.style.backgroundColor = 'white';
+      tempDiv.style.zIndex = '-1000';
+      document.body.appendChild(tempDiv);
+      
+      tempDiv.innerHTML = getResumeHtml();
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+      
+      const canvas = await html2canvas(tempDiv, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: 'white',
+        logging: false,
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.body.firstChild as HTMLElement;
+          if (clonedElement) {
+            clonedElement.style.width = `${A4_WIDTH}px`;
+            clonedElement.style.padding = '40px';
+            clonedElement.style.boxSizing = 'border-box';
+          }
+        }
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = pdf.internal.pageSize.getWidth();
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      
+      if (imgHeight > pdf.internal.pageSize.getHeight()) {
         let heightLeft = imgHeight;
         let position = 0;
+        const pageHeight = pdf.internal.pageSize.getHeight();
         
-        // Add the first page
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+        pdf.deletePage(1);
         
-        // Add additional pages if needed
         while (heightLeft > 0) {
-          position = heightLeft - imgHeight;
           pdf.addPage();
           pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
           heightLeft -= pageHeight;
+          position -= pageHeight;
         }
-        
-        // Save the PDF
-        pdf.save("resume.pdf");
-        
-        toast({
-          title: "Success",
-          description: "Resume downloaded successfully",
-        });
-      } else {
-        throw new Error("PDF container reference not found");
       }
+      
+      document.body.removeChild(tempDiv);
+      
+      pdf.save("resume.pdf");
+      
+      toast({
+        title: "Success",
+        description: "Resume downloaded successfully",
+      });
     } catch (error) {
       console.error("Error generating PDF:", error);
       toast({
@@ -474,7 +459,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
 
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 p-4 sm:p-6">
           <div className="w-full lg:w-2/3 overflow-hidden flex flex-col items-center">
-            {/* Pagination at top */}
             {totalPages > 1 && (
               <div className="mb-4 w-full flex justify-center">
                 <Pagination>
@@ -508,12 +492,9 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
               </div>
             )}
             
-            {/* Resume pages container */}
             <div ref={resumePagesRef} className="w-full">
-              {/* Pages will be dynamically generated here */}
             </div>
             
-            {/* Pagination at bottom */}
             {totalPages > 1 && (
               <div className="mt-4 w-full flex justify-center">
                 <Pagination>
