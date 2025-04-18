@@ -1,7 +1,6 @@
-
 import { toast } from "@/hooks/use-toast";
 
-const API_BASE_URL = "http://127.0.0.1:3012";
+const API_BASE_URL = "https://ezeapply.onrender.com";
 
 export interface ResumeAnalysisResponse {
   personal_details: {
@@ -55,7 +54,7 @@ export async function analyzeResume(
 ): Promise<ResumeAnalysisResponse> {
   try {
     const formData = new FormData();
-    
+
     // If resume is provided, append it (for resume upload flow)
     if (resume) {
       formData.append("resume", resume);
@@ -63,7 +62,7 @@ export async function analyzeResume(
     } else {
       console.log(`Searching for ${job_profile} jobs`);
     }
-    
+
     // Always append job profile
     formData.append("job_profile", job_profile);
 
