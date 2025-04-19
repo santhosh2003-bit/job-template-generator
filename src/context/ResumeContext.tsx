@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 interface JobOpportunity {
   apply_link: string;
   company: string;
-  customized_resume?: {  // Changed from required to optional with ?
+  customized_resume?: {
     modified_skills: string[];
     modified_work_experience: {
       Company: string;
@@ -39,9 +39,48 @@ interface PersonalDetails {
   physical_address: string;
 }
 
+export interface ResumeExperienceItem {
+  title: string;
+  company: string;
+  location: string;
+  period: string;
+  highlights: string[];
+}
+
+export interface ResumeEducationItem {
+  degree: string;
+  school: string;
+  period: string;
+}
+
+export interface ResumeData {
+  personalInfo: {
+    name: string;
+    title: string;
+    email: string;
+    phone: string;
+    github: string;
+    linkedin: string;
+    location: string;
+    summary: string;
+  };
+  skills: string[];
+  experience: ResumeExperienceItem[];
+  education: ResumeEducationItem[];
+}
+
 interface ApiResponse {
   job_opportunities: JobOpportunity[];
   personal_details: PersonalDetails;
+  resume_data: {
+    skills: string[];
+    experience: {
+      title: string;
+      company: string;
+      period: string;
+      responsibilities: string[];
+    }[];
+  };
 }
 
 interface ResumeContextType {
@@ -56,6 +95,7 @@ interface ResumeContextType {
   setJobOpportunities: (jobs: JobOpportunity[]) => void;
   personalDetails: PersonalDetails | null;
   setPersonalDetails: (details: PersonalDetails) => void;
+  formattedResumeData: ResumeData | null;
 }
 
 const ResumeContext = createContext<ResumeContextType | undefined>(undefined);
@@ -81,6 +121,47 @@ export const ResumeProvider = ({ children }: { children: ReactNode }) => {
     }
     return true;
   };
+  
+  const formattedResumeData: ResumeData | null = personalDetails ? {
+    personalInfo: {
+      name: personalDetails?.full_name || "Alex Johnson",
+      title: personalDetails?.current_position || "Senior Software Engineer",
+      email: personalDetails?.email || "alex@example.com",
+      phone: personalDetails?.phone_number || "(555) 123-4567",
+      github: personalDetails?.github === "None" ? "" : personalDetails?.github || "",
+      linkedin: personalDetails?.linkedin === "None" ? "" : personalDetails?.linkedin || "",
+      location: personalDetails?.physical_address || "San Francisco, CA",
+      summary: personalDetails?.brief_summary === "None" ? 
+        "Experienced professional with expertise in relevant technologies." : 
+        personalDetails?.brief_summary,
+    },
+    skills: resumeData?.skills || ["JavaScript", "TypeScript", "React", "Node.js"],
+    experience: resumeData?.experience || [
+      {
+        title: "Software Engineer",
+        company: "Example Company",
+        location: "Remote",
+        period: "2021 - Present",
+        highlights: [
+          "Developed web applications",
+          "Collaborated with team members",
+        ],
+      },
+    ],
+    education: personalDetails?.education ? [
+      {
+        degree: personalDetails.education,
+        school: "",
+        period: "",
+      },
+    ] : [
+      {
+        degree: "Bachelor of Science in Computer Science",
+        school: "University",
+        period: "2012 - 2016",
+      },
+    ],
+  } : null;
 
   return (
     <ResumeContext.Provider
@@ -96,6 +177,7 @@ export const ResumeProvider = ({ children }: { children: ReactNode }) => {
         setJobOpportunities,
         personalDetails,
         setPersonalDetails,
+        formattedResumeData,
       }}
     >
       {children}

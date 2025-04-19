@@ -1,3 +1,4 @@
+
 import { toast } from "@/hooks/use-toast";
 
 const API_BASE_URL = "https://ezeapply.onrender.com";

@@ -13,7 +13,7 @@ interface HeaderImageProps {
 const HeaderImage: FC<HeaderImageProps> = ({
   title,
   subtitle,
-  imageUrl = "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=2072&auto=format&fit=crop",
+  imageUrl = "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=1200&auto=format&fit=crop",
   overlay = true,
   height = 'medium',
   className = '',
@@ -33,6 +33,7 @@ const HeaderImage: FC<HeaderImageProps> = ({
         src={imageUrl} 
         alt={title || "Header image"} 
         className="w-full h-full object-cover"
+        loading="lazy"
       />
       
       {overlay && (

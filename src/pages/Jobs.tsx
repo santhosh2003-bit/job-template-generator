@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -55,16 +56,26 @@ const Jobs = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [location, setLocation] = useState("");
   const [jobType, setJobType] = useState("all");
-  const [salary, setSalary] = useState([50]);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [jobListings, setJobListings] = useState<Job[]>([]);
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const { jobOpportunities, personalDetails } = useResume();
-
+  const { 
+    jobOpportunities, 
+    personalDetails,
+    setJobOpportunities,
+    selectedTemplate,
+    checkResumeStatus
+  } = useResume();
+  
+  const [jobListings, setJobListings] = useState<Job[]>([]);
+  
   useEffect(() => {
+    if (!checkResumeStatus()) {
+      return;
+    }
+    
     if (jobOpportunities && jobOpportunities.length > 0) {
       console.log("Using job opportunities from resume context:", jobOpportunities);
       setJobListings(jobOpportunities);
@@ -78,6 +89,7 @@ const Jobs = () => {
     try {
       const response = await analyzeResume(null, query);
       console.log("Loaded jobs:", response.job_opportunities);
+      setJobOpportunities(response.job_opportunities || []);
       setJobListings(response.job_opportunities || []);
     } catch (error) {
       console.error("Error loading jobs:", error);
@@ -92,10 +104,19 @@ const Jobs = () => {
   };
 
   const handleSearch = () => {
-    loadJobs(searchTerm || "developer", location);
+    loadJobs(searchTerm || "software developer", location);
   };
 
   const handlePreview = (job: Job) => {
+    if (!selectedTemplate) {
+      toast({
+        title: "No Template Selected",
+        description: "Please select a resume template first",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setSelectedJob(job);
     setShowPreview(true);
   };
@@ -114,13 +135,7 @@ const Jobs = () => {
     
     const matchesType = jobType === "all" || job.type === jobType;
     
-    const jobSalaryMin = job.salary
-      ? parseInt((job.salary).replace(/[^0-9]/g, "").substring(0, 6))
-      : 0;
-    
-    const matchesSalary = !job.salary || salary[0] * 2000 <= jobSalaryMin;
-
-    return matchesSearch && matchesLocation && matchesType && matchesSalary;
+    return matchesSearch && matchesLocation && matchesType;
   });
 
   return (

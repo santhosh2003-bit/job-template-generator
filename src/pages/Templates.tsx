@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -7,9 +8,14 @@ import { useResume } from "@/context/ResumeContext";
 import { Check } from "lucide-react";
 
 const Templates = () => {
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
-  const { setSelectedTemplate: setGlobalTemplate } = useResume();
+  const { selectedTemplate, setSelectedTemplate: setGlobalTemplate, checkResumeStatus } = useResume();
+  const [localSelectedTemplate, setLocalSelectedTemplate] = useState<string | null>(selectedTemplate);
   const navigate = useNavigate();
+
+  // Check if user has uploaded a resume
+  if (!checkResumeStatus()) {
+    return null; // checkResumeStatus will redirect to upload page
+  }
 
   const templates = [
     {
@@ -21,24 +27,24 @@ const Templates = () => {
     {
       id: "template2",
       name: "Creative",
-      description: "Modern design for creative positions",
-      image: "/templates/template1.png",
+      description: "Modern design with accent colors for creative positions",
+      image: "/templates/template1.png", // Use same image for now
     },
     {
       id: "template3",
       name: "Academic",
       description: "Formal design for academic and research positions",
-      image: "/templates/template1.png",
+      image: "/templates/template1.png", // Use same image for now
     },
   ];
 
   const handleTemplateSelect = (templateId: string) => {
-    setSelectedTemplate(templateId);
+    setLocalSelectedTemplate(templateId);
   };
 
   const handleContinue = () => {
-    if (selectedTemplate) {
-      setGlobalTemplate(selectedTemplate);
+    if (localSelectedTemplate) {
+      setGlobalTemplate(localSelectedTemplate);
       navigate("/jobs");
     }
   };
@@ -67,7 +73,7 @@ const Templates = () => {
               key={template.id}
               onClick={() => handleTemplateSelect(template.id)}
               className={`border rounded-lg p-1 sm:p-4 h-fit transition-all cursor-pointer ${
-                selectedTemplate === template.id
+                localSelectedTemplate === template.id
                   ? "ring-2 ring-primary"
                   : "hover:border-primary/50"
               }`}
@@ -78,7 +84,7 @@ const Templates = () => {
                   alt={template.name}
                   className="h-auto max-h-[300px] sm:max-h-[400px] w-full object-contain"
                 />
-                {selectedTemplate === template.id && (
+                {localSelectedTemplate === template.id && (
                   <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
                     <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-primary flex items-center justify-center">
                       <Check className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
@@ -102,8 +108,8 @@ const Templates = () => {
           <Button
             size="lg"
             onClick={handleContinue}
-            disabled={!selectedTemplate}
-            className="w-full sm:w-auto"
+            disabled={!localSelectedTemplate}
+            className="w-full sm:w-auto bg-purple-500 hover:bg-purple-600"
           >
             Continue to Jobs
           </Button>
