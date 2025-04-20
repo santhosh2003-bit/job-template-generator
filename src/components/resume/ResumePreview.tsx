@@ -200,28 +200,33 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         description: "Please wait while we prepare your resume...",
       });
 
-      // Create a visible div for better PDF generation
+      // Create a single full visible div for better PDF generation
       const pdfDiv = document.createElement('div');
       pdfDiv.style.position = 'fixed';
       pdfDiv.style.top = '0';
       pdfDiv.style.left = '0';
       pdfDiv.style.width = `${A4_WIDTH}px`;
+      pdfDiv.style.height = `${A4_HEIGHT}px`;
       pdfDiv.style.backgroundColor = 'white';
-      pdfDiv.style.zIndex = '-1000';
-      pdfDiv.style.visibility = 'hidden';
+      pdfDiv.style.zIndex = '9999'; // Make sure it's visible for rendering
+      pdfDiv.style.overflow = 'hidden';
+      pdfDiv.style.padding = '0';
+      pdfDiv.style.margin = '0';
       document.body.appendChild(pdfDiv);
       
       // Create root for the PDF div
       const pdfRoot = createRoot(pdfDiv);
       pdfRoot.render(
-        <ResumeTemplate 
-          data={resumeDataToShow} 
-          template={selectedTemplate || "template1"} 
-        />
+        <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
+          <ResumeTemplate 
+            data={resumeDataToShow} 
+            template={selectedTemplate || "template1"} 
+          />
+        </div>
       );
       
-      // Wait for rendering to complete
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Wait longer for rendering to complete
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Create PDF with correct dimensions
       const pdf = new jsPDF({
@@ -232,51 +237,23 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
 
       // Use html2canvas with higher quality settings
       const canvas = await html2canvas(pdfDiv, {
-        scale: 2, // Higher scale for better quality
+        scale: 3, // Higher scale for better quality
         useCORS: true,
         allowTaint: true,
         backgroundColor: 'white',
-        logging: false
+        logging: false,
+        windowWidth: A4_WIDTH,
+        windowHeight: A4_HEIGHT
       });
       
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL('image/png', 1.0);
       
       // Calculate dimensions that preserve aspect ratio
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      const canvasAspectRatio = canvas.height / canvas.width;
-      const pdfAspectRatio = pdfHeight / pdfWidth;
       
-      let imgWidth = pdfWidth;
-      let imgHeight = imgWidth * canvasAspectRatio;
-      
-      // If image height exceeds page height, scale down to fit
-      if (imgHeight > pdfHeight) {
-        imgHeight = pdfHeight;
-        imgWidth = imgHeight / canvasAspectRatio;
-      }
-      
-      // Add image to the PDF, centered
-      const xPos = (pdfWidth - imgWidth) / 2;
-      pdf.addImage(imgData, 'PNG', xPos, 0, imgWidth, imgHeight);
-      
-      // If the content is very long, handle multi-page
-      if (imgHeight > pdfHeight) {
-        const pageCount = Math.ceil(imgHeight / pdfHeight);
-        
-        // Create additional pages if needed
-        for (let i = 1; i < pageCount; i++) {
-          pdf.addPage();
-          pdf.addImage(
-            imgData,
-            'PNG',
-            xPos,
-            -(imgHeight * i),
-            imgWidth,
-            imgHeight
-          );
-        }
-      }
+      // Add image to the PDF at full size
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       
       // Clean up
       document.body.removeChild(pdfDiv);
