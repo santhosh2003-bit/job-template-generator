@@ -48,7 +48,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
 
   const A4_WIDTH = 800;
   const A4_HEIGHT = 1120;
-  const PAGE_MARGIN = 0;
+  const PAGE_MARGIN = 50;
 
   const CONTENT_WIDTH = A4_WIDTH - PAGE_MARGIN * 2;
   const CONTENT_HEIGHT = A4_HEIGHT - PAGE_MARGIN * 2;
@@ -200,34 +200,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         description: "Please wait while we prepare your resume...",
       });
 
-      // Create a single full visible div for better PDF generation
-      const pdfDiv = document.createElement('div');
-      pdfDiv.style.position = 'fixed';
-      pdfDiv.style.top = '0';
-      pdfDiv.style.left = '0';
-      pdfDiv.style.width = `${A4_WIDTH}px`;
-      pdfDiv.style.height = `${A4_HEIGHT}px`;
-      pdfDiv.style.backgroundColor = 'white';
-      pdfDiv.style.zIndex = '9999'; // Make sure it's visible for rendering
-      pdfDiv.style.overflow = 'hidden';
-      pdfDiv.style.padding = '0';
-      pdfDiv.style.margin = '0';
-      document.body.appendChild(pdfDiv);
-      
-      // Create root for the PDF div
-      const pdfRoot = createRoot(pdfDiv);
-      pdfRoot.render(
-        <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-          <ResumeTemplate 
-            data={resumeDataToShow} 
-            template={selectedTemplate || "template1"} 
-          />
-        </div>
-      );
-      
-      // Wait longer for rendering to complete
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
       // Create PDF with correct dimensions
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -235,28 +207,81 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         format: 'a4',
       });
 
-      // Use html2canvas with higher quality settings
-      const canvas = await html2canvas(pdfDiv, {
-        scale: 3, // Higher scale for better quality
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: 'white',
-        logging: false,
-        windowWidth: A4_WIDTH,
-        windowHeight: A4_HEIGHT
-      });
-      
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      
-      // Calculate dimensions that preserve aspect ratio
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      // Add image to the PDF at full size
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      
-      // Clean up
-      document.body.removeChild(pdfDiv);
+      // Generate each page separately for multi-page support
+      for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+        // If not first page, add a new page to PDF
+        if (pageNum > 1) {
+          pdf.addPage();
+        }
+
+        // Create a fully visible div for rendering the current page
+        const pdfDiv = document.createElement('div');
+        pdfDiv.style.position = 'fixed';
+        pdfDiv.style.top = '0';
+        pdfDiv.style.left = '0';
+        pdfDiv.style.width = `${A4_WIDTH}px`;
+        pdfDiv.style.height = `${A4_HEIGHT}px`;
+        pdfDiv.style.backgroundColor = 'white';
+        pdfDiv.style.zIndex = '9999';
+        pdfDiv.style.overflow = 'hidden';
+        pdfDiv.style.padding = '0';
+        pdfDiv.style.margin = '0';
+        document.body.appendChild(pdfDiv);
+
+        // Create content wrapper with padding
+        const contentWrapper = document.createElement('div');
+        contentWrapper.style.padding = `${PAGE_MARGIN}px`;
+        contentWrapper.style.width = `${A4_WIDTH}px`;
+        contentWrapper.style.height = `${A4_HEIGHT}px`;
+        contentWrapper.style.boxSizing = 'border-box';
+        pdfDiv.appendChild(contentWrapper);
+        
+        // Create root for the current page
+        const pageRoot = createRoot(contentWrapper);
+        
+        // Position content to show specific page portion
+        const contentStyle = {
+          position: 'relative',
+          top: `-${(pageNum - 1) * CONTENT_HEIGHT}px`,
+          width: '100%',
+          transform: 'scale(0.99)', // Slight scale to ensure content fits
+        };
+        
+        pageRoot.render(
+          <div style={contentStyle}>
+            <ResumeTemplate 
+              data={resumeDataToShow} 
+              template={selectedTemplate || "template1"} 
+            />
+          </div>
+        );
+        
+        // Wait longer for rendering to complete
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Use html2canvas with higher quality settings
+        const canvas = await html2canvas(contentWrapper, {
+          scale: 3, // Higher scale for better quality
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: 'white',
+          logging: false,
+          windowWidth: A4_WIDTH - (PAGE_MARGIN * 2),
+          windowHeight: A4_HEIGHT - (PAGE_MARGIN * 2)
+        });
+        
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        
+        // Calculate dimensions
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        
+        // Add image to the PDF with proper positioning
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        
+        // Clean up
+        document.body.removeChild(pdfDiv);
+      }
       
       // Save the PDF
       pdf.save(`resume-${Date.now()}.pdf`);
@@ -477,3 +502,4 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
 };
 
 export default ResumePreview;
+

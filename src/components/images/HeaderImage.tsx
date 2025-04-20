@@ -25,6 +25,12 @@ const HeaderImage: FC<HeaderImageProps> = ({
     large: "h-96",
   };
 
+  // Handle image loading error by providing a fallback
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    e.currentTarget.src = "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=1200&auto=format&fit=crop";
+    e.currentTarget.onerror = null; // Prevent infinite error loop
+  };
+
   return (
     <div 
       className={`relative w-full ${heightClasses[height]} overflow-hidden rounded-xl ${className}`}
@@ -34,6 +40,7 @@ const HeaderImage: FC<HeaderImageProps> = ({
         alt={title || "Header image"} 
         className="w-full h-full object-cover"
         loading="lazy"
+        onError={handleImageError}
       />
       
       {overlay && (
@@ -56,3 +63,4 @@ const HeaderImage: FC<HeaderImageProps> = ({
 };
 
 export default HeaderImage;
+
