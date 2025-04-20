@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { createRoot } from "react-dom/client";
 import {
   Pagination,
   PaginationContent,
@@ -107,7 +108,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
     tempContent.style.width = "100%";
     tempContent.style.height = "auto";
     
-    const root = document.createRoot(tempContainer);
+    // Create root for the temporary container
+    const root = createRoot(tempContainer);
     root.render(
       <ResumeTemplate 
         data={resumeDataToShow} 
@@ -148,7 +150,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       contentClone.style.top = `-${i * CONTENT_HEIGHT}px`;
       contentClone.style.width = "100%";
       
-      const pageRoot = document.createRoot(contentClone);
+      // Create root for the content clone
+      const pageRoot = createRoot(contentClone);
       pageRoot.render(
         <ResumeTemplate 
           data={resumeDataToShow} 
@@ -208,8 +211,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       pdfDiv.style.visibility = 'hidden';
       document.body.appendChild(pdfDiv);
       
-      // Render the resume template to this div
-      const pdfRoot = document.createRoot(pdfDiv);
+      // Create root for the PDF div
+      const pdfRoot = createRoot(pdfDiv);
       pdfRoot.render(
         <ResumeTemplate 
           data={resumeDataToShow} 
