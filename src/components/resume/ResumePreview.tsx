@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, CSSProperties } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -53,10 +52,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   const CONTENT_WIDTH = A4_WIDTH - PAGE_MARGIN * 2;
   const CONTENT_HEIGHT = A4_HEIGHT - PAGE_MARGIN * 2;
 
-  // Get customized resume data from job if available
   const customizedResume = jobData?.customized_resume || null;
 
-  // Build the resume data to show, preferring customized data if available
   const resumeDataToShow = formattedResumeData ? {
     ...formattedResumeData,
     skills: customizedResume?.modified_skills || formattedResumeData.skills,
@@ -96,7 +93,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
 
     resumePagesRef.current.innerHTML = "";
 
-    // Create a temporary container to measure content height
     const tempContainer = document.createElement("div");
     tempContainer.style.width = `${CONTENT_WIDTH}px`;
     tempContainer.style.position = "absolute";
@@ -108,7 +104,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
     tempContent.style.width = "100%";
     tempContent.style.height = "auto";
     
-    // Create root for the temporary container
     const root = createRoot(tempContainer);
     root.render(
       <ResumeTemplate 
@@ -119,12 +114,10 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
     
     document.body.appendChild(tempContainer);
 
-    // Get the height of the content
     const contentHeight = tempContainer.offsetHeight;
     const pages = Math.max(1, Math.ceil(contentHeight / CONTENT_HEIGHT));
     setTotalPages(pages);
 
-    // Create pages
     for (let i = 0; i < pages; i++) {
       const pageDiv = document.createElement("div");
       pageDiv.className = "resume-page";
@@ -150,7 +143,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       contentClone.style.top = `-${i * CONTENT_HEIGHT}px`;
       contentClone.style.width = "100%";
       
-      // Create root for the content clone
       const pageRoot = createRoot(contentClone);
       pageRoot.render(
         <ResumeTemplate 
@@ -200,21 +192,17 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         description: "Please wait while we prepare your resume...",
       });
 
-      // Create PDF with correct dimensions
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'pt',
         format: 'a4',
       });
 
-      // Generate each page separately for multi-page support
       for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
-        // If not first page, add a new page to PDF
         if (pageNum > 1) {
           pdf.addPage();
         }
 
-        // Create a fully visible div for rendering the current page
         const pdfDiv = document.createElement('div');
         pdfDiv.style.position = 'fixed';
         pdfDiv.style.top = '0';
@@ -228,7 +216,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         pdfDiv.style.margin = '0';
         document.body.appendChild(pdfDiv);
 
-        // Create content wrapper with padding
         const contentWrapper = document.createElement('div');
         contentWrapper.style.padding = `${PAGE_MARGIN}px`;
         contentWrapper.style.width = `${A4_WIDTH}px`;
@@ -236,15 +223,13 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         contentWrapper.style.boxSizing = 'border-box';
         pdfDiv.appendChild(contentWrapper);
         
-        // Create root for the current page
         const pageRoot = createRoot(contentWrapper);
         
-        // Position content to show specific page portion
-        const contentStyle = {
+        const contentStyle: CSSProperties = {
           position: 'relative',
           top: `-${(pageNum - 1) * CONTENT_HEIGHT}px`,
           width: '100%',
-          transform: 'scale(0.99)', // Slight scale to ensure content fits
+          transform: 'scale(0.99)',
         };
         
         pageRoot.render(
@@ -256,12 +241,10 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
           </div>
         );
         
-        // Wait longer for rendering to complete
         await new Promise(resolve => setTimeout(resolve, 1500));
         
-        // Use html2canvas with higher quality settings
         const canvas = await html2canvas(contentWrapper, {
-          scale: 3, // Higher scale for better quality
+          scale: 3,
           useCORS: true,
           allowTaint: true,
           backgroundColor: 'white',
@@ -272,18 +255,14 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         
         const imgData = canvas.toDataURL('image/png', 1.0);
         
-        // Calculate dimensions
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
         
-        // Add image to the PDF with proper positioning
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
         
-        // Clean up
         document.body.removeChild(pdfDiv);
       }
       
-      // Save the PDF
       pdf.save(`resume-${Date.now()}.pdf`);
 
       toast({
@@ -502,4 +481,3 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
 };
 
 export default ResumePreview;
-
