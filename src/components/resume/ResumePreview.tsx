@@ -114,49 +114,51 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
     
     document.body.appendChild(tempContainer);
 
-    const contentHeight = tempContainer.offsetHeight;
-    const pages = Math.max(1, Math.ceil(contentHeight / CONTENT_HEIGHT));
-    setTotalPages(pages);
+    setTimeout(() => {
+      const contentHeight = tempContainer.offsetHeight;
+      const pages = Math.max(1, Math.ceil(contentHeight / CONTENT_HEIGHT));
+      setTotalPages(pages);
 
-    for (let i = 0; i < pages; i++) {
-      const pageDiv = document.createElement("div");
-      pageDiv.className = "resume-page";
-      pageDiv.id = `resume-page-${i + 1}`;
-      pageDiv.style.width = `${A4_WIDTH}px`;
-      pageDiv.style.height = `${A4_HEIGHT}px`;
-      pageDiv.style.backgroundColor = "white";
-      pageDiv.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
-      pageDiv.style.margin = "0 auto 20px auto";
-      pageDiv.style.position = "relative";
-      pageDiv.style.overflow = "hidden";
-      pageDiv.style.display = i + 1 === currentPage ? "block" : "none";
+      for (let i = 0; i < pages; i++) {
+        const pageDiv = document.createElement("div");
+        pageDiv.className = "resume-page";
+        pageDiv.id = `resume-page-${i + 1}`;
+        pageDiv.style.width = `${A4_WIDTH}px`;
+        pageDiv.style.height = `${A4_HEIGHT}px`;
+        pageDiv.style.backgroundColor = "white";
+        pageDiv.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+        pageDiv.style.margin = "0 auto 20px auto";
+        pageDiv.style.position = "relative";
+        pageDiv.style.overflow = "hidden";
+        pageDiv.style.display = i + 1 === currentPage ? "block" : "none";
 
-      const contentDiv = document.createElement("div");
-      contentDiv.className = "resume-content";
-      contentDiv.style.padding = `${PAGE_MARGIN}px`;
-      contentDiv.style.height = `${CONTENT_HEIGHT}px`;
-      contentDiv.style.overflow = "hidden";
-      contentDiv.style.position = "relative";
+        const contentDiv = document.createElement("div");
+        contentDiv.className = "resume-content";
+        contentDiv.style.padding = `${PAGE_MARGIN}px`;
+        contentDiv.style.height = `${CONTENT_HEIGHT}px`;
+        contentDiv.style.overflow = "hidden";
+        contentDiv.style.position = "relative";
 
-      const contentClone = document.createElement("div");
-      contentClone.style.position = "absolute";
-      contentClone.style.top = `-${i * CONTENT_HEIGHT}px`;
-      contentClone.style.width = "100%";
-      
-      const pageRoot = createRoot(contentClone);
-      pageRoot.render(
-        <ResumeTemplate 
-          data={resumeDataToShow} 
-          template={selectedTemplate || "template1"} 
-        />
-      );
+        const contentClone = document.createElement("div");
+        contentClone.style.position = "absolute";
+        contentClone.style.top = `-${i * CONTENT_HEIGHT}px`;
+        contentClone.style.width = "100%";
+        
+        const pageRoot = createRoot(contentClone);
+        pageRoot.render(
+          <ResumeTemplate 
+            data={resumeDataToShow} 
+            template={selectedTemplate || "template1"} 
+          />
+        );
 
-      contentDiv.appendChild(contentClone);
-      pageDiv.appendChild(contentDiv);
-      resumePagesRef.current.appendChild(pageDiv);
-    }
+        contentDiv.appendChild(contentClone);
+        pageDiv.appendChild(contentDiv);
+        resumePagesRef.current.appendChild(pageDiv);
+      }
 
-    document.body.removeChild(tempContainer);
+      document.body.removeChild(tempContainer);
+    }, 200);
   };
 
   const updateVisiblePage = () => {
@@ -198,41 +200,78 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         format: 'a4',
       });
 
-      for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
-        if (pageNum > 1) {
-          pdf.addPage();
-        }
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
 
-        const pdfDiv = document.createElement('div');
-        pdfDiv.style.position = 'fixed';
-        pdfDiv.style.top = '0';
-        pdfDiv.style.left = '0';
-        pdfDiv.style.width = `${A4_WIDTH}px`;
-        pdfDiv.style.height = `${A4_HEIGHT}px`;
-        pdfDiv.style.backgroundColor = 'white';
-        pdfDiv.style.zIndex = '9999';
-        pdfDiv.style.overflow = 'hidden';
-        pdfDiv.style.padding = '0';
-        pdfDiv.style.margin = '0';
-        document.body.appendChild(pdfDiv);
+      const renderedPages = [];
 
+      const offscreenContainer = document.createElement('div');
+      offscreenContainer.style.position = 'absolute';
+      offscreenContainer.style.top = '0';
+      offscreenContainer.style.left = '-9999px';
+      offscreenContainer.style.width = `${A4_WIDTH}px`;
+      offscreenContainer.style.visibility = 'visible';
+      document.body.appendChild(offscreenContainer);
+      
+      const fullResumeDiv = document.createElement('div');
+      fullResumeDiv.style.width = `${CONTENT_WIDTH}px`;
+      fullResumeDiv.style.padding = `0`;
+      fullResumeDiv.style.margin = '0';
+      fullResumeDiv.style.boxSizing = 'border-box';
+      fullResumeDiv.style.backgroundColor = 'white';
+      offscreenContainer.appendChild(fullResumeDiv);
+      
+      const fullResumeRoot = createRoot(fullResumeDiv);
+      fullResumeRoot.render(
+        <ResumeTemplate
+          data={resumeDataToShow} 
+          template={selectedTemplate || "template1"}
+        />
+      );
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const totalHeight = fullResumeDiv.scrollHeight;
+      const actualPages = Math.max(1, Math.ceil(totalHeight / CONTENT_HEIGHT));
+      
+      offscreenContainer.removeChild(fullResumeDiv);
+      
+      for (let pageNum = 1; pageNum <= actualPages; pageNum++) {
+        const pageDiv = document.createElement('div');
+        pageDiv.style.width = `${A4_WIDTH}px`;
+        pageDiv.style.height = `${A4_HEIGHT}px`;
+        pageDiv.style.backgroundColor = 'white';
+        pageDiv.style.overflow = 'hidden';
+        pageDiv.style.position = 'relative';
+        pageDiv.style.padding = '0';
+        pageDiv.style.margin = '0';
+        
         const contentWrapper = document.createElement('div');
         contentWrapper.style.padding = `${PAGE_MARGIN}px`;
         contentWrapper.style.width = `${A4_WIDTH}px`;
         contentWrapper.style.height = `${A4_HEIGHT}px`;
         contentWrapper.style.boxSizing = 'border-box';
-        pdfDiv.appendChild(contentWrapper);
+        contentWrapper.style.overflow = 'hidden';
+        pageDiv.appendChild(contentWrapper);
         
-        const pageRoot = createRoot(contentWrapper);
+        const contentContainer = document.createElement('div');
+        contentContainer.style.position = 'relative';
+        contentContainer.style.width = `${CONTENT_WIDTH}px`;
+        contentContainer.style.height = `${CONTENT_HEIGHT}px`;
+        contentContainer.style.overflow = 'hidden';
+        contentWrapper.appendChild(contentContainer);
+        
+        const contentRoot = createRoot(contentContainer);
         
         const contentStyle: CSSProperties = {
-          position: 'relative',
+          position: 'absolute',
           top: `-${(pageNum - 1) * CONTENT_HEIGHT}px`,
+          left: '0',
           width: '100%',
-          transform: 'scale(0.99)',
+          transform: 'scale(0.98)',
         };
         
-        pageRoot.render(
+        contentRoot.render(
           <div style={contentStyle}>
             <ResumeTemplate 
               data={resumeDataToShow} 
@@ -241,27 +280,35 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
           </div>
         );
         
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        offscreenContainer.appendChild(pageDiv);
+        renderedPages.push(pageDiv);
         
-        const canvas = await html2canvas(contentWrapper, {
-          scale: 3,
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
+      for (let i = 0; i < renderedPages.length; i++) {
+        if (i > 0) {
+          pdf.addPage();
+        }
+        
+        const pageCanvas = await html2canvas(renderedPages[i], {
+          scale: 4,
           useCORS: true,
           allowTaint: true,
           backgroundColor: 'white',
           logging: false,
-          windowWidth: A4_WIDTH - (PAGE_MARGIN * 2),
-          windowHeight: A4_HEIGHT - (PAGE_MARGIN * 2)
+          windowWidth: A4_WIDTH,
+          windowHeight: A4_HEIGHT,
+          imageTimeout: 10000
         });
         
-        const imgData = canvas.toDataURL('image/png', 1.0);
-        
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        
+        const imgData = pageCanvas.toDataURL('image/png', 1.0);
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
         
-        document.body.removeChild(pdfDiv);
+        offscreenContainer.removeChild(renderedPages[i]);
       }
+      
+      document.body.removeChild(offscreenContainer);
       
       pdf.save(`resume-${Date.now()}.pdf`);
 
