@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -21,7 +20,14 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/layout/Layout";
 import ResumePreview from "@/components/resume/ResumePreview";
-import { Briefcase, MapPin, Clock, BarChart3, Search, Loader2 } from "lucide-react";
+import {
+  Briefcase,
+  MapPin,
+  Clock,
+  BarChart3,
+  Search,
+  Loader2,
+} from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useResume } from "@/context/ResumeContext";
 import { analyzeResume } from "@/lib/api";
@@ -61,30 +67,36 @@ const Jobs = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const { 
-    jobOpportunities, 
+  const {
+    jobOpportunities,
     personalDetails,
     setJobOpportunities,
     selectedTemplate,
-    checkResumeStatus
+    checkResumeStatus,
   } = useResume();
-  
+
   const [jobListings, setJobListings] = useState<Job[]>([]);
-  
+
   useEffect(() => {
     if (!checkResumeStatus()) {
       return;
     }
-    
+
     if (jobOpportunities && jobOpportunities.length > 0) {
-      console.log("Using job opportunities from resume context:", jobOpportunities);
+      console.log(
+        "Using job opportunities from resume context:",
+        jobOpportunities
+      );
       setJobListings(jobOpportunities);
     } else {
-      loadJobs();
+      // loadJobs();
     }
   }, [jobOpportunities]);
 
-  const loadJobs = async (query: string = "software developer", loc: string = "") => {
+  const loadJobs = async (
+    query: string = "software developer",
+    loc: string = ""
+  ) => {
     setIsLoading(true);
     try {
       const response = await analyzeResume(null, query);
@@ -116,7 +128,7 @@ const Jobs = () => {
       });
       return;
     }
-    
+
     setSelectedJob(job);
     setShowPreview(true);
   };
@@ -124,17 +136,17 @@ const Jobs = () => {
   const filteredJobs = jobListings.filter((job) => {
     const jobTitle = job.job_title || "";
     const jobLocation = job.location || job.place || "";
-    
-    const matchesSearch = searchTerm 
+
+    const matchesSearch = searchTerm
       ? jobTitle.toLowerCase().includes(searchTerm.toLowerCase())
       : true;
-    
-    const matchesLocation = location 
-      ? jobLocation.toLowerCase().includes(location.toLowerCase()) 
+
+    const matchesLocation = location
+      ? jobLocation.toLowerCase().includes(location.toLowerCase())
       : true;
-    
+
     const matchesType = jobType === "all" || job.type === jobType;
-    
+
     return matchesSearch && matchesLocation && matchesType;
   });
 
@@ -195,13 +207,15 @@ const Jobs = () => {
               </Select>
             </div>
             <div className="flex items-end">
-              <Button 
-                className="w-full bg-purple-500 hover:bg-purple-600" 
+              <Button
+                className="w-full bg-purple-500 hover:bg-purple-600"
                 onClick={handleSearch}
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Searching</>
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Searching
+                  </>
                 ) : (
                   <>Search Jobs</>
                 )}
@@ -230,7 +244,10 @@ const Jobs = () => {
             </div>
           ) : (
             filteredJobs.map((job) => (
-              <Card key={job.job_id} className="overflow-hidden w-full md:w-[700px]">
+              <Card
+                key={job.job_id}
+                className="overflow-hidden w-full md:w-[700px]"
+              >
                 <CardHeader className="pb-3 p-4 md:p-6">
                   <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-2">
                     <div>

@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef, CSSProperties } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { useResume } from "@/context/ResumeContext";
 import { useToast } from "@/hooks/use-toast";
@@ -14,14 +14,6 @@ import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { createRoot } from "react-dom/client";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import ResumeTemplate from "./ResumeTemplate";
 
 interface ResumePreviewProps {
@@ -35,158 +27,87 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   onOpenChange,
   jobData,
 }) => {
-  const { selectedTemplate, resumeData, personalDetails, formattedResumeData } = useResume();
+  const { selectedTemplate, resumeData, personalDetails, formattedResumeData } =
+    useResume();
   const { toast } = useToast();
-  const resumePagesRef = useRef<HTMLDivElement>(null);
-  const resumeContentRef = useRef<HTMLDivElement>(null);
-  const pdfContainerRef = useRef<HTMLDivElement>(null);
+  const resumePageRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-  const A4_WIDTH = 800;
-  const A4_HEIGHT = 1120;
-  const PAGE_MARGIN = 50;
-
+  const A4_WIDTH = 595; // A4 width in points (72 DPI)
+  const A4_HEIGHT = 842; // A4 height in points (72 DPI)
+  const PAGE_MARGIN = 20;
   const CONTENT_WIDTH = A4_WIDTH - PAGE_MARGIN * 2;
   const CONTENT_HEIGHT = A4_HEIGHT - PAGE_MARGIN * 2;
 
   const customizedResume = jobData?.customized_resume || null;
 
-  const resumeDataToShow = formattedResumeData ? {
-    ...formattedResumeData,
-    skills: customizedResume?.modified_skills || formattedResumeData.skills,
-    experience: customizedResume?.modified_work_experience
-      ? customizedResume.modified_work_experience.map((exp: any) => ({
-          title: exp["Job Title"],
-          company: exp.Company,
-          location: "",
-          period: "",
-          highlights: exp.Responsibilities,
-        }))
-      : formattedResumeData.experience
-  } : null;
-
-  useEffect(() => {
-    if (open) {
-      setCurrentPage(1);
-      if (!pdfContainerRef.current) {
-        const div = document.createElement("div");
-        div.style.position = "absolute";
-        div.style.left = "-9999px";
-        div.style.visibility = "hidden";
-        document.body.appendChild(div);
-        pdfContainerRef.current = div;
+  const resumeDataToShow = formattedResumeData
+    ? {
+        ...formattedResumeData,
+        skills: customizedResume?.modified_skills || formattedResumeData.skills,
+        experience: customizedResume?.modified_work_experience
+          ? customizedResume.modified_work_experience.map((exp: any) => ({
+              title: exp["Job Title"],
+              company: exp.Company,
+              location: "",
+              period: "",
+              highlights: exp.Responsibilities,
+            }))
+          : formattedResumeData.experience,
       }
-    }
-  }, [open]);
+    : null;
 
   useEffect(() => {
-    if (open && resumePagesRef.current && resumeDataToShow) {
-      createResumePages();
+    if (open && resumePageRef.current && resumeDataToShow) {
+      createResumePage();
     }
-  }, [resumeDataToShow, open]);
+  }, [resumeDataToShow, open, selectedTemplate]);
 
-  const createResumePages = () => {
-    if (!resumePagesRef.current || !resumeDataToShow) return;
+  const createResumePage = async () => {
+    if (!resumePageRef.current || !resumeDataToShow) return;
 
-    resumePagesRef.current.innerHTML = "";
+    resumePageRef.current.innerHTML = "";
 
-    const tempContainer = document.createElement("div");
-    tempContainer.style.width = `${CONTENT_WIDTH}px`;
-    tempContainer.style.position = "absolute";
-    tempContainer.style.left = "-9999px";
-    tempContainer.style.visibility = "hidden";
-    tempContainer.style.overflow = "visible";
-    
-    const tempContent = document.createElement("div");
-    tempContent.style.width = "100%";
-    tempContent.style.height = "auto";
-    
-    const root = createRoot(tempContainer);
-    root.render(
-      <ResumeTemplate 
-        data={resumeDataToShow} 
-        template={selectedTemplate || "template1"} 
+    const pageDiv = document.createElement("div");
+    pageDiv.className = "resume-page";
+    pageDiv.style.width = `${A4_WIDTH}px`;
+    pageDiv.style.height = `${A4_HEIGHT}px`;
+    pageDiv.style.backgroundColor = "white";
+    pageDiv.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+    pageDiv.style.margin = "0 auto";
+    pageDiv.style.position = "relative";
+
+    const contentDiv = document.createElement("div");
+    contentDiv.className = "resume-content";
+    contentDiv.style.width = `${CONTENT_WIDTH}px`;
+    contentDiv.style.height = `${CONTENT_HEIGHT}px`;
+    contentDiv.style.padding = `${PAGE_MARGIN}px`;
+    contentDiv.style.boxSizing = "border-box";
+    contentDiv.style.overflow = "hidden";
+    contentDiv.style.fontFamily = "'Calibri', sans-serif";
+
+    const contentClone = document.createElement("div");
+    contentClone.style.width = `${CONTENT_WIDTH}px`;
+
+    const pageRoot = createRoot(contentClone);
+    pageRoot.render(
+      <ResumeTemplate
+        data={resumeDataToShow}
+        template={selectedTemplate || "template1"}
       />
     );
-    
-    document.body.appendChild(tempContainer);
 
-    setTimeout(() => {
-      const contentHeight = tempContainer.offsetHeight;
-      const pages = Math.max(1, Math.ceil(contentHeight / CONTENT_HEIGHT));
-      setTotalPages(pages);
+    contentDiv.appendChild(contentClone);
+    pageDiv.appendChild(contentDiv);
+    resumePageRef.current.appendChild(pageDiv);
 
-      for (let i = 0; i < pages; i++) {
-        const pageDiv = document.createElement("div");
-        pageDiv.className = "resume-page";
-        pageDiv.id = `resume-page-${i + 1}`;
-        pageDiv.style.width = `${A4_WIDTH}px`;
-        pageDiv.style.height = `${A4_HEIGHT}px`;
-        pageDiv.style.backgroundColor = "white";
-        pageDiv.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
-        pageDiv.style.margin = "0 auto 20px auto";
-        pageDiv.style.position = "relative";
-        pageDiv.style.overflow = "hidden";
-        pageDiv.style.display = i + 1 === currentPage ? "block" : "none";
-
-        const contentDiv = document.createElement("div");
-        contentDiv.className = "resume-content";
-        contentDiv.style.padding = `${PAGE_MARGIN}px`;
-        contentDiv.style.height = `${CONTENT_HEIGHT}px`;
-        contentDiv.style.overflow = "hidden";
-        contentDiv.style.position = "relative";
-
-        const contentClone = document.createElement("div");
-        contentClone.style.position = "absolute";
-        contentClone.style.top = `-${i * CONTENT_HEIGHT}px`;
-        contentClone.style.width = "100%";
-        
-        const pageRoot = createRoot(contentClone);
-        pageRoot.render(
-          <ResumeTemplate 
-            data={resumeDataToShow} 
-            template={selectedTemplate || "template1"} 
-          />
-        );
-
-        contentDiv.appendChild(contentClone);
-        pageDiv.appendChild(contentDiv);
-        resumePagesRef.current.appendChild(pageDiv);
-      }
-
-      document.body.removeChild(tempContainer);
-    }, 200);
-  };
-
-  const updateVisiblePage = () => {
-    if (!resumePagesRef.current) return;
-
-    const pages = resumePagesRef.current.querySelectorAll(".resume-page");
-    pages.forEach((page, index) => {
-      if (index + 1 === currentPage) {
-        (page as HTMLElement).style.display = "block";
-      } else {
-        (page as HTMLElement).style.display = "none";
-      }
-    });
-  };
-
-  useEffect(() => {
-    updateVisiblePage();
-  }, [currentPage]);
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
+    await new Promise((resolve) => setTimeout(resolve, 2000));
   };
 
   const handleDownload = async () => {
-    if (!resumeDataToShow) return;
-    
+    if (!resumeDataToShow || !resumePageRef.current) return;
+
     try {
       setIsGeneratingPdf(true);
       toast({
@@ -195,122 +116,94 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       });
 
       const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'pt',
-        format: 'a4',
+        orientation: "portrait",
+        unit: "pt",
+        format: "a4",
       });
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const pageDiv = resumePageRef.current.querySelector(".resume-page");
+      if (!pageDiv) throw new Error("Resume page not found");
 
-      const renderedPages = [];
-
-      const offscreenContainer = document.createElement('div');
-      offscreenContainer.style.position = 'absolute';
-      offscreenContainer.style.top = '0';
-      offscreenContainer.style.left = '-9999px';
+      const offscreenContainer = document.createElement("div");
+      offscreenContainer.style.position = "absolute";
+      offscreenContainer.style.left = "-9999px";
       offscreenContainer.style.width = `${A4_WIDTH}px`;
-      offscreenContainer.style.visibility = 'visible';
+      offscreenContainer.style.height = `${A4_HEIGHT}px`;
       document.body.appendChild(offscreenContainer);
-      
-      const fullResumeDiv = document.createElement('div');
-      fullResumeDiv.style.width = `${CONTENT_WIDTH}px`;
-      fullResumeDiv.style.padding = `0`;
-      fullResumeDiv.style.margin = '0';
-      fullResumeDiv.style.boxSizing = 'border-box';
-      fullResumeDiv.style.backgroundColor = 'white';
-      offscreenContainer.appendChild(fullResumeDiv);
-      
-      const fullResumeRoot = createRoot(fullResumeDiv);
-      fullResumeRoot.render(
-        <ResumeTemplate
-          data={resumeDataToShow} 
-          template={selectedTemplate || "template1"}
-        />
+      const clonedPageDiv = pageDiv.cloneNode(true) as HTMLElement;
+      offscreenContainer.appendChild(clonedPageDiv);
+
+      // Modify cloned DOM to replace borderBottom with div and adjust spacing
+      const h3Elements = clonedPageDiv.querySelectorAll("h3");
+      h3Elements.forEach((h3) => {
+        // Remove borderBottom and related styles
+        h3.style.borderBottom = "none";
+        h3.style.paddingBottom = "0";
+        h3.style.marginBottom = "6px"; // Increased margin to position line
+        h3.style.position = "static"; // Remove relative positioning
+        h3.style.zIndex = "auto";
+
+        // Insert a div for the line after h3
+        const lineDiv = document.createElement("div");
+        lineDiv.style.width = "100%";
+        lineDiv.style.height = "1px";
+        lineDiv.style.backgroundColor = "#000000";
+        lineDiv.style.marginBottom = "6px"; // Increased margin below line
+        h3.parentNode?.insertBefore(lineDiv, h3.nextSibling);
+      });
+
+      // Reduce other margins to compensate for increased spacing
+      const sections = clonedPageDiv.querySelectorAll("section");
+      sections.forEach((section) => {
+        section.style.marginBottom = "2px"; // Reduced from 5px
+      });
+
+      const experienceItems = clonedPageDiv.querySelectorAll(
+        "div[style*='margin-bottom: 4px']"
       );
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const totalHeight = fullResumeDiv.scrollHeight;
-      const actualPages = Math.max(1, Math.ceil(totalHeight / CONTENT_HEIGHT));
-      
-      offscreenContainer.removeChild(fullResumeDiv);
-      
-      for (let pageNum = 1; pageNum <= actualPages; pageNum++) {
-        const pageDiv = document.createElement('div');
-        pageDiv.style.width = `${A4_WIDTH}px`;
-        pageDiv.style.height = `${A4_HEIGHT}px`;
-        pageDiv.style.backgroundColor = 'white';
-        pageDiv.style.overflow = 'hidden';
-        pageDiv.style.position = 'relative';
-        pageDiv.style.padding = '0';
-        pageDiv.style.margin = '0';
-        
-        const contentWrapper = document.createElement('div');
-        contentWrapper.style.padding = `${PAGE_MARGIN}px`;
-        contentWrapper.style.width = `${A4_WIDTH}px`;
-        contentWrapper.style.height = `${A4_HEIGHT}px`;
-        contentWrapper.style.boxSizing = 'border-box';
-        contentWrapper.style.overflow = 'hidden';
-        pageDiv.appendChild(contentWrapper);
-        
-        const contentContainer = document.createElement('div');
-        contentContainer.style.position = 'relative';
-        contentContainer.style.width = `${CONTENT_WIDTH}px`;
-        contentContainer.style.height = `${CONTENT_HEIGHT}px`;
-        contentContainer.style.overflow = 'hidden';
-        contentWrapper.appendChild(contentContainer);
-        
-        const contentRoot = createRoot(contentContainer);
-        
-        const contentStyle: CSSProperties = {
-          position: 'absolute',
-          top: `-${(pageNum - 1) * CONTENT_HEIGHT}px`,
-          left: '0',
-          width: '100%',
-          transform: 'scale(0.98)',
-        };
-        
-        contentRoot.render(
-          <div style={contentStyle}>
-            <ResumeTemplate 
-              data={resumeDataToShow} 
-              template={selectedTemplate || "template1"} 
-            />
-          </div>
-        );
-        
-        offscreenContainer.appendChild(pageDiv);
-        renderedPages.push(pageDiv);
-        
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
-      
-      for (let i = 0; i < renderedPages.length; i++) {
-        if (i > 0) {
-          pdf.addPage();
-        }
-        
-        const pageCanvas = await html2canvas(renderedPages[i], {
-          scale: 4,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: 'white',
-          logging: false,
-          windowWidth: A4_WIDTH,
-          windowHeight: A4_HEIGHT,
-          imageTimeout: 10000
-        });
-        
-        const imgData = pageCanvas.toDataURL('image/png', 1.0);
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        
-        offscreenContainer.removeChild(renderedPages[i]);
-      }
-      
-      document.body.removeChild(offscreenContainer);
-      
+      experienceItems.forEach((item) => {
+        item.style.marginBottom = "2px"; // Reduced from 4px
+      });
+
+      const subElements = clonedPageDiv.querySelectorAll(
+        "div[style*='margin-bottom: 2px']"
+      );
+      subElements.forEach((item) => {
+        item.style.marginBottom = "1px"; // Reduced from 2px
+      });
+
+      const bulletPoints = clonedPageDiv.querySelectorAll(
+        "li[style*='margin-bottom: 1px']"
+      );
+      bulletPoints.forEach((li) => {
+        li.style.marginBottom = "0.5px"; // Reduced from 1px
+      });
+
+      // Force quadruple repaints
+      offscreenContainer.offsetHeight;
+      offscreenContainer.offsetHeight;
+      offscreenContainer.offsetHeight;
+      offscreenContainer.offsetHeight;
+
+      const canvas = await html2canvas(clonedPageDiv, {
+        scale: 4,
+        useCORS: true,
+        backgroundColor: "white",
+        width: A4_WIDTH,
+        height: A4_HEIGHT,
+        windowWidth: A4_WIDTH,
+        windowHeight: A4_HEIGHT,
+        scrollX: 0,
+        scrollY: 0,
+        logging: false,
+        willReadFrequently: true,
+      });
+
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      pdf.addImage(imgData, "PNG", 0, 0, A4_WIDTH, A4_HEIGHT);
       pdf.save(`resume-${Date.now()}.pdf`);
+
+      document.body.removeChild(offscreenContainer);
 
       toast({
         title: "Success",
@@ -331,16 +224,13 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   const handleApply = async () => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
       if (jobData.job_url) {
         window.open(jobData.job_url, "_blank");
       }
-
       toast({
         title: "Application Submitted",
         description: "Your application has been submitted successfully",
       });
-
       onOpenChange(false);
     } catch (error) {
       toast({
@@ -351,14 +241,12 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
     }
   };
 
-  if (!resumeDataToShow) {
-    return null;
-  }
+  if (!resumeDataToShow) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[1400px] max-h-[90vh] overflow-auto p-0">
-        <DialogHeader className="p-4 sm:p-6">
+        <DialogHeader className="p-6">
           <DialogTitle className="text-xl font-bold">
             Resume Preview
           </DialogTitle>
@@ -375,105 +263,17 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
           </Button>
         </DialogHeader>
 
-        <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 p-4 sm:p-6">
-          <div className="w-full lg:w-2/3 overflow-hidden flex flex-col items-center">
-            {totalPages > 1 && (
-              <div className="mb-4 w-full flex justify-center">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        className={
-                          currentPage === 1
-                            ? "pointer-events-none opacity-50"
-                            : ""
-                        }
-                      />
-                    </PaginationItem>
+        <div className="flex flex-col lg:flex-row gap-6 p-6">
+          <div className="w-full lg:w-2/3 flex flex-col items-center">
+            <div ref={resumePageRef} className="w-full max-w-[595px]"></div>
 
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                      (page) => (
-                        <PaginationItem key={page}>
-                          <PaginationLink
-                            onClick={() => handlePageChange(page)}
-                            isActive={page === currentPage}
-                          >
-                            {page}
-                          </PaginationLink>
-                        </PaginationItem>
-                      )
-                    )}
-
-                    <PaginationItem>
-                      <PaginationNext
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        className={
-                          currentPage === totalPages
-                            ? "pointer-events-none opacity-50"
-                            : ""
-                        }
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div>
-            )}
-
-            <div ref={resumePagesRef} className="w-full scale-90 md:scale-100 origin-center"></div>
-
-            {totalPages > 1 && (
-              <div className="mt-4 w-full flex justify-center">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        className={
-                          currentPage === 1
-                            ? "pointer-events-none opacity-50"
-                            : ""
-                        }
-                      />
-                    </PaginationItem>
-
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                      (page) => (
-                        <PaginationItem key={page}>
-                          <PaginationLink
-                            onClick={() => handlePageChange(page)}
-                            isActive={page === currentPage}
-                          >
-                            {page}
-                          </PaginationLink>
-                        </PaginationItem>
-                      )
-                    )}
-
-                    <PaginationItem>
-                      <PaginationNext
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        className={
-                          currentPage === totalPages
-                            ? "pointer-events-none opacity-50"
-                            : ""
-                        }
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div>
-            )}
-
-            <div className="mt-4">
-              <Button
-                onClick={handleDownload}
-                className="bg-purple-500 hover:bg-purple-600"
-                disabled={isGeneratingPdf}
-              >
-                {isGeneratingPdf ? "Preparing PDF..." : "Download Resume"}
-              </Button>
-            </div>
+            <Button
+              onClick={handleDownload}
+              className="mt-4 bg-purple-500 hover:bg-purple-600"
+              disabled={isGeneratingPdf}
+            >
+              {isGeneratingPdf ? "Preparing PDF..." : "Download Resume"}
+            </Button>
           </div>
 
           <div className="w-full lg:w-1/3 border rounded-md p-4 h-fit">
@@ -482,14 +282,12 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
             <p className="text-muted-foreground mb-4">
               {jobData.location || jobData.place}
             </p>
-
             <div className="mb-4">
               <h3 className="font-semibold mb-2">Job Description</h3>
               <p className="text-sm whitespace-pre-line">
                 {jobData.job_description}
               </p>
             </div>
-
             {jobData.requirements && (
               <div className="mb-4">
                 <h3 className="font-semibold mb-2">Requirements</h3>
@@ -500,7 +298,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                 </ul>
               </div>
             )}
-
             {jobData.benefits && (
               <div className="mb-4">
                 <h3 className="font-semibold mb-2">Benefits</h3>
@@ -511,15 +308,12 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
                 </ul>
               </div>
             )}
-
-            <div className="mt-6">
-              <Button
-                onClick={handleApply}
-                className="w-full bg-purple-500 hover:bg-purple-600"
-              >
-                Apply Now
-              </Button>
-            </div>
+            <Button
+              onClick={handleApply}
+              className="w-full bg-purple-500 hover:bg-purple-600"
+            >
+              Apply Now
+            </Button>
           </div>
         </div>
       </DialogContent>

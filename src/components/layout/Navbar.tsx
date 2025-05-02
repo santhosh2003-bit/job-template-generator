@@ -129,7 +129,7 @@ const Navbar = () => {
       // API INTEGRATION COMMENT:
       // 1. Implement actual API call here to authenticate user
       // Example API call:
-      const response = await fetch("https://ezeapply.onrender.com/auth/login", {
+      const response = await fetch("http://127.0.0.1:5000/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -177,16 +177,13 @@ const Navbar = () => {
       // API INTEGRATION COMMENT:
       // 1. Implement actual API call here to register user
       // Example API call:
-      const response = await fetch(
-        "https://ezeapply.onrender.com/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(signUpData),
-        }
-      );
+      const response = await fetch("http://127.0.0.1:5000/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(signUpData),
+      });
       const data = await response.json();
       console.log(data);
       if (!response.ok) throw new Error(data.warning || "Sign up failed");
