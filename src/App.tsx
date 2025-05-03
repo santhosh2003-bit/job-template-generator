@@ -17,6 +17,14 @@ import NotFound from "./pages/NotFound";
 import CoverLetterPage from "./pages/CoverLetterPage";
 import Resources from "./pages/Resources";
 import Company from "./pages/Company";
+import Blog from "./pages/Blog";
+import ResumeGuide from "./pages/ResumeGuide";
+import JobSearchGuide from "./pages/JobSearchGuide";
+import HelpCenter from "./pages/HelpCenter";
+import AboutUs from "./pages/AboutUs";
+import Careers from "./pages/Careers";
+import Contact from "./pages/Contact";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +51,19 @@ const AppRoutes = () => {
       <Route path="/premium" element={<Premium />} />
       <Route path="/resources" element={<Resources />} />
       <Route path="/company" element={<Company />} />
+      
+      {/* New resource pages */}
+      <Route path="/blog" element={<Blog />} />
+      <Route path="/resume-tips" element={<ResumeGuide />} />
+      <Route path="/job-search-guide" element={<JobSearchGuide />} />
+      <Route path="/help-center" element={<HelpCenter />} />
+      
+      {/* Company pages */}
+      <Route path="/about-us" element={<AboutUs />} />
+      <Route path="/careers" element={<Careers />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      
       <Route path="/dummy" element={<Dummy />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
