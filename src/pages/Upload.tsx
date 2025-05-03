@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -116,6 +117,9 @@ const ResumeUpload = () => {
 
   return (
     <Layout>
+      <Helmet>
+        <title>Upload Resume | EzeApply</title>
+      </Helmet>
       <div className="container max-w-4xl mx-auto py-20 px-4">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold mb-2">Upload Your Resume</h1>
