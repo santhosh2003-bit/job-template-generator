@@ -15,6 +15,8 @@ import Jobs from "./pages/Jobs";
 import Premium from "./pages/Premium";
 import NotFound from "./pages/NotFound";
 import CoverLetterPage from "./pages/CoverLetterPage";
+import Resources from "./pages/Resources";
+import Company from "./pages/Company";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +41,8 @@ const AppRoutes = () => {
       <Route path="/jobs" element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
       <Route path="/cover-letter" element={<ProtectedRoute><CoverLetterPage /></ProtectedRoute>} />
       <Route path="/premium" element={<Premium />} />
+      <Route path="/resources" element={<Resources />} />
+      <Route path="/company" element={<Company />} />
       <Route path="/dummy" element={<Dummy />} />
       <Route path="*" element={<NotFound />} />
     </Routes>

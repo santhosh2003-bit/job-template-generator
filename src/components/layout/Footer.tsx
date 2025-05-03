@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -11,25 +12,25 @@ const Footer = () => {
         { name: "Features", path: "#" },
         { name: "Templates", path: "/templates" },
         { name: "Job Matching", path: "/jobs" },
-        { name: "Premium", path: "#" },
+        { name: "Premium", path: "/premium" },
       ],
     },
     {
       title: "Resources",
       links: [
-        { name: "Blog", path: "#" },
-        { name: "Resume Tips", path: "#" },
-        { name: "Job Search Guide", path: "#" },
-        { name: "Help Center", path: "#" },
+        { name: "Blog", path: "/resources#blog" },
+        { name: "Resume Tips", path: "/resources#resume-tips" },
+        { name: "Job Search Guide", path: "/resources#job-search" },
+        { name: "Help Center", path: "/resources#help-center" },
       ],
     },
     {
       title: "Company",
       links: [
-        { name: "About Us", path: "#" },
-        { name: "Careers", path: "#" },
-        { name: "Contact", path: "#" },
-        { name: "Privacy Policy", path: "#" },
+        { name: "About Us", path: "/company#about" },
+        { name: "Careers", path: "/company#careers" },
+        { name: "Contact", path: "/company#contact" },
+        { name: "Privacy Policy", path: "/company#privacy" },
       ],
     },
   ];
