@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
 import { ResumeProvider } from "./context/ResumeContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -75,13 +76,15 @@ const App = () => (
     <ThemeProvider>
       <TooltipProvider>
         <BrowserRouter>
-          <AuthProvider>
-            <ResumeProvider>
-              <Toaster />
-              <Sonner />
-              <AppRoutes />
-            </ResumeProvider>
-          </AuthProvider>
+          <HelmetProvider>
+            <AuthProvider>
+              <ResumeProvider>
+                <Toaster />
+                <Sonner />
+                <AppRoutes />
+              </ResumeProvider>
+            </AuthProvider>
+          </HelmetProvider>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
