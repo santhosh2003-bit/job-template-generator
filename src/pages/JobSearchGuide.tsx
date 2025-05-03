@@ -1,6 +1,7 @@
+
 import { Helmet } from "react-helmet";
 import Layout from "@/components/layout/Layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Briefcase } from "lucide-react";
 
 const JobSearchGuide = () => {
