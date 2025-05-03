@@ -1,6 +1,6 @@
 
 import { useNavigate } from "react-router-dom";
-import { Lock } from "lucide-react";
+import { Lock, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PremiumFeatureOverlayProps {
@@ -23,7 +23,11 @@ const PremiumFeatureOverlay = ({
         <div className="h-12 w-12 rounded-full bg-purple-500/20 flex items-center justify-center mb-4">
           <Lock className="h-6 w-6 text-purple-500" />
         </div>
-        <p className="text-center mb-4 font-medium text-lg">{message}</p>
+        <div className="flex items-center mb-2 text-purple-500">
+          <Star className="h-4 w-4 mr-1" fill="currentColor" />
+          <span className="font-medium">Premium Feature</span>
+        </div>
+        <p className="text-center mb-4 font-medium text-lg max-w-xs">{message}</p>
         <Button 
           className="bg-purple-500 hover:bg-purple-600"
           onClick={() => navigate("/premium")}

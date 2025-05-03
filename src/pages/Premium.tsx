@@ -1,59 +1,46 @@
-
-import { motion } from "framer-motion";
 import { useState } from "react";
-import { Check, X, Star } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import Layout from "@/components/layout/Layout";
+import { motion } from "framer-motion";
+import { CheckCircle, ShieldCheck, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/context/AuthContext";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Layout from "@/components/layout/Layout";
+import { Link } from "react-router-dom";
 
 const Premium = () => {
-  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "yearly">("monthly");
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  
-  const handlePurchase = (planType: string) => {
-    if (!isAuthenticated) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to purchase a premium plan",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // This would connect to a payment processor in a real implementation
-    toast({
-      title: "Feature coming soon",
-      description: `Premium ${planType} plan purchase will be available soon!`,
-    });
+  const [isMonthly, setIsMonthly] = useState(true);
+
+  const toggleBillingCycle = () => {
+    setIsMonthly(!isMonthly);
   };
 
-  const planFeatures = {
-    free: [
-      { name: "Basic resume templates", included: true },
-      { name: "Resume parsing", included: true },
-      { name: "Job matching", included: true },
-      { name: "Up to 3 resume versions", included: true },
-      { name: "Basic resume analytics", included: false },
-      { name: "AI-enhanced resume optimization", included: false },
-      { name: "Priority job matching", included: false },
-      { name: "Unlimited resume versions", included: false },
-    ],
-    premium: [
-      { name: "Basic resume templates", included: true },
-      { name: "Resume parsing", included: true },
-      { name: "Job matching", included: true },
-      { name: "Up to 3 resume versions", included: true },
-      { name: "Basic resume analytics", included: true },
-      { name: "AI-enhanced resume optimization", included: true },
-      { name: "Priority job matching", included: true },
-      { name: "Unlimited resume versions", included: true },
-    ]
-  };
+  const features = [
+    {
+      name: "Advanced Resume Templates",
+      description: "Access to exclusive premium resume templates.",
+    },
+    {
+      name: "Advanced Job Search",
+      description: "Filter jobs by salary, experience level, and date posted.",
+    },
+    {
+      name: "AI Cover Letter Generator",
+      description: "Create tailored cover letters instantly for any job application.",
+      new: true,
+    },
+    {
+      name: "Resume Analytics",
+      description: "Track views and downloads of your resume.",
+      coming: true,
+    },
+    {
+      name: "Priority Support",
+      description: "Get priority customer support and feedback.",
+    },
+    {
+      name: "Ad-free Experience",
+      description: "Enjoy using our platform without any advertisements.",
+    },
+  ];
 
   return (
     <Layout>
@@ -61,140 +48,88 @@ const Premium = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="container max-w-6xl py-16 md:py-24"
+        className="container mx-auto mt-20 md:mt-20 px-4 md:px-0"
       >
-        <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">Upgrade Your Career Journey</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Get access to premium features that will help you stand out in the job market and 
-            land your dream job faster.
+        <div className="text-center mb-10">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">
+            Unlock Premium Features
+          </h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Upgrade to premium and take advantage of all the features to help
+            you land your dream job.
           </p>
         </div>
 
-        <div className="flex justify-center mb-10">
-          <div className="bg-muted p-1 rounded-full">
-            <Button
-              variant={selectedPlan === "monthly" ? "default" : "ghost"}
-              className={selectedPlan === "monthly" ? "bg-purple-500 hover:bg-purple-600" : ""}
-              onClick={() => setSelectedPlan("monthly")}
-            >
-              Monthly
-            </Button>
-            <Button
-              variant={selectedPlan === "yearly" ? "default" : "ghost"}
-              className={selectedPlan === "yearly" ? "bg-purple-500 hover:bg-purple-600" : ""}
-              onClick={() => setSelectedPlan("yearly")}
-            >
-              Yearly
-              <span className="ml-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
-                20% off
-              </span>
-            </Button>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Free Plan */}
-          <Card className="relative border-2 overflow-hidden">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span className="text-2xl">Free Plan</span>
-                <span className="text-xl font-normal">$0</span>
+        <div className="flex flex-col md:flex-row justify-center gap-6 mb-12">
+          <Card className="w-full md:w-96">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl font-semibold">
+                {isMonthly ? "Monthly" : "Yearly"}
               </CardTitle>
+              <CardDescription className="text-muted-foreground">
+                Our most popular plan
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <ul className="space-y-2">
-                {planFeatures.free.map((feature, index) => (
-                  <li key={index} className="flex items-center">
-                    {feature.included ? (
-                      <Check className="h-5 w-5 mr-2 text-green-500" />
-                    ) : (
-                      <X className="h-5 w-5 mr-2 text-muted-foreground" />
-                    )}
-                    <span className={feature.included ? "" : "text-muted-foreground"}>
-                      {feature.name}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+            <CardContent className="text-center">
+              <div className="text-5xl font-bold">
+                ${isMonthly ? "19" : "199"}
+              </div>
+              <p className="text-muted-foreground">
+                {isMonthly ? "per month" : "per year"}
+              </p>
             </CardContent>
-            <CardFooter>
-              <Button
-                className="w-full"
-                variant="outline"
-                onClick={() => navigate("/upload")}
-              >
+            <div className="p-6">
+              <Button className="w-full bg-purple-500 hover:bg-purple-600">
                 Get Started
               </Button>
-            </CardFooter>
-          </Card>
-
-          {/* Premium Plan */}
-          <Card className="relative border-2 border-purple-500 overflow-hidden">
-            <div className="absolute top-0 right-0 bg-purple-500 text-white px-3 py-1 rounded-bl-lg flex items-center">
-              <Star className="h-4 w-4 mr-1" /> Premium
             </div>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span className="text-2xl">Premium</span>
-                <span className="text-xl">
-                  ${selectedPlan === "monthly" ? "9.99" : "95.90"}
-                  <span className="text-sm text-muted-foreground">
-                    /{selectedPlan === "monthly" ? "mo" : "yr"}
-                  </span>
-                </span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <ul className="space-y-2">
-                {planFeatures.premium.map((feature, index) => (
-                  <li key={index} className="flex items-center">
-                    <Check className="h-5 w-5 mr-2 text-green-500" />
-                    <span>{feature.name}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button 
-                className="w-full bg-purple-500 hover:bg-purple-600" 
-                onClick={() => handlePurchase(selectedPlan)}
-              >
-                Upgrade Now
-              </Button>
-            </CardFooter>
           </Card>
         </div>
 
-        <div className="mt-16 bg-muted/50 p-8 rounded-xl">
-          <h2 className="text-2xl font-bold mb-4">What our Premium users are saying</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                quote: "I landed my dream job within 2 weeks of using the premium features!",
-                author: "Sarah K.",
-                position: "Software Engineer"
-              },
-              {
-                quote: "The AI resume optimization made a huge difference in my callback rate.",
-                author: "Michael T.",
-                position: "Marketing Manager"
-              },
-              {
-                quote: "Worth every penny. The premium template designs are gorgeous.",
-                author: "Jessica L.",
-                position: "UX Designer"
-              }
-            ].map((testimonial, index) => (
-              <div key={index} className="bg-background p-6 rounded-lg shadow-sm">
-                <p className="mb-4 italic">"{testimonial.quote}"</p>
-                <div>
-                  <p className="font-medium">{testimonial.author}</p>
-                  <p className="text-sm text-muted-foreground">{testimonial.position}</p>
-                </div>
-              </div>
+        <div className="flex justify-center mb-8">
+          <Button
+            variant="outline"
+            className="bg-transparent hover:bg-secondary"
+            onClick={toggleBillingCycle}
+          >
+            Switch to {isMonthly ? "Yearly" : "Monthly"} Billing
+          </Button>
+        </div>
+
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold mb-4">Premium Features</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((feature, index) => (
+              <Card key={index}>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
+                    {feature.name}
+                    {feature.new && (
+                      <div className="ml-2 rounded-full bg-green-500 text-white text-xs px-2 py-0.5">
+                        New
+                      </div>
+                    )}
+                    {feature.coming && (
+                      <div className="ml-2 rounded-full bg-blue-500 text-white text-xs px-2 py-0.5">
+                        Coming Soon
+                      </div>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>{feature.description}</CardDescription>
+                </CardContent>
+              </Card>
             ))}
           </div>
+        </div>
+
+        <div className="text-center">
+          <p className="text-muted-foreground">
+            Secure payments powered by Stripe.
+          </p>
+          <ShieldCheck className="mx-auto h-6 w-6 text-purple-500 mt-2" />
         </div>
       </motion.div>
     </Layout>

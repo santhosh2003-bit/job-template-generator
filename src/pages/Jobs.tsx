@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,7 @@ import { useResume } from "@/context/ResumeContext";
 import { analyzeResume } from "@/lib/api";
 import PremiumFeatureOverlay from "@/components/premium/PremiumFeatureOverlay";
 import PremiumBadge from "@/components/premium/PremiumBadge";
+import CoverLetterGenerator from "@/components/premium/CoverLetterGenerator";
 
 interface Job {
   id?: string;
@@ -60,6 +62,10 @@ interface Job {
     }[];
   };
 }
+
+// For demonstration purposes, let's assume this user is premium
+// In a real application, this would come from an auth context or API
+const userIsPremium = true;
 
 const Jobs = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -347,18 +353,26 @@ const Jobs = () => {
                   </p>
                 </CardContent>
                 <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-3 border-t p-4 md:p-6">
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => handlePreview(job)}
+                      className="w-full sm:w-auto"
+                    >
+                      Preview Resume
+                    </Button>
+                    <CoverLetterGenerator 
+                      jobTitle={job.job_title}
+                      companyName={job.company}
+                      jobDescription={job.job_description}
+                      isPremium={userIsPremium}
+                    />
+                  </div>
                   {job.salary && (
                     <p className="text-xs md:text-sm font-medium">
                       {job.salary}
                     </p>
                   )}
-                  <Button
-                    variant="outline"
-                    onClick={() => handlePreview(job)}
-                    className="w-full sm:w-auto"
-                  >
-                    Preview Resume
-                  </Button>
                 </CardFooter>
               </Card>
             ))
