@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -136,12 +137,14 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       // Modify cloned DOM to replace borderBottom with div and adjust spacing
       const h3Elements = clonedPageDiv.querySelectorAll("h3");
       h3Elements.forEach((h3) => {
+        // Fix TypeScript error: cast the element to HTMLElement
+        const h3Element = h3 as HTMLElement;
         // Remove borderBottom and related styles
-        h3.style.borderBottom = "none";
-        h3.style.paddingBottom = "0";
-        h3.style.marginBottom = "6px"; // Increased margin to position line
-        h3.style.position = "static"; // Remove relative positioning
-        h3.style.zIndex = "auto";
+        h3Element.style.borderBottom = "none";
+        h3Element.style.paddingBottom = "0";
+        h3Element.style.marginBottom = "6px"; // Increased margin to position line
+        h3Element.style.position = "static"; // Remove relative positioning
+        h3Element.style.zIndex = "auto";
 
         // Insert a div for the line after h3
         const lineDiv = document.createElement("div");
@@ -155,28 +158,36 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
       // Reduce other margins to compensate for increased spacing
       const sections = clonedPageDiv.querySelectorAll("section");
       sections.forEach((section) => {
-        section.style.marginBottom = "2px"; // Reduced from 5px
+        // Fix TypeScript error: cast the element to HTMLElement
+        const sectionElement = section as HTMLElement;
+        sectionElement.style.marginBottom = "2px"; // Reduced from 5px
       });
 
       const experienceItems = clonedPageDiv.querySelectorAll(
         "div[style*='margin-bottom: 4px']"
       );
       experienceItems.forEach((item) => {
-        item.style.marginBottom = "2px"; // Reduced from 4px
+        // Fix TypeScript error: cast the element to HTMLElement
+        const itemElement = item as HTMLElement;
+        itemElement.style.marginBottom = "2px"; // Reduced from 4px
       });
 
       const subElements = clonedPageDiv.querySelectorAll(
         "div[style*='margin-bottom: 2px']"
       );
       subElements.forEach((item) => {
-        item.style.marginBottom = "1px"; // Reduced from 2px
+        // Fix TypeScript error: cast the element to HTMLElement
+        const itemElement = item as HTMLElement;
+        itemElement.style.marginBottom = "1px"; // Reduced from 2px
       });
 
       const bulletPoints = clonedPageDiv.querySelectorAll(
         "li[style*='margin-bottom: 1px']"
       );
       bulletPoints.forEach((li) => {
-        li.style.marginBottom = "0.5px"; // Reduced from 1px
+        // Fix TypeScript error: cast the element to HTMLElement
+        const liElement = li as HTMLElement;
+        liElement.style.marginBottom = "0.5px"; // Reduced from 1px
       });
 
       // Force quadruple repaints
@@ -196,7 +207,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
         scrollX: 0,
         scrollY: 0,
         logging: false,
-        willReadFrequently: true,
+        // Remove the 'willReadFrequently' property as it's not in the Options type
       });
 
       const imgData = canvas.toDataURL("image/png", 1.0);
