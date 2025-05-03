@@ -5,7 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
 import { useResume } from "@/context/ResumeContext";
-import { Check } from "lucide-react";
+import { Check, Lock } from "lucide-react";
+import PremiumBadge from "@/components/premium/PremiumBadge";
+import PremiumFeatureOverlay from "@/components/premium/PremiumFeatureOverlay";
 
 const Templates = () => {
   const { selectedTemplate, setSelectedTemplate: setGlobalTemplate, checkResumeStatus } = useResume();
@@ -23,23 +25,44 @@ const Templates = () => {
       name: "Professional",
       description: "Clean and professional design for corporate positions",
       image: "/templates/template1.png",
+      premium: false
     },
     {
       id: "template2",
       name: "Creative",
       description: "Modern design with accent colors for creative positions",
       image: "/templates/template1.png", // Use same image for now
+      premium: false
     },
     {
       id: "template3",
       name: "Academic",
       description: "Formal design for academic and research positions",
       image: "/templates/template1.png", // Use same image for now
+      premium: false
+    },
+    {
+      id: "template4",
+      name: "Executive",
+      description: "Premium template for senior executive positions",
+      image: "/templates/template1.png", // Use same image for now
+      premium: true
+    },
+    {
+      id: "template5",
+      name: "Tech Specialist",
+      description: "Showcase technical skills with this premium template",
+      image: "/templates/template1.png", // Use same image for now
+      premium: true
     },
   ];
 
   const handleTemplateSelect = (templateId: string) => {
-    setLocalSelectedTemplate(templateId);
+    // Only allow selection of non-premium templates
+    const template = templates.find(t => t.id === templateId);
+    if (template && !template.premium) {
+      setLocalSelectedTemplate(templateId);
+    }
   };
 
   const handleContinue = () => {
@@ -47,6 +70,10 @@ const Templates = () => {
       setGlobalTemplate(localSelectedTemplate);
       navigate("/jobs");
     }
+  };
+
+  const handlePremiumClick = () => {
+    navigate("/premium");
   };
 
   return (
@@ -71,31 +98,48 @@ const Templates = () => {
           {templates.map((template) => (
             <div
               key={template.id}
-              onClick={() => handleTemplateSelect(template.id)}
-              className={`border rounded-lg p-1 sm:p-4 h-fit transition-all cursor-pointer ${
-                localSelectedTemplate === template.id
-                  ? "ring-2 ring-primary"
-                  : "hover:border-primary/50"
+              onClick={() => !template.premium && handleTemplateSelect(template.id)}
+              className={`border rounded-lg p-1 sm:p-4 h-fit transition-all ${
+                template.premium 
+                  ? "cursor-default" 
+                  : "cursor-pointer " + (localSelectedTemplate === template.id
+                      ? "ring-2 ring-primary"
+                      : "hover:border-primary/50")
               }`}
             >
               <div className="relative aspect-[5/5] bg-accent/20">
-                <img
-                  src="/templates/template1.png"
-                  alt={template.name}
-                  className="h-auto max-h-[300px] sm:max-h-[400px] w-full object-contain"
-                />
-                {localSelectedTemplate === template.id && (
-                  <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
-                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-primary flex items-center justify-center">
-                      <Check className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-                    </div>
-                  </div>
+                {template.premium ? (
+                  <PremiumFeatureOverlay message="Unlock premium templates">
+                    <img
+                      src="/templates/template1.png"
+                      alt={template.name}
+                      className="h-auto max-h-[300px] sm:max-h-[400px] w-full object-contain"
+                    />
+                  </PremiumFeatureOverlay>
+                ) : (
+                  <>
+                    <img
+                      src="/templates/template1.png"
+                      alt={template.name}
+                      className="h-auto max-h-[300px] sm:max-h-[400px] w-full object-contain"
+                    />
+                    {localSelectedTemplate === template.id && (
+                      <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
+                        <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-primary flex items-center justify-center">
+                          <Check className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
               <div className="mt-2 sm:mt-3">
-                <h3 className="font-semibold text-sm sm:text-base mb-1">
-                  {template.name}
-                </h3>
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="font-semibold text-sm sm:text-base">
+                    {template.name}
+                  </h3>
+                  {template.premium && <PremiumBadge tooltipText="Premium template" />}
+                </div>
                 <p className="text-xs sm:text-sm text-muted-foreground">
                   {template.description}
                 </p>
@@ -104,7 +148,7 @@ const Templates = () => {
           ))}
         </div>
 
-        <div className="text-center">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Button
             size="lg"
             onClick={handleContinue}
@@ -112,6 +156,14 @@ const Templates = () => {
             className="w-full sm:w-auto bg-purple-500 hover:bg-purple-600"
           >
             Continue to Jobs
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={handlePremiumClick}
+            className="w-full sm:w-auto"
+          >
+            Unlock Premium Templates
           </Button>
         </div>
       </motion.div>

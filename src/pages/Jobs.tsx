@@ -27,10 +27,13 @@ import {
   BarChart3,
   Search,
   Loader2,
+  Star,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useResume } from "@/context/ResumeContext";
 import { analyzeResume } from "@/lib/api";
+import PremiumFeatureOverlay from "@/components/premium/PremiumFeatureOverlay";
+import PremiumBadge from "@/components/premium/PremiumBadge";
 
 interface Job {
   id?: string;
@@ -170,6 +173,7 @@ const Jobs = () => {
 
         <div className="glass-card p-4 md:p-6 rounded-xl mb-6 md:mb-8">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {/* Search input */}
             <div>
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -181,6 +185,8 @@ const Jobs = () => {
                 />
               </div>
             </div>
+            
+            {/* Location input */}
             <div>
               <div className="relative">
                 <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -192,6 +198,8 @@ const Jobs = () => {
                 />
               </div>
             </div>
+            
+            {/* Job type select */}
             <div>
               <Select value={jobType} onValueChange={setJobType}>
                 <SelectTrigger>
@@ -206,6 +214,8 @@ const Jobs = () => {
                 </SelectContent>
               </Select>
             </div>
+            
+            {/* Search button */}
             <div className="flex items-end">
               <Button
                 className="w-full bg-purple-500 hover:bg-purple-600"
@@ -222,9 +232,52 @@ const Jobs = () => {
               </Button>
             </div>
           </div>
+          
+          {/* Advanced search - Premium feature */}
+          <div className="mt-4">
+            <PremiumFeatureOverlay message="Upgrade to Premium for advanced job search filters">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Select disabled>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Salary Range" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="any">Any Salary</SelectItem>
+                    <SelectItem value="50k">$50k+</SelectItem>
+                    <SelectItem value="75k">$75k+</SelectItem>
+                    <SelectItem value="100k">$100k+</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select disabled>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Experience Level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="entry">Entry Level</SelectItem>
+                    <SelectItem value="mid">Mid Level</SelectItem>
+                    <SelectItem value="senior">Senior Level</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select disabled>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Posted Date" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="any">Any Time</SelectItem>
+                    <SelectItem value="day">Last 24 hours</SelectItem>
+                    <SelectItem value="week">Last 7 days</SelectItem>
+                    <SelectItem value="month">Last 30 days</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </PremiumFeatureOverlay>
+          </div>
         </div>
 
         <div className="space-y-4 mb-10 flex flex-wrap gap-4 px-4">
+          {/* Loading state */}
           {isLoading ? (
             <div className="w-full flex justify-center py-20">
               <div className="flex flex-col items-center">
@@ -264,6 +317,9 @@ const Jobs = () => {
                         <div className="bg-purple-500/10 text-purple-500 rounded-full px-3 py-1 text-sm flex items-center">
                           <BarChart3 className="mr-1 h-4 w-4" />
                           {job.match}% Match
+                          {job.match > 80 && (
+                            <Star className="ml-1 h-3 w-3" fill="currentColor" />
+                          )}
                         </div>
                       </div>
                     )}

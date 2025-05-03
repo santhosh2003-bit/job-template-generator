@@ -12,6 +12,7 @@ import Dummy from "./pages/Dummy";
 import ResumeUpload from "./pages/Upload";
 import Templates from "./pages/Templates";
 import Jobs from "./pages/Jobs";
+import Premium from "./pages/Premium";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const AppRoutes = () => {
       <Route path="/upload" element={<ProtectedRoute><ResumeUpload /></ProtectedRoute>} />
       <Route path="/templates" element={<ProtectedRoute><Templates /></ProtectedRoute>} />
       <Route path="/jobs" element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
+      <Route path="/premium" element={<Premium />} />
       <Route path="/dummy" element={<Dummy />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
